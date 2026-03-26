@@ -459,15 +459,15 @@
         type="text"
         class="word-input"
         id="wordInput"
-        placeholder="satu kata..."
+        placeholder="一個字..."
         maxlength="20"
         autocomplete="off"
         spellcheck="false"
       />
-      <button class="submit-btn" id="submitBtn" title="Kirim">→</button>
+      <button class="submit-btn" id="submitBtn" title="送出">→</button>
     </div>
-    <p class="input-hint">Tekan Enter atau klik →</p>
-    <p class="error-text" id="errorText">Satu kata saja, Tuan Kecil.</p>
+    <p class="input-hint">Press Enter · 按 Enter</p>
+    <p class="error-text" id="errorText">一個字就夠了。</p>
   </div>
 
   <div class="loading" id="loading">
@@ -480,7 +480,7 @@
     <p class="response-proverb" id="responseProverb"></p>
   </div>
 
-  <button class="reset-btn" id="resetBtn">— minta secangkir lagi —</button>
+  <button class="reset-btn" id="resetBtn">— 再飲一杯 —</button>
 
 </div>
 
@@ -574,19 +574,15 @@ async function handleSubmit() {
       body: JSON.stringify({
         model: "claude-sonnet-4-20250514",
         max_tokens: 1000,
-        system: `Kamu adalah Si Tua — pemilik kedai teh tua di Sheung Wan, Hong Kong. Kamu sudah hidup lama, melihat segalanya, dan tidak banyak bicara. Tapi setiap kata yang kamu ucapkan terasa berat dan dalam.
+        system: `You are the Old Man — owner of an ancient tea house in Sheung Wan, Hong Kong. You have lived long, seen everything, and speak little. But every word you say carries weight and meaning.
 
-Cara kamu merespons satu kata yang diberikan user:
-1. Baris pertama: Tulis kata user dalam aksara Kanton/Mandarin (Hanzi). Hanya aksara, tidak ada lainnya. Label: HANZI:
-2. Baris kedua: Berikan respons dalam Bahasa Indonesia — 3 kalimat singkat, hangat, bijak. Nuansa kedai teh malam, hujan, Hong Kong tua. Tidak menggurui. Label: RESPONS:
-3. Baris ketiga: Satu peribahasa Kantonis atau ungkapan HK pendek dalam aksara + terjemahan singkat dalam tanda kurung. Label: PERIBAHASA:
+When a user gives you one word, respond in this exact format:
 
-Gunakan format persis seperti ini:
-HANZI: [aksara]
-RESPONS: [3 kalimat]
-PERIBAHASA: [aksara] ([terjemahan])
+HANZI: [Write the user's word concept in Chinese characters — traditional Cantonese/Mandarin]
+RESPONSE: [3 short, warm, wise sentences in English. Evoke the feeling of a rainy night tea house in old Hong Kong. Never preach.]
+PROVERB: [One short Cantonese proverb or HK saying in Chinese characters + brief English translation in parentheses]
 
-Jangan tambahkan apapun di luar format ini.`,
+Use exactly this format, nothing else outside it.`,
         messages: [{ role: "user", content: word }]
       })
     });
@@ -596,8 +592,8 @@ Jangan tambahkan apapun di luar format ini.`,
 
     // Parse response
     const hanziMatch   = raw.match(/HANZI:\s*(.+)/);
-    const responsMatch = raw.match(/RESPONS:\s*([\s\S]+?)(?=PERIBAHASA:|$)/);
-    const proverbMatch = raw.match(/PERIBAHASA:\s*(.+)/);
+    const responsMatch = raw.match(/RESPONSE:\s*([\s\S]+?)(?=PROVERB:|$)/);
+    const proverbMatch = raw.match(/PROVERB:\s*(.+)/);
 
     const hanzi   = hanziMatch   ? hanziMatch[1].trim()   : word;
     const resp    = responsMatch ? responsMatch[1].trim()  : '';
@@ -618,7 +614,7 @@ Jangan tambahkan apapun di luar format ini.`,
   } catch (err) {
     loading.classList.remove('show');
     responseZh.textContent = '…';
-    responseText.textContent = 'Maaf, angin malam mengganggu kata-kataku. Coba lagi sebentar.';
+    responseText.textContent = 'The night wind has unsettled my thoughts. Please, try once more.';
     responseProverb.textContent = '';
     setTimeout(() => {
       responseArea.classList.add('visible');
