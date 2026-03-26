@@ -1,148 +1,206 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-HK">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>yatjizha – Zodiac & Fortune</title>
+<title>yatjizha 命理館</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 
 <style>
 html { scroll-behavior: smooth; }
+.modal { display:none; }
 </style>
 </head>
 
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-zinc-100 text-zinc-800">
 
-<!-- ================= HEADER ================= -->
+<!-- HEADER -->
 <header class="bg-white shadow sticky top-0 z-50">
-  <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
-    <h1 class="text-xl font-bold text-red-600">🐉 yatjizha</h1>
+  <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between">
+    <h1 class="text-xl font-bold text-red-600">🐉 yatjizha 命理館</h1>
     <nav class="space-x-4 text-sm">
-      <a href="#zodiac">Zodiac</a>
-      <a href="#fortune">Fortune</a>
+      <a href="#about">關於</a>
+      <a href="#fortune">今日運勢</a>
+      <a href="#whitepaper">白皮書</a>
+      <a href="#team">團隊</a>
     </nav>
   </div>
 </header>
 
-<!-- ================= HERO ================= -->
-<section class="bg-gradient-to-br from-red-600 to-red-800 text-white py-20 text-center">
-  <h2 class="text-4xl font-bold mb-4">Discover Your Fate</h2>
-  <p class="opacity-90">Ancient wisdom meets modern curiosity</p>
+<!-- HERO -->
+<section class="bg-gradient-to-br from-red-700 to-red-900 text-white py-20 text-center">
+  <h2 class="text-4xl font-bold mb-4">命由天定，運由人行</h2>
+  <p class="opacity-90 mb-6">香港味 · 江湖術 · 數碼玄學</p>
+
+  <!-- ORYNTH -->
+  <a href="https://orynth.dev/projects/yatzicha" target="_blank">
+    <img src="https://orynth.dev/api/badge/yatzicha?theme=light&style=default" width="260" class="mx-auto rounded"/>
+  </a>
 </section>
 
-<!-- ================= ZODIAC ================= -->
-<section id="zodiac" class="py-16 max-w-5xl mx-auto px-4">
-  <h2 class="text-2xl font-bold mb-6 text-center">🌟 Western Zodiac</h2>
-  
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-    <div class="bg-white p-4 rounded shadow text-center">♈ Aries</div>
-    <div class="bg-white p-4 rounded shadow text-center">♉ Taurus</div>
-    <div class="bg-white p-4 rounded shadow text-center">♊ Gemini</div>
-    <div class="bg-white p-4 rounded shadow text-center">♋ Cancer</div>
-    <div class="bg-white p-4 rounded shadow text-center">♌ Leo</div>
-    <div class="bg-white p-4 rounded shadow text-center">♍ Virgo</div>
-    <div class="bg-white p-4 rounded shadow text-center">♎ Libra</div>
-    <div class="bg-white p-4 rounded shadow text-center">♏ Scorpio</div>
-  </div>
+<!-- ABOUT -->
+<section id="about" class="py-16 max-w-5xl mx-auto px-4">
+  <h2 class="text-3xl font-bold mb-6">關於我哋</h2>
+
+  <p class="mb-4 text-gray-600">
+    命理唔係迷信，係一種觀察世界嘅方法。
+  </p>
+
+  <p class="mb-4 text-gray-600">
+    yatjizha 將香港傳統術數、生肖、星座，同現代科技結合，
+    打造一個屬於新時代嘅命運系統。
+  </p>
+
+  <p class="text-gray-600">
+    有啲嘢，唔講你唔信；講咗，你又開始留意。
+  </p>
 </section>
 
-<!-- ================= DAILY FORTUNE ================= -->
+<!-- FORTUNE -->
 <section id="fortune" class="py-16 bg-black text-white">
   <div class="max-w-xl mx-auto text-center px-4">
 
-    <h2 class="text-3xl font-bold mb-4">🔮 Daily Fortune</h2>
-    <p class="text-gray-400 mb-8">Ancient whispers. Your fate today.</p>
+    <h2 class="text-3xl font-bold mb-4">🔮 今日運勢</h2>
+    <p class="text-gray-400 mb-8">有啲嘢，今日先會發生</p>
 
     <input type="date" id="date" class="mb-4 px-4 py-2 text-black rounded">
 
     <select id="mode" class="mb-4 px-4 py-2 text-black rounded">
-      <option value="oldman">Old Man HK</option>
-      <option value="ghost">Ghost</option>
-      <option value="monk">Monk</option>
+      <option value="oldman">老伯</option>
+      <option value="ghost">靈體</option>
+      <option value="monk">和尚</option>
     </select>
 
     <br>
 
     <button onclick="generate()" 
       class="px-6 py-3 bg-red-600 rounded hover:bg-red-700">
-      Reveal My Fate
+      開運
     </button>
 
     <div id="result" class="mt-6 text-lg hidden"></div>
 
-    <button id="shareBtn"
-      class="mt-4 px-4 py-2 border hidden">
-      Share to X
+    <button id="shareBtn" class="mt-4 px-4 py-2 border hidden">
+      分享去 X
     </button>
 
   </div>
 </section>
 
-<!-- ================= SCRIPT ================= -->
+<!-- WHITEPAPER -->
+<section id="whitepaper" class="py-16 bg-zinc-900 text-white text-center">
+  <h2 class="text-3xl font-bold mb-4">白皮書</h2>
+  <p class="text-gray-400 mb-6">唔係教你信，而係教你睇</p>
+
+  <button onclick="openWP()" class="px-6 py-3 bg-red-600 rounded">
+    查看內容
+  </button>
+</section>
+
+<!-- MODAL -->
+<div id="wpModal" class="fixed inset-0 bg-black/70 flex items-center justify-center modal">
+  <div class="bg-white text-black p-6 rounded max-w-lg">
+    <h3 class="text-xl font-bold mb-4">yatjizha 方法論</h3>
+
+    <p class="mb-2">1. 傳統術數資料整理（香港 / 中華文化）</p>
+    <p class="mb-2">2. 多來源交叉驗證</p>
+    <p class="mb-2">3. 現代語境重新解讀</p>
+
+    <p class="mt-4 text-sm text-gray-600">
+      命運唔係固定，而係一種趨勢。
+    </p>
+
+    <button onclick="closeWP()" class="mt-4 px-4 py-2 bg-black text-white rounded">
+      關閉
+    </button>
+  </div>
+</div>
+
+<!-- TEAM -->
+<section id="team" class="py-16 text-center">
+  <h2 class="text-3xl font-bold mb-8">團隊</h2>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+
+    <div>
+      <div class="w-20 h-20 mx-auto bg-red-500 rounded-full mb-2"></div>
+      <p class="font-semibold">YanZingBit</p>
+      <a href="https://x.com/YanZingBit" target="_blank" class="text-sm text-red-600">@YanZingBit</a>
+    </div>
+
+    <div>
+      <div class="w-20 h-20 mx-auto bg-gray-400 rounded-full mb-2"></div>
+      <p>Li Chen</p>
+    </div>
+
+    <div>
+      <div class="w-20 h-20 mx-auto bg-gray-400 rounded-full mb-2"></div>
+      <p>Mei Wong</p>
+    </div>
+
+    <div>
+      <div class="w-20 h-20 mx-auto bg-gray-400 rounded-full mb-2"></div>
+      <p>Zhang Lin</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- SCRIPT -->
 <script>
-const data = {
-  oldman: [
-    "Heaven does not speak. But you feel it when luck turns.",
-    "If you chase luck, it hides.",
-    "Gold comes to the patient.",
-    "Someone remembers your name tonight."
-  ],
-  ghost: [
-    "Your luck is borrowed.",
-    "A forgotten choice returns.",
-    "Not all smiles are alive.",
-    "The shadow behind you moves."
-  ],
-  monk: [
-    "Silence answers everything.",
-    "Desire creates suffering.",
-    "Walk slower.",
-    "You are distracted, not lost."
-  ]
+const data={
+oldman:[
+"有啲運氣，唔係你追到，而係佢搵你。",
+"今日有人會提起你個名。",
+"錢唔會走，但會轉方向。",
+"你以為結束，其實係開始。"
+],
+ghost:[
+"你行緊條路，唔係第一次行。",
+"有個決定，今日會返嚟。",
+"唔係所有笑容都真。",
+"影子後面，仲有影子。"
+],
+monk:[
+"靜，先聽到答案。",
+"放低一樣嘢，先得到另一樣。",
+"你唔係迷路，只係心亂。",
+"慢一步，會睇多啲。"
+]
 };
 
-function seed(str){
-  let h=0;
-  for(let i=0;i<str.length;i++){
-    h=str.charCodeAt(i)+((h<<5)-h);
-  }
-  return Math.abs(h);
+function seed(s){
+let h=0;for(let i=0;i<s.length;i++){h=s.charCodeAt(i)+((h<<5)-h);}return Math.abs(h);
 }
 
 function generate(){
-  let date=document.getElementById("date").value;
-  let mode=document.getElementById("mode").value;
+let d=document.getElementById("date").value;
+let m=document.getElementById("mode").value;
+if(!d)d=new Date().toISOString().split("T")[0];
 
-  if(!date){
-    date=new Date().toISOString().split("T")[0];
-  }
+let s=seed(d+m);
+let text=data[m][s%data[m].length];
 
-  let s=seed(date+mode);
-  let list=data[mode];
-  let text=list[s%list.length];
+let r=document.getElementById("result");
+r.innerText="";
+r.classList.remove("hidden");
 
-  let res=document.getElementById("result");
-  res.innerText="";
-  res.classList.remove("hidden");
-
-  let i=0;
-  function type(){
-    if(i<text.length){
-      res.innerText+=text[i];
-      i++;
-      setTimeout(type,25);
-    }
-  }
-  type();
-
-  let share=document.getElementById("shareBtn");
-  share.classList.remove("hidden");
-  share.onclick=()=>{
-    let url="https://twitter.com/intent/tweet?text="+encodeURIComponent("🔮 "+text+" #yatjizha");
-    window.open(url);
-  };
+let i=0;
+function t(){
+if(i<text.length){r.innerText+=text[i];i++;setTimeout(t,25);}
 }
+t();
+
+let share=document.getElementById("shareBtn");
+share.classList.remove("hidden");
+share.onclick=()=>{
+window.open("https://twitter.com/intent/tweet?text="+encodeURIComponent("🔮 "+text+" #yatjizha"));
+};
+}
+
+function openWP(){document.getElementById("wpModal").style.display="flex";}
+function closeWP(){document.getElementById("wpModal").style.display="none";}
 </script>
 
 </body>
