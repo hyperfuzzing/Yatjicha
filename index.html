@@ -9,12 +9,11 @@
 
 <style>
 body { background:#0b0b0b; color:#e5e5e5; }
-.fade-in { animation: fadeIn .6s ease; }
+.fade-in { animation: fadeIn .8s ease; }
 @keyframes fadeIn {
-  from {opacity:0; transform:translateY(20px)}
-  to {opacity:1; transform:translateY(0)}
+from {opacity:0; transform:translateY(20px)}
+to {opacity:1; transform:translateY(0)}
 }
-.card:hover { transform: translateY(-5px); transition:.3s;}
 .section { border-top:1px solid rgba(255,255,255,0.08); }
 </style>
 </head>
@@ -24,13 +23,13 @@ body { background:#0b0b0b; color:#e5e5e5; }
 <!-- HEADER -->
 <header class="sticky top-0 backdrop-blur border-b border-white/10">
 <div class="max-w-6xl mx-auto flex justify-between p-4 text-sm text-gray-400">
-  <div>yatjizha 命理館</div>
-  <nav class="space-x-4">
-    <a href="#about">關於</a>
-    <a href="#how">使用方式</a>
-    <a href="#whitepaper">白皮書</a>
-    <a href="#team">團隊</a>
-  </nav>
+<div>yatjizha 命理館</div>
+<nav class="space-x-4">
+<a href="#about">關於</a>
+<a href="#how">使用方式</a>
+<a href="#whitepaper">白皮書</a>
+<a href="#team">團隊</a>
+</nav>
 </div>
 </header>
 
@@ -40,7 +39,7 @@ body { background:#0b0b0b; color:#e5e5e5; }
 <p class="text-gray-500 mt-2">以命盤作為一種自我定位方式</p>
 </section>
 
-<!-- RITUAL -->
+<!-- INPUT -->
 <section class="text-center py-16">
 <input type="date" id="birth-date" class="text-black p-2 rounded">
 
@@ -54,88 +53,56 @@ body { background:#0b0b0b; color:#e5e5e5; }
 
 <div id="result-box" class="hidden mt-10 fade-in max-w-xl mx-auto">
 <h3 class="text-xl mb-3">你的能量結構</h3>
-<p id="reading"></p>
+<pre id="reading" class="text-left whitespace-pre-wrap"></pre>
 
-<div class="mt-6">
-<button onclick="saveProfile()" class="border px-4 py-2 mr-2">保存</button>
-<button onclick="shareCard()" class="border px-4 py-2">分享</button>
+<div class="mt-6 space-x-2">
+<button onclick="saveProfile()" class="border px-4 py-2">保存</button>
+<button onclick="generateCard()" class="border px-4 py-2">生成卡片</button>
+<button onclick="downloadCard()" class="border px-4 py-2">下載</button>
 </div>
 </div>
 </section>
 
-<!-- SHARE -->
-<div id="share-card" class="hidden text-center mt-10 p-6 border border-white/10 max-w-sm mx-auto">
-<h3 class="text-lg mb-2">Energy Profile</h3>
-<p id="card-text" class="text-gray-400"></p>
+<!-- CANVAS -->
+<div class="flex justify-center mt-10">
+<canvas id="cardCanvas" width="400" height="600" class="hidden border border-white/10"></canvas>
 </div>
 
 <!-- ABOUT -->
 <section id="about" class="section py-20 text-center max-w-3xl mx-auto">
 <h2 class="text-2xl mb-4">關於</h2>
-<p class="text-gray-500 leading-relaxed">
-yatjizha 並唔只係一個命理工具，而係一個以策展方式構建嘅數碼系統。
-我哋將東西方命理結構轉化為一種可以被體驗嘅語言，
-讓每個人可以透過命盤理解自己所處嘅位置。
+<p class="text-gray-500">
+yatjizha 並唔只係一個命理工具，而係一種數碼身份結構。
 </p>
 </section>
 
-<!-- HOW TO -->
-<section id="how" class="section py-20 text-center max-w-3xl mx-auto">
+<!-- HOW -->
+<section id="how" class="section py-20 text-center">
 <h2 class="text-2xl mb-6">使用方式</h2>
-
-<div class="space-y-4 text-gray-500">
-<p>1. 輸入你嘅出生日期</p>
-<p>2. 系統將解析你嘅能量結構</p>
-<p>3. 生成個人命盤敘事</p>
-<p>4. 保存或分享你嘅身份卡片</p>
-</div>
+<p class="text-gray-500">輸入日期 → 解讀 → 生成身份卡</p>
 </section>
 
 <!-- WHITEPAPER -->
 <section id="whitepaper" class="section py-20 text-center max-w-3xl mx-auto">
 <h2 class="text-2xl mb-4">白皮書</h2>
-<p class="text-gray-500 leading-relaxed">
-本系統基於雙重命理結構（西方星座與東方生肖），
-透過演算法將時間轉換為象徵性語言。
-未來將擴展為可持續身份系統，
-包括 AI 解讀、個人檔案與跨平台連結。
+<p class="text-gray-500">
+系統基於時間轉換為象徵語言，構建可持續身份。
 </p>
 </section>
 
 <!-- TEAM -->
-<section id="team" class="section py-20 text-center max-w-5xl mx-auto">
+<section id="team" class="section py-20 text-center">
 <h2 class="text-2xl mb-6">團隊</h2>
-
-<div class="grid md:grid-cols-3 gap-6">
-
-<div class="card border border-white/10 p-5 rounded">
-<h3>Yan Zing</h3>
-<p class="text-gray-500 text-sm">Founder</p>
-<a href="https://x.com/YanZingBit" target="_blank" class="text-blue-400 text-sm">X Profile</a>
-</div>
-
-<div class="card border border-white/10 p-5 rounded">
-<h3>Li Chen</h3>
-<p class="text-gray-500 text-sm">System Architect</p>
-</div>
-
-<div class="card border border-white/10 p-5 rounded">
-<h3>Wong Kai</h3>
-<p class="text-gray-500 text-sm">Design Curator</p>
-</div>
-
-</div>
+<p class="text-gray-500">Yan Zing · Li Chen · Wong Kai</p>
 </section>
 
-<!-- BADGE -->
+<!-- FOOTER -->
 <footer class="text-center py-10 text-gray-600">
-<a href="https://orynth.dev/projects/yatzicha" target="_blank">
-<img src="https://orynth.dev/api/badge/yatzicha?theme=light&style=default" width="140" class="mx-auto opacity-60">
-</a>
+<img src="https://orynth.dev/api/badge/yatzicha?theme=light&style=default" width="120" class="mx-auto opacity-50">
 </footer>
 
 <script>
-// ZODIAC
+// ===== ZODIAC =====
 function getZodiac(m,d){
 if((m==3&&d>=21)||(m==4&&d<=19)) return "白羊座";
 if((m==4&&d>=20)||(m==5&&d<=20)) return "金牛座";
@@ -151,48 +118,98 @@ if((m==1&&d>=20)||(m==2&&d<=18)) return "水瓶座";
 return "雙魚座";
 }
 
-// AI READING
+// ===== MAIN AI =====
 function generateReading(){
 const val=document.getElementById("birth-date").value;
 if(!val) return;
 
 const d=new Date(val);
+const y=d.getFullYear();
 const m=d.getMonth()+1;
 const day=d.getDate();
 
 const zodiac=getZodiac(m,day);
-const seed=m*day;
+const seed=y+m*31+day*17;
 
-const types=["流動型","穩定型","分裂型","轉換型"];
-const traits=["直覺強","理性高","情緒敏感","結構清晰"];
+const types=["流動型","結構型","分裂型","轉換型","潛伏型"];
+const traits=["直覺強但壓抑","理性依賴","情緒敏感","外冷內熱","尋找定位"];
+const conflicts=["理性 vs 直覺","穩定 vs 變化","表達 vs 壓抑","內在 vs 外界","控制 vs 放手"];
+const phases=["啟動期","重組期","擴張期","停滯期","轉化期"];
+const names=["Echo Pattern","Silent Axis","Fractured Flow","Hidden Core","Dual Mirror"];
 
-const type=types[seed%4];
-const trait=traits[(seed+2)%4];
+const type=types[seed%5];
+const trait=traits[(seed+2)%5];
+const conflict=conflicts[(seed+5)%5];
+const phase=phases[(seed+8)%5];
+const name=names[(seed+11)%5];
 
-const text=`你屬於${zodiac}，能量結構為「${type}」。
-你傾向${trait}，顯示你正處於一種動態平衡之中。`;
+const text=`識別名稱：${name}
+
+星座：${zodiac}
+能量類型：${type}
+
+內在傾向：
+${trait}
+
+核心矛盾：
+${conflict}
+
+當前狀態：
+${phase}`;
 
 loading.innerText="解析中...";
-
 setTimeout(()=>{
 loading.innerText="";
 result-box.classList.remove("hidden");
 reading.innerText=text;
 window.profile=text;
+window.identity={name,zodiac,type,phase};
 },1500);
 }
 
-// SAVE
+// ===== SAVE =====
 function saveProfile(){
 localStorage.setItem("profile",window.profile);
 alert("已保存");
 }
 
-// SHARE
-function shareCard(){
-document.getElementById("share-card").classList.remove("hidden");
-document.getElementById("card-text").innerText=window.profile;
-navigator.clipboard.writeText(window.profile);
+// ===== GENERATE CARD =====
+function generateCard(){
+const c=document.getElementById("cardCanvas");
+const ctx=c.getContext("2d");
+
+c.classList.remove("hidden");
+
+// background
+ctx.fillStyle="#0b0b0b";
+ctx.fillRect(0,0,400,600);
+
+// text
+ctx.fillStyle="#ffffff";
+ctx.font="16px monospace";
+
+ctx.fillText("YATJIZHA",140,40);
+
+ctx.font="14px monospace";
+ctx.fillText(window.identity.name,120,100);
+
+ctx.fillText(window.identity.zodiac,150,160);
+ctx.fillText(window.identity.type,120,200);
+
+ctx.fillText("Phase:",160,260);
+ctx.fillText(window.identity.phase,120,290);
+
+ctx.strokeStyle="rgba(255,255,255,0.2)";
+ctx.strokeRect(20,20,360,560);
+}
+
+// ===== DOWNLOAD =====
+function downloadCard(){
+const c=document.getElementById("cardCanvas");
+const link=document.createElement("a");
+link.download="identity-card.png";
+link.href=c.toDataURL();
+link.click();
 }
 </script>
 
