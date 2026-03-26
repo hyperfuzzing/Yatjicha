@@ -2,219 +2,147 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>yatjizha – Hong Kong & Chinese Zodiac</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>yatjizha – Zodiac & Fortune</title>
 
-<!-- Tailwind CSS via CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
-<script>
-  // Tailwind customisation (optional)
-  tailwind.config = {
-    theme: {
-      extend: {
-        colors: {
-          primary: '#0066FF',   // biru khas
-        },
-      },
-    },
-  }
-</script>
 
 <style>
-  /* Modal backdrop – hidden by default */
-  #detail-modal { display:none; }
+html { scroll-behavior: smooth; }
 </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans">
 
-<header class="bg-white shadow-md py-4">
-  <div class="max-w-5xl mx-auto flex items-center justify-between px-4">
-    <h1 class="text-2xl font-bold">yatjizha</h1>
-    <div class="flex space-x-2">
-      <button id="lang-en" class="px-3 py-1 rounded hover:bg-gray-200">EN</button>
-      <button id="lang-zh" class="px-3 py-1 rounded hover:bg-gray-200">中文</button>
-    </div>
+<body class="bg-gray-50 text-gray-800">
+
+<!-- ================= HEADER ================= -->
+<header class="bg-white shadow sticky top-0 z-50">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+    <h1 class="text-xl font-bold text-red-600">🐉 yatjizha</h1>
+    <nav class="space-x-4 text-sm">
+      <a href="#zodiac">Zodiac</a>
+      <a href="#fortune">Fortune</a>
+    </nav>
   </div>
 </header>
 
-<main class="max-w-5xl mx-auto p-4">
-  <!-- Intro -->
-  <section class="mb-8 text-center">
-    <h2 id="title-intro" class="text-xl font-medium"></h2>
-    <p id="desc-intro" class="mt-2 text-gray-600"></p>
-  </section>
+<!-- ================= HERO ================= -->
+<section class="bg-gradient-to-br from-red-600 to-red-800 text-white py-20 text-center">
+  <h2 class="text-4xl font-bold mb-4">Discover Your Fate</h2>
+  <p class="opacity-90">Ancient wisdom meets modern curiosity</p>
+</section>
 
-  <!-- Grids -->
-  <section class="grid grid-cols-1 md:grid-cols-2 gap-8">
-    <!-- Western zodiac -->
-    <div class="bg-white rounded-lg shadow p-4">
-      <h3 id="western-title" class="text-lg font-semibold mb-2"></h3>
-      <div id="western-grid" class="grid grid-cols-3 gap-2"></div>
-    </div>
-
-    <!-- Chinese zodiac (Shio) -->
-    <div class="bg-white rounded-lg shadow p-4">
-      <h3 id="chinese-title" class="text-lg font-semibold mb-2"></h3>
-      <div id="chinese-grid" class="grid grid-cols-3 gap-2"></div>
-    </div>
-  </section>
-</main>
-
-<!-- Detail modal -->
-<div id="detail-modal"
-     class="fixed inset-0 bg-black/50 flex items-center justify-center">
-  <div class="bg-white rounded-lg max-w-md w-full p-6 relative">
-    <button id="close-modal"
-            class="absolute top-2 right-2 text-gray-400 hover:text-gray-600">
-      ✕
-    </button>
-    <h4 id="detail-title" class="text-xl font-bold mb-2"></h4>
-    <p id="detail-content" class="text-gray-700"></p>
+<!-- ================= ZODIAC ================= -->
+<section id="zodiac" class="py-16 max-w-5xl mx-auto px-4">
+  <h2 class="text-2xl font-bold mb-6 text-center">🌟 Western Zodiac</h2>
+  
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="bg-white p-4 rounded shadow text-center">♈ Aries</div>
+    <div class="bg-white p-4 rounded shadow text-center">♉ Taurus</div>
+    <div class="bg-white p-4 rounded shadow text-center">♊ Gemini</div>
+    <div class="bg-white p-4 rounded shadow text-center">♋ Cancer</div>
+    <div class="bg-white p-4 rounded shadow text-center">♌ Leo</div>
+    <div class="bg-white p-4 rounded shadow text-center">♍ Virgo</div>
+    <div class="bg-white p-4 rounded shadow text-center">♎ Libra</div>
+    <div class="bg-white p-4 rounded shadow text-center">♏ Scorpio</div>
   </div>
-</div>
+</section>
 
+<!-- ================= DAILY FORTUNE ================= -->
+<section id="fortune" class="py-16 bg-black text-white">
+  <div class="max-w-xl mx-auto text-center px-4">
+
+    <h2 class="text-3xl font-bold mb-4">🔮 Daily Fortune</h2>
+    <p class="text-gray-400 mb-8">Ancient whispers. Your fate today.</p>
+
+    <input type="date" id="date" class="mb-4 px-4 py-2 text-black rounded">
+
+    <select id="mode" class="mb-4 px-4 py-2 text-black rounded">
+      <option value="oldman">Old Man HK</option>
+      <option value="ghost">Ghost</option>
+      <option value="monk">Monk</option>
+    </select>
+
+    <br>
+
+    <button onclick="generate()" 
+      class="px-6 py-3 bg-red-600 rounded hover:bg-red-700">
+      Reveal My Fate
+    </button>
+
+    <div id="result" class="mt-6 text-lg hidden"></div>
+
+    <button id="shareBtn"
+      class="mt-4 px-4 py-2 border hidden">
+      Share to X
+    </button>
+
+  </div>
+</section>
+
+<!-- ================= SCRIPT ================= -->
 <script>
-// ------------------------------------------------------------------
-// 1️⃣  Data (embedded)
-// ------------------------------------------------------------------
-const westernZodiac = [
-  { name_en: "Aries",      name_zh: "牡羊座",   date: "21 Mar – 19 Apr",  desc_en: "Courageous, energetic, confident.",               desc_zh: "勇敢、充滿活力且自信。" },
-  { name_en: "Taurus",    name_zh: "金牛座",   date: "20 Apr – 20 May",  desc_en: "Reliable, patient, practical.",                desc_zh: "可靠、耐心且務實。" },
-  { name_en: "Gemini",    name_zh: "雙子座",   date: "21 May – 20 Jun",  desc_en: "Adaptable, curious, communicative.",           desc_zh: "善變、好奇且善於溝通。" },
-  { name_en: "Cancer",    name_zh: "巨蟹座",   date: "21 Jun – 22 Jul",  desc_en: "Intuitive, caring, protective.",               desc_zh: "直覺、關懷且保護慾強。" },
-  { name_en: "Leo",       name_zh: "獅子座",   date: "23 Jul – 22 Aug",  desc_en: "Creative, passionate, charismatic.",           desc_zh: "創意、熱情且富有魅力。" },
-  { name_en: "Virgo",     name_zh: "處女座",   date: "23 Aug – 22 Sep",  desc_en: "Analytical, meticulous, modest.",               desc_zh: "分析力強、細緻且謙遜。" },
-  { name_en: "Libra",     name_zh: "天秤座",   date: "23 Sep – 22 Oct",  desc_en: "Diplomatic, fair, sociable.",                  desc_zh: "外交手腕佳、公平且善交際。" },
-  { name_en: "Scorpio",   name_zh: "天蠍座",   date: "23 Oct – 21 Nov",  desc_en: "Intense, resourceful, secretive.",             desc_zh: "熱情、資源豐富且神祕。" },
-  { name_en: "Sagittarius",name_zh:"射手座",  date: "22 Nov – 21 Dec",  desc_en: "Optimistic, adventurous, philosophical.",      desc_zh: "樂觀、冒險且富有哲理。" },
-  { name_en: "Capricorn", name_zh: "摩羯座",   date: "22 Dec – 19 Jan",  desc_en: "Disciplined, responsible, ambitious.",          desc_zh: "有紀律、負責且有抱負。" },
-  { name_en: "Aquarius",  name_zh: "水瓶座",   date: "20 Jan – 18 Feb",  desc_en: "Innovative, humanitarian, independent.",       desc_zh: "創新、人道且獨立。" },
-  { name_en: "Pisces",    name_zh: "雙魚座",   date: "19 Feb – 20 Mar",  desc_en: "Compassionate, artistic, intuitive.",           desc_zh: "富有同情心、藝術且直覺。" }
-];
-
-const chineseZodiac = [
-  { name_en: "Rat",   name_zh: "鼠",   years: "2020, 2008, 1996 …", desc_en: "Quick‑witted, resourceful, adaptable.",   desc_zh: "機智、足智多謀且適應力強。" },
-  { name_en: "Ox",    name_zh: "牛",   years: "2021, 2009, 1997 …", desc_en: "Diligent, dependable, strong‑willed.",    desc_zh: "勤奮、可靠且意志堅定。" },
-  { name_en: "Tiger", name_zh: "虎",   years: "2022, 2010, 1998 …", desc_en: "Brave, confident, competitive.",          desc_zh: "勇敢、自信且好勝。" },
-  { name_en: "Rabbit",name_zh: "兔",   years: "2023, 2011, 1999 …", desc_en: "Gentle, elegant, compassionate.",         desc_zh: "溫柔、優雅且有同情心。" },
-  { name_en: "Dragon",name_zh: "龍",   years: "2024, 2012, 2000 …", desc_en: "Charismatic, powerful, ambitious.",       desc_zh: "有魅力、強大且有抱負。" },
-  { name_en: "Snake", name_zh: "蛇",   years: "2025, 2013, 2001 …", desc_en: "Wise, enigmatic, intuitive.",              desc_zh: "智慧、神祕且直覺。" },
-  { name_en: "Horse", name_zh: "馬",   years: "2026, 2014, 2002 …", desc_en: "Energetic, independent, free‑spirit.",    desc_zh: "精力充沛、獨立且自由。" },
-  { name_en: "Goat",  name_zh: "羊",   years: "2027, 2015, 2003 …", desc_en: "Calm, compassionate, artistic.",           desc_zh: "平靜、慈悲且有藝術天分。" },
-  { name_en: "Monkey",name_zh: "猴",   years: "2028, 2016, 2004 …", desc_en: "Playful, clever, curious.",                desc_zh: "調皮、聰明且好奇。" },
-  { name_en: "Rooster",name_zh:"雞",   years: "2029, 2017, 2005 …", desc_en: "Observant, hardworking, confident.",       desc_zh: "觀察力強、勤奮且自信。" },
-  { name_en: "Dog",   name_zh: "狗",   years: "2030, 2018, 2006 …", desc_en: "Loyal, honest, protective.",               desc_zh: "忠誠、誠實且保護慾強。" },
-  { name_en: "Pig",   name_zh: "豬",   years: "2031, 2019, 2007 …", desc_en: "Generous, diligent, compassionate.",        desc_zh: "慷慨、勤奮且富有同情心。" }
-];
-
-// ------------------------------------------------------------------
-// 2️⃣  UI Text (i18n)
-// ------------------------------------------------------------------
-const i18n = {
-  en: {
-    titleIntro: "Explore Hong Kong & Chinese Zodiac",
-    descIntro: "Tap a sign to learn its meaning, history and cultural tips.",
-    westernTitle: "Western Zodiac",
-    chineseTitle: "Chinese Zodiac (Shio)"
-  },
-  zh: {
-    titleIntro: "探索香港與中國星座",
-    descIntro: "點選星座了解其意義、歷史與文化小提示。",
-    westernTitle: "西方星座",
-    chineseTitle: "中國生肖"
-  }
+const data = {
+  oldman: [
+    "Heaven does not speak. But you feel it when luck turns.",
+    "If you chase luck, it hides.",
+    "Gold comes to the patient.",
+    "Someone remembers your name tonight."
+  ],
+  ghost: [
+    "Your luck is borrowed.",
+    "A forgotten choice returns.",
+    "Not all smiles are alive.",
+    "The shadow behind you moves."
+  ],
+  monk: [
+    "Silence answers everything.",
+    "Desire creates suffering.",
+    "Walk slower.",
+    "You are distracted, not lost."
+  ]
 };
 
-// ------------------------------------------------------------------
-// 3️⃣  Helper functions
-// ------------------------------------------------------------------
-let currentLang = 'en';
-
-function setLang(lang) {
-  currentLang = lang;
-  const t = i18n[lang];
-  document.getElementById('title-intro').textContent   = t.titleIntro;
-  document.getElementById('desc-intro').textContent    = t.descIntro;
-  document.getElementById('western-title').textContent = t.westernTitle;
-  document.getElementById('chinese-title').textContent = t.chineseTitle;
-  // rebuild grids so labels switch language
-  buildGrids();
+function seed(str){
+  let h=0;
+  for(let i=0;i<str.length;i++){
+    h=str.charCodeAt(i)+((h<<5)-h);
+  }
+  return Math.abs(h);
 }
 
-function buildGrids() {
-  const westernGrid = document.getElementById('western-grid');
-  const chineseGrid = document.getElementById('chinese-grid');
-  westernGrid.innerHTML = '';
-  chineseGrid.innerHTML = '';
+function generate(){
+  let date=document.getElementById("date").value;
+  let mode=document.getElementById("mode").value;
 
-  westernZodiac.forEach(z => {
-    const btn = document.createElement('button');
-    btn.className = 'p-2 rounded hover:bg-gray-100 flex flex-col items-center';
-    // Menggunakan emoji sebagai ikon sederhana (tidak butuh gambar eksternal)
-    const emoji = {
-      Aries: '♈', Taurus: '♉', Gemini: '♊', Cancer: '♋',
-      Leo: '♌', Virgo: '♍', Libra: '♎', Scorpio: '♏',
-      Sagittarius: '♐', Capricorn: '♑', Aquarius: '♒', Pisces: '♓'
-    }[z.name_en];
-    btn.innerHTML = `<div class="text-2xl mb-1">${emoji}</div>
-                     <span class="text-sm">${currentLang === 'en' ? z.name_en : z.name_zh}</span>`;
-    btn.onclick = () => openDetail(z, 'western');
-    westernGrid.appendChild(btn);
-  });
-
-  chineseZodiac.forEach(z => {
-    const btn = document.createElement('button');
-    btn.className = 'p-2 rounded hover:bg-gray-100 flex flex-col items-center';
-    // Emoji shio (簡易版) – 只作示例
-    const emojiMap = {
-      Rat: '🐀', Ox: '🐂', Tiger: '🐅', Rabbit: '🐇',
-      Dragon: '🐉', Snake: '🐍', Horse: '🐎', Goat: '🐐',
-      Monkey: '🐒', Rooster: '🐓', Dog: '🐕', Pig: '🐖'
-    };
-    const emoji = emojiMap[z.name_en];
-    btn.innerHTML = `<div class="text-2xl mb-1">${emoji}</div>
-                     <span class="text-sm">${currentLang === 'en' ? z.name_en : z.name_zh}</span>`;
-    btn.onclick = () => openDetail(z, 'chinese');
-    chineseGrid.appendChild(btn);
-  });
-}
-
-function openDetail(item, type) {
-  const title = currentLang === 'en' ? item.name_en : item.name_zh;
-  const detailTitle = document.getElementById('detail-title');
-  const detailContent = document.getElementById('detail-content');
-
-  detailTitle.textContent = title;
-
-  if (type === 'western') {
-    detailContent.innerHTML = `
-      <p class="mb-1"><strong>${currentLang === 'en' ? 'Date' : '日期'}:</strong> ${item.date}</p>
-      <p>${currentLang === 'en' ? item.desc_en : item.desc_zh}</p>
-    `;
-  } else {
-    detailContent.innerHTML = `
-      <p class="mb-1"><strong>${currentLang === 'en' ? 'Years' : '年份'}:</strong> ${item.years}</p>
-      <p>${currentLang === 'en' ? item.desc_en : item.desc_zh}</p>
-    `;
+  if(!date){
+    date=new Date().toISOString().split("T")[0];
   }
 
-  const modal = document.getElementById('detail-modal');
-  modal.style.display = 'flex';
+  let s=seed(date+mode);
+  let list=data[mode];
+  let text=list[s%list.length];
+
+  let res=document.getElementById("result");
+  res.innerText="";
+  res.classList.remove("hidden");
+
+  let i=0;
+  function type(){
+    if(i<text.length){
+      res.innerText+=text[i];
+      i++;
+      setTimeout(type,25);
+    }
+  }
+  type();
+
+  let share=document.getElementById("shareBtn");
+  share.classList.remove("hidden");
+  share.onclick=()=>{
+    let url="https://twitter.com/intent/tweet?text="+encodeURIComponent("🔮 "+text+" #yatjizha");
+    window.open(url);
+  };
 }
-
-// ------------------------------------------------------------------
-// 4️⃣  Event listeners
-// ------------------------------------------------------------------
-document.getElementById('lang-en').addEventListener('click', () => setLang('en'));
-document.getElementById('lang-zh').addEventListener('click', () => setLang('zh'));
-document.getElementById('close-modal').addEventListener('click', () => {
-  document.getElementById('detail-modal').style.display = 'none';
-});
-
-// ------------------------------------------------------------------
-// 5️⃣  Init
-// ------------------------------------------------------------------
-setLang('en');   // default English
 </script>
 
 </body>
