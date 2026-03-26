@@ -116,7 +116,7 @@ nav {
 
 /* Mobile drawer */
 .mobile-menu {
-  display:none; position:fixed; top:60px; left:0; right:0;
+  display:none; position:fixed; top:calc(60px + max(0px, env(safe-area-inset-top))); left:0; right:0;
   background:rgba(16,11,9,0.99); border-bottom:1px solid rgba(200,133,58,0.1);
   z-index:199; padding:8px 0 20px;
   backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
@@ -137,7 +137,7 @@ nav {
 .page { display:none; min-height:100vh; min-height:100dvh; position:relative; z-index:10; }
 .page.active { display:block; }
 #page-home { display:none; flex-direction:column; align-items:center; justify-content:center; padding:80px 20px 100px; min-height:100vh; min-height:100dvh; }
-#page-home.active { display:flex; }
+#page-home.active { display:flex !important; }
 
 /* ── HOME ── */
 .title-block { text-align:center; margin-bottom:36px; animation:rise 1.6s cubic-bezier(0.16,1,0.3,1) both; }
@@ -306,9 +306,13 @@ input:focus:not(:focus-visible) { outline: none; }
 
 /* ── MOBILE SAFE AREA (iPhone notch / Dynamic Island) ── */
 nav {
-  padding-top: env(safe-area-inset-top);
+  padding-top: max(0px, env(safe-area-inset-top));
   padding-left: max(20px, env(safe-area-inset-left));
   padding-right: max(20px, env(safe-area-inset-right));
+  /* keep height consistent with safe area */
+  height: calc(60px + max(0px, env(safe-area-inset-top)));
+  align-items: flex-end;
+  padding-bottom: 0;
 }
 footer {
   padding-bottom: max(24px, env(safe-area-inset-bottom));
@@ -316,17 +320,18 @@ footer {
   padding-right: max(20px, env(safe-area-inset-right));
 }
 #page-home {
+  padding-top: max(100px, calc(80px + max(0px, env(safe-area-inset-top))));
   padding-bottom: max(100px, calc(80px + env(safe-area-inset-bottom)));
 }
 
 /* ── MOBILE INPUT IMPROVEMENTS ── */
+/* Prevent iOS zoom on input focus — MUST be 16px minimum always */
+input, input[type="text"], .word-input { font-size: max(16px, 1em); }
 @media (max-width: 480px) {
-  .word-input { font-size: 1.5rem; }
+  .word-input { font-size: max(16px, 1.5rem); }
   .input-area { padding: 0 8px; }
   .response-area { padding: 0 12px; }
   .reset-btn { width: 100%; max-width: 320px; }
-  /* Prevent zoom on input focus (iOS) */
-  input[type="text"] { font-size: max(16px, 1.5rem); }
 }
 
 /* ── TOUCH TARGET SIZES (min 44px) ── */
@@ -390,10 +395,10 @@ footer {
   </button>
 </nav>
 <div class="mobile-menu" id="mobileMenu">
-  <a onclick="navTo('home')">Tea Room · 茶室</a>
-  <a onclick="navTo('about')">About · 關於</a>
-  <a onclick="navTo('team')">Team · 團隊</a>
-  <a onclick="navTo('whitepaper')">Whitepaper · 白皮書</a>
+  <a onclick="navTo('home')" data-page="home">Tea Room · 茶室</a>
+  <a onclick="navTo('about')" data-page="about">About · 關於</a>
+  <a onclick="navTo('team')" data-page="team">Team · 團隊</a>
+  <a onclick="navTo('whitepaper')" data-page="whitepaper">Whitepaper · 白皮書</a>
 </div>
 
 <!-- HOME -->
@@ -488,7 +493,7 @@ footer {
         <span class="team-name-en">Chan Wing Lam</span>
         <span class="team-role">Head of Design · 視覺設計總監</span>
         <p class="team-bio">From Kennedy Town. Trained in calligraphy before pixels. Believes every font choice is a philosophical statement about the self.</p>
-        <div class="team-social"><a href="#" onclick="return false;">𝕏 Twitter</a></div>
+        <div class="team-social"><a href="https://x.com/YatJiCha" target="_blank" rel="noopener">𝕏 @YatJiCha</a></div>
       </div>
       <div class="team-card fade-in delay-2">
         <div class="team-avatar">梁</div>
@@ -496,7 +501,7 @@ footer {
         <span class="team-name-en">Leung Si Ho</span>
         <span class="team-role">AI Architect · 人工智能架構師</span>
         <p class="team-bio">Grew up in Kowloon City. Trained on philosophy and machine learning in equal measure. Writes prompts the way a poet writes verses.</p>
-        <div class="team-social"><a href="#" onclick="return false;">𝕏 Twitter</a></div>
+        <div class="team-social"><a href="https://x.com/YatJiCha" target="_blank" rel="noopener">𝕏 @YatJiCha</a></div>
       </div>
       <div class="team-card fade-in delay-3">
         <div class="team-avatar">鄭</div>
@@ -504,7 +509,7 @@ footer {
         <span class="team-name-en">Cheng Wai Hin</span>
         <span class="team-role">Culture Lead · 文化總監</span>
         <p class="team-bio">Grew up listening to Canto-pop in Sham Shui Po. Keeper of the tea house's soul. Ensures nothing we build forgets where it came from.</p>
-        <div class="team-social"><a href="#" onclick="return false;">𝕏 Twitter</a></div>
+        <div class="team-social"><a href="https://x.com/YatJiCha" target="_blank" rel="noopener">𝕏 @YatJiCha</a></div>
       </div>
       <div class="team-card fade-in delay-1">
         <div class="team-avatar">吳</div>
@@ -512,7 +517,7 @@ footer {
         <span class="team-name-en">Ng Ka Chun</span>
         <span class="team-role">Frontend Engineer · 前端工程師</span>
         <p class="team-bio">From Tai Po. Obsessed with motion, rain effects, and the precise opacity of things at 3am. If it's beautiful and runs in a browser, he made it.</p>
-        <div class="team-social"><a href="#" onclick="return false;">𝕏 Twitter</a></div>
+        <div class="team-social"><a href="https://x.com/YatJiCha" target="_blank" rel="noopener">𝕏 @YatJiCha</a></div>
       </div>
       <div class="team-card fade-in delay-2">
         <div class="team-avatar">何</div>
@@ -520,7 +525,7 @@ footer {
         <span class="team-name-en">Ho Sau Man</span>
         <span class="team-role">Community · 社群建立者</span>
         <p class="team-bio">Raised in Wan Chai. Former teacher. Understands that language carries everything ever left unsaid.</p>
-        <div class="team-social"><a href="#" onclick="return false;">𝕏 Twitter</a></div>
+        <div class="team-social"><a href="https://x.com/YatJiCha" target="_blank" rel="noopener">𝕏 @YatJiCha</a></div>
       </div>
     </div>
   </div>
@@ -672,14 +677,22 @@ function navTo(id){mobileMenu.classList.remove('open');hamburger.classList.remov
 function showPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
+  document.querySelectorAll('.mobile-menu a').forEach(a=>a.classList.remove('active'));
   const page=document.getElementById('page-'+id);
   if(!page)return;
   page.classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
   const link=document.getElementById('nav-'+id);
   if(link)link.classList.add('active');
+  /* Update mobile menu active state */
+  const mobileLinks=mobileMenu.querySelectorAll('a[data-page]');
+  mobileLinks.forEach(a=>{if(a.dataset.page===id)a.classList.add('active');});
   page.querySelectorAll('.fade-in').forEach(el=>{el.style.animation='none';void el.offsetWidth;el.style.animation='';});
-  if(id==='home'){page.style.display='flex';setTimeout(()=>wordInput&&wordInput.focus(),300);}
+  /* Restore correct display type for home (flex) */
+  if(id==='home'){
+    page.style.display='flex';
+    setTimeout(()=>wordInput&&wordInput.focus(),300);
+  }
 }
 
 /* Tea Room */
@@ -703,8 +716,11 @@ async function handleSubmit(){
   if(countWords(word)>1){errorText.classList.add('show');wordInput.focus();return;}
   errorText.classList.remove('show');
   inputArea.style.opacity='0';inputArea.style.pointerEvents='none';
-  promptText.style.opacity='0';loading.classList.add('show');
+  promptText.style.opacity='0';
+  loading.classList.add('show');
   responseArea.classList.remove('visible');
+  resetBtn.classList.remove('show');
+  let raw='';
   try{
     const res=await fetch("https://api.anthropic.com/v1/messages",{
       method:"POST",
@@ -724,22 +740,19 @@ Use exactly this format. Nothing outside it.`,
       })
     });
     const data=await res.json();
-    const raw=data.content?.[0]?.text||'';
-    const hM=raw.match(/HANZI:\s*(.+)/);
-    const rM=raw.match(/RESPONSE:\s*([\s\S]+?)(?=PROVERB:|$)/);
-    const pM=raw.match(/PROVERB:\s*(.+)/);
-    loading.classList.remove('show');
-    responseZh.textContent=hM?hM[1].trim():word;
-    responseText.textContent=rM?rM[1].trim():'';
-    responseProverb.textContent=pM?pM[1].trim():'';
-    setTimeout(()=>{responseArea.classList.add('visible');resetBtn.classList.add('show');},120);
+    raw=data.content?.[0]?.text||'';
   }catch(err){
+    raw='';
+  }finally{
     loading.classList.remove('show');
-    responseZh.textContent='…';
-    responseText.textContent='The night wind has unsettled my thoughts. Please, try once more.';
-    responseProverb.textContent='';
-    setTimeout(()=>{responseArea.classList.add('visible');resetBtn.classList.add('show');},120);
   }
+  const hM=raw.match(/HANZI:\s*(.+)/);
+  const rM=raw.match(/RESPONSE:\s*([\s\S]+?)(?=PROVERB:|$)/);
+  const pM=raw.match(/PROVERB:\s*(.+)/);
+  responseZh.textContent=hM?hM[1].trim():word;
+  responseText.textContent=rM?rM[1].trim():'The night wind has unsettled my thoughts. Please, try once more.';
+  responseProverb.textContent=pM?pM[1].trim():'';
+  setTimeout(()=>{responseArea.classList.add('visible');resetBtn.classList.add('show');},120);
 }
 
 try {
