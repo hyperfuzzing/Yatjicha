@@ -15,15 +15,29 @@ body { background:#0b0b0b; color:#e5e5e5; }
   to {opacity:1; transform:translateY(0)}
 }
 .card:hover { transform: translateY(-5px); transition:.3s;}
+.section { border-top:1px solid rgba(255,255,255,0.08); }
 </style>
 </head>
 
 <body>
 
+<!-- HEADER -->
+<header class="sticky top-0 backdrop-blur border-b border-white/10">
+<div class="max-w-6xl mx-auto flex justify-between p-4 text-sm text-gray-400">
+  <div>yatjizha 命理館</div>
+  <nav class="space-x-4">
+    <a href="#about">關於</a>
+    <a href="#how">使用方式</a>
+    <a href="#whitepaper">白皮書</a>
+    <a href="#team">團隊</a>
+  </nav>
+</div>
+</header>
+
 <!-- HERO -->
 <section class="text-center py-20">
-<h1 class="text-2xl tracking-widest">yatjizha 命理館</h1>
-<p class="text-gray-500 mt-2">Symbolic Identity System</p>
+<h1 class="text-2xl tracking-widest">Symbolic Identity System</h1>
+<p class="text-gray-500 mt-2">以命盤作為一種自我定位方式</p>
 </section>
 
 <!-- RITUAL -->
@@ -49,81 +63,136 @@ body { background:#0b0b0b; color:#e5e5e5; }
 </div>
 </section>
 
-<!-- SHARE CARD -->
+<!-- SHARE -->
 <div id="share-card" class="hidden text-center mt-10 p-6 border border-white/10 max-w-sm mx-auto">
 <h3 class="text-lg mb-2">Energy Profile</h3>
 <p id="card-text" class="text-gray-400"></p>
 </div>
 
-<!-- BADGE (dipindah bawah & kecil) -->
+<!-- ABOUT -->
+<section id="about" class="section py-20 text-center max-w-3xl mx-auto">
+<h2 class="text-2xl mb-4">關於</h2>
+<p class="text-gray-500 leading-relaxed">
+yatjizha 並唔只係一個命理工具，而係一個以策展方式構建嘅數碼系統。
+我哋將東西方命理結構轉化為一種可以被體驗嘅語言，
+讓每個人可以透過命盤理解自己所處嘅位置。
+</p>
+</section>
+
+<!-- HOW TO -->
+<section id="how" class="section py-20 text-center max-w-3xl mx-auto">
+<h2 class="text-2xl mb-6">使用方式</h2>
+
+<div class="space-y-4 text-gray-500">
+<p>1. 輸入你嘅出生日期</p>
+<p>2. 系統將解析你嘅能量結構</p>
+<p>3. 生成個人命盤敘事</p>
+<p>4. 保存或分享你嘅身份卡片</p>
+</div>
+</section>
+
+<!-- WHITEPAPER -->
+<section id="whitepaper" class="section py-20 text-center max-w-3xl mx-auto">
+<h2 class="text-2xl mb-4">白皮書</h2>
+<p class="text-gray-500 leading-relaxed">
+本系統基於雙重命理結構（西方星座與東方生肖），
+透過演算法將時間轉換為象徵性語言。
+未來將擴展為可持續身份系統，
+包括 AI 解讀、個人檔案與跨平台連結。
+</p>
+</section>
+
+<!-- TEAM -->
+<section id="team" class="section py-20 text-center max-w-5xl mx-auto">
+<h2 class="text-2xl mb-6">團隊</h2>
+
+<div class="grid md:grid-cols-3 gap-6">
+
+<div class="card border border-white/10 p-5 rounded">
+<h3>Yan Zing</h3>
+<p class="text-gray-500 text-sm">Founder</p>
+<a href="https://x.com/YanZingBit" target="_blank" class="text-blue-400 text-sm">X Profile</a>
+</div>
+
+<div class="card border border-white/10 p-5 rounded">
+<h3>Li Chen</h3>
+<p class="text-gray-500 text-sm">System Architect</p>
+</div>
+
+<div class="card border border-white/10 p-5 rounded">
+<h3>Wong Kai</h3>
+<p class="text-gray-500 text-sm">Design Curator</p>
+</div>
+
+</div>
+</section>
+
+<!-- BADGE -->
 <footer class="text-center py-10 text-gray-600">
 <a href="https://orynth.dev/projects/yatzicha" target="_blank">
-<img src="https://orynth.dev/api/badge/yatzicha?theme=light&style=default" width="140" class="mx-auto opacity-70">
+<img src="https://orynth.dev/api/badge/yatzicha?theme=light&style=default" width="140" class="mx-auto opacity-60">
 </a>
 </footer>
 
 <script>
-// ===== ZODIAC CALC =====
-function getZodiac(month, day){
-if((month==3&&day>=21)||(month==4&&day<=19)) return "白羊座";
-if((month==4&&day>=20)||(month==5&&day<=20)) return "金牛座";
-if((month==5&&day>=21)||(month==6&&day<=21)) return "雙子座";
-if((month==6&&day>=22)||(month==7&&day<=22)) return "巨蟹座";
-if((month==7&&day>=23)||(month==8&&day<=22)) return "獅子座";
-if((month==8&&day>=23)||(month==9&&day<=22)) return "處女座";
-if((month==9&&day>=23)||(month==10&&day<=23)) return "天秤座";
-if((month==10&&day>=24)||(month==11&&day<=22)) return "天蠍座";
-if((month==11&&day>=23)||(month==12&&day<=21)) return "人馬座";
-if((month==12&&day>=22)||(month==1&&day<=19)) return "山羊座";
-if((month==1&&day>=20)||(month==2&&day<=18)) return "水瓶座";
+// ZODIAC
+function getZodiac(m,d){
+if((m==3&&d>=21)||(m==4&&d<=19)) return "白羊座";
+if((m==4&&d>=20)||(m==5&&d<=20)) return "金牛座";
+if((m==5&&d>=21)||(m==6&&d<=21)) return "雙子座";
+if((m==6&&d>=22)||(m==7&&d<=22)) return "巨蟹座";
+if((m==7&&d>=23)||(m==8&&d<=22)) return "獅子座";
+if((m==8&&d>=23)||(m==9&&d<=22)) return "處女座";
+if((m==9&&d>=23)||(m==10&&d<=23)) return "天秤座";
+if((m==10&&d>=24)||(m==11&&d<=22)) return "天蠍座";
+if((m==11&&d>=23)||(m==12&&d<=21)) return "人馬座";
+if((m==12&&d>=22)||(m==1&&d<=19)) return "山羊座";
+if((m==1&&d>=20)||(m==2&&d<=18)) return "水瓶座";
 return "雙魚座";
 }
 
-// ===== AI STYLE READING (deterministic) =====
+// AI READING
 function generateReading(){
-const input=document.getElementById("birth-date").value;
-if(!input) return;
+const val=document.getElementById("birth-date").value;
+if(!val) return;
 
-const d=new Date(input);
+const d=new Date(val);
 const m=d.getMonth()+1;
 const day=d.getDate();
 
 const zodiac=getZodiac(m,day);
-
-// deterministic "AI"
 const seed=m*day;
+
 const types=["流動型","穩定型","分裂型","轉換型"];
 const traits=["直覺強","理性高","情緒敏感","結構清晰"];
 
-const type=types[seed%types.length];
-const trait=traits[(seed+3)%traits.length];
+const type=types[seed%4];
+const trait=traits[(seed+2)%4];
 
 const text=`你屬於${zodiac}，能量結構為「${type}」。
-你嘅特質傾向於${trait}，顯示你喺現實與內在之間持續調整。
-當前階段，你正進入一個轉化周期。`;
+你傾向${trait}，顯示你正處於一種動態平衡之中。`;
 
-document.getElementById("loading").innerText="解析中...";
+loading.innerText="解析中...";
+
 setTimeout(()=>{
-document.getElementById("loading").innerText="";
-document.getElementById("result-box").classList.remove("hidden");
-document.getElementById("reading").innerText=text;
-window.currentProfile=text;
+loading.innerText="";
+result-box.classList.remove("hidden");
+reading.innerText=text;
+window.profile=text;
 },1500);
 }
 
-// ===== SAVE =====
+// SAVE
 function saveProfile(){
-localStorage.setItem("yatjizha_profile", window.currentProfile);
+localStorage.setItem("profile",window.profile);
 alert("已保存");
 }
 
-// ===== SHARE =====
+// SHARE
 function shareCard(){
-const card=document.getElementById("share-card");
-card.classList.remove("hidden");
-document.getElementById("card-text").innerText=window.currentProfile;
-
-navigator.clipboard.writeText(window.currentProfile);
+document.getElementById("share-card").classList.remove("hidden");
+document.getElementById("card-text").innerText=window.profile;
+navigator.clipboard.writeText(window.profile);
 }
 </script>
 
