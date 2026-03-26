@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>一字茶 · Cinematic</title>
+<title>一字茶 · Yat Ji Cha</title>
 
 <style>
 :root{
@@ -26,41 +26,30 @@ body{
   overflow:hidden;
 }
 
-/* OPENING */
+/* opening */
 .opening{
-  position:fixed;
-  inset:0;
+  position:fixed;inset:0;
   background:#0a0907;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  display:flex;align-items:center;justify-content:center;
   z-index:999;
-  animation:fadeOut 3.5s ease 3s forwards;
+  animation:fadeOut 3s ease 2.5s forwards;
 }
+@keyframes fadeOut{to{opacity:0;visibility:hidden}}
 .opening-inner{text-align:center;color:var(--accent)}
-.opening-text{font-size:1rem;opacity:.7;margin-bottom:10px}
-.opening-sub{font-size:.7rem;opacity:.4}
+.opening-text{font-size:1rem;opacity:.7}
+.opening-sub{font-size:.7rem;opacity:.4;margin-top:6px}
 
-@keyframes fadeOut{
-  to{opacity:0;visibility:hidden}
-}
-
-/* RAIN */
+/* rain */
 canvas{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  opacity:.2;
+  position:fixed;inset:0;
+  opacity:.2;pointer-events:none;
 }
 
-/* APP */
+/* app */
 .app{
-  position:relative;
-  z-index:2;
-  width:100%;
-  max-width:420px;
-  text-align:center;
-  padding:20px;
+  position:relative;z-index:2;
+  width:100%;max-width:420px;
+  text-align:center;padding:20px;
 }
 
 .title{
@@ -68,24 +57,23 @@ canvas{
   letter-spacing:.2em;
   color:var(--accent);
 }
-
 .sub{
   font-size:.7rem;
   letter-spacing:.3em;
   color:var(--dim);
-  margin-bottom:30px;
+  margin-bottom:25px;
 }
 
-/* SELECT */
+/* select */
 select{
   background:none;
   border:1px solid var(--dim);
   color:var(--dim);
   padding:8px;
-  margin-bottom:20px;
+  margin-bottom:15px;
 }
 
-/* INPUT */
+/* input */
 .input{
   width:100%;
   border:none;
@@ -98,8 +86,15 @@ select{
   outline:none;
 }
 
+.hint{
+  font-size:.65rem;
+  color:var(--dim);
+  margin-top:6px;
+}
+
+/* button */
 .btn{
-  margin-top:20px;
+  margin-top:18px;
   border:1px solid var(--dim);
   padding:12px;
   background:none;
@@ -110,47 +105,56 @@ select{
   color:var(--text);
   border-color:var(--accent);
 }
+.btn:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
 
-/* RESPONSE */
+/* status */
+.status{
+  margin-top:15px;
+  font-size:.7rem;
+  color:var(--dim);
+  opacity:0;
+  transition:.3s;
+}
+.status.show{opacity:1}
+
+/* response */
 .response{
-  margin-top:40px;
+  margin-top:35px;
   opacity:0;
   transform:translateY(10px);
-  transition:.8s;
+  transition:.7s;
 }
 .response.show{opacity:1;transform:none}
 
 .hanzi{
   font-size:2.5rem;
   color:var(--accent);
-  margin-bottom:20px;
+  margin-bottom:18px;
 }
-
 .text{
   font-style:italic;
   line-height:1.8;
-  margin-bottom:20px;
+  margin-bottom:18px;
 }
-
-.proverb{
-  color:var(--accent);
-}
-
+.proverb{color:var(--accent)}
 .meaning{
   font-size:.8rem;
   color:var(--dim);
 }
 
-/* ACTION */
+/* actions */
 .actions{
   display:none;
   margin-top:20px;
-  gap:10px;
   flex-direction:column;
+  gap:10px;
 }
 .actions.show{display:flex}
 
-/* subtle breathing */
+/* breathing */
 body{
   animation:breath 8s ease-in-out infinite;
 }
@@ -163,10 +167,9 @@ body{
 
 <body>
 
-<!-- OPENING -->
 <div class="opening">
   <div class="opening-inner">
-    <div class="opening-text">Sheung Wan · past midnight</div>
+    <div class="opening-text">Sheung Wan · midnight</div>
     <div class="opening-sub">雨落 · 燈未熄</div>
   </div>
 </div>
@@ -190,7 +193,11 @@ body{
 </select>
 
 <input id="input" class="input" placeholder="one word">
-<button class="btn" onclick="submitWord()">brew</button>
+<div class="hint">one word only</div>
+
+<button id="btn" class="btn" onclick="submitWord()">ask the tea</button>
+
+<div id="status" class="status"></div>
 
 <div id="response" class="response">
   <div id="hanzi" class="hanzi"></div>
@@ -207,7 +214,7 @@ body{
 </div>
 
 <script>
-/* RAIN */
+/* rain */
 const canvas=document.getElementById('rain');
 const ctx=canvas.getContext('2d');
 canvas.width=innerWidth;
@@ -215,12 +222,7 @@ canvas.height=innerHeight;
 
 let drops=[];
 for(let i=0;i<60;i++){
-  drops.push({
-    x:Math.random()*canvas.width,
-    y:Math.random()*canvas.height,
-    len:Math.random()*15,
-    speed:Math.random()*1+0.3
-  });
+  drops.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,len:15,speed:1});
 }
 
 function drawRain(){
@@ -233,37 +235,48 @@ function drawRain(){
     ctx.stroke();
     d.y+=d.speed;
     d.x-=0.2;
-    if(d.y>canvas.height){
-      d.y=0;
-      d.x=Math.random()*canvas.width;
-    }
+    if(d.y>canvas.height){d.y=0;d.x=Math.random()*canvas.width;}
   });
   requestAnimationFrame(drawRain);
 }
 drawRain();
 
-/* SOUND */
+/* sound */
 document.addEventListener('click',()=>{
-  const audio=document.getElementById('rainSound');
-  audio.volume=0.25;
-  audio.play().catch(()=>{});
+  rainSound.volume=0.25;
+  rainSound.play().catch(()=>{});
 },{once:true});
 
-/* PROMPTS */
+/* prompts */
 function getPrompt(type){
-  if(type==="ghost") return "You are a quiet ghost. Speak gently. 3 sentences only.";
-  if(type==="monk") return "You are a zen monk. Calm, detached. 3 sentences only.";
-  if(type==="oldwoman") return "You are an old tea lady. Warm and observant.";
-  return "You are an old man in Hong Kong tea house. Speak softly.";
+  if(type==="ghost") return "You are a ghost. quiet, poetic, 3 sentences.";
+  if(type==="monk") return "You are a zen monk. minimal and calm.";
+  if(type==="oldwoman") return "You are a warm tea lady.";
+  return "You are an old Hong Kong tea man.";
 }
 
-/* SUBMIT */
+/* submit */
 async function submitWord(){
-  const word=document.getElementById('input').value.trim();
-  const char=document.getElementById('character').value;
+  const btn=document.getElementById('btn');
+  if(btn.disabled) return;
+
+  const word=input.value.trim();
   if(!word) return;
 
-  await new Promise(r=>setTimeout(r,1800+Math.random()*1200));
+  const status=document.getElementById('status');
+
+  btn.disabled=true;
+  btn.innerText="...";
+  
+  const states=[
+    "he is listening...",
+    "pouring tea...",
+    "the cup is warm..."
+  ];
+  status.innerText=states[Math.floor(Math.random()*states.length)];
+  status.classList.add('show');
+
+  await new Promise(r=>setTimeout(r,800+Math.random()*400));
 
   let raw="";
   try{
@@ -272,35 +285,36 @@ async function submitWord(){
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
         word,
-        system:getPrompt(char)
+        system:getPrompt(character.value)
       })
     });
     const data=await res.json();
     raw=data.text||"";
   }catch(e){}
 
-  const h=raw.match(/HANZI:\s*(.+)/);
-  const t=raw.match(/RESPONSE:\s*([\s\S]+?)PROVERB:/);
-  const p=raw.match(/PROVERB:\s*(.+)/);
-  const m=raw.match(/MEANING:\s*(.+)/);
+  hanzi.innerText=raw.match(/HANZI:\s*(.+)/)?.[1]||word;
+  text.innerText=raw.match(/RESPONSE:\s*([\s\S]+?)PROVERB:/)?.[1]||"...";
+  proverb.innerText=raw.match(/PROVERB:\s*(.+)/)?.[1]||"";
+  meaning.innerText=raw.match(/MEANING:\s*(.+)/)?.[1]||"";
 
-  hanzi.innerText=h?.[1]||word;
-  text.innerText=t?.[1]||"...";
-  proverb.innerText=p?.[1]||"";
-  meaning.innerText=m?.[1]||"";
+  status.innerText="served";
+  setTimeout(()=>status.classList.remove('show'),1200);
 
   response.classList.add('show');
   actions.classList.add('show');
+
+  btn.disabled=false;
+  btn.innerText="ask the tea";
 }
 
-/* RESET */
+/* reset */
 function reset(){
   input.value="";
   response.classList.remove('show');
   actions.classList.remove('show');
 }
 
-/* SHARE VIRAL */
+/* share */
 function share(){
   let tweet=`${hanzi.innerText}
 
