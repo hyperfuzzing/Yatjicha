@@ -3,634 +3,648 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#060810">
+<meta name="theme-color" content="#1a1410">
 <title>一字茶 · Yat Ji Cha</title>
-<meta name="description" content="Speak one word. Receive wisdom brewed from old Hong Kong." />
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23060810'/><text x='4' y='25' font-size='20' fill='%234fd1c5' font-family='serif'>茶</text></svg>"/>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;700;900&family=IM+Fell+English:ital@0;1&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
 <style>
-/* ─── TOKENS — Noctera palette ─── */
 :root {
-  --bg:       #060810;
-  --bg2:      #080b14;
-  --surface:  #0c1018;
-  --border:   rgba(79,209,197,0.09);
-  --border-h: rgba(79,209,197,0.24);
-  --teal:     #4fd1c5;
-  --teal-d:   #2b9e93;
-  --teal-l:   #81e6d9;
-  --text:     #c8d4d8;
-  --text-dim: #6b8289;
-  --text-fnt: #3d5057;
-  --white:    #e8f0f2;
-  --red:      #e57373;
-  --glow:     rgba(79,209,197,0.14);
+  --ink: #1a1410;
+  --paper: #f0e6d3;
+  --paper-dim: #c9b89a;
+  --paper-ghost: #9a8870;
+  --amber: #d4923f;
+  --amber-dim: #a86e28;
+  --amber-text: #e8aa5a;
+  --error: #e06060;
 }
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html{scroll-behavior:smooth;font-size:16px;}
-body{
-  background:var(--bg);
-  color:var(--text);
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html { scroll-behavior:smooth; }
+body {
+  background:var(--ink);
+  color:var(--paper);
   font-family:'IM Fell English',serif;
-  min-height:100vh;min-height:100dvh;
+  min-height:100vh;
+  min-height:100dvh;
   overflow-x:hidden;
-  cursor:default;
 }
 
-/* ─── GRAIN OVERLAY ─── */
-body::before{
-  content:'';position:fixed;inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events:none;z-index:0;opacity:0.5;mix-blend-mode:overlay;
+/* Rain */
+#rain { position:fixed; inset:0; pointer-events:none; z-index:0; opacity:0.35; }
+.grain {
+  position:fixed; inset:0; opacity:0.25; pointer-events:none; z-index:1; mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+}
+.ambient {
+  position:fixed; top:40%; left:50%; transform:translate(-50%,-50%);
+  width:min(700px,120vw); height:min(700px,120vw);
+  background:radial-gradient(ellipse,rgba(200,133,58,0.07) 0%,transparent 65%);
+  pointer-events:none; z-index:1;
 }
 
-/* ─── AMBIENT LIGHT ─── */
-.ambient{
-  position:fixed;top:30%;left:50%;transform:translate(-50%,-50%);
-  width:min(600px,110vw);height:min(600px,110vw);
-  background:radial-gradient(ellipse,rgba(79,209,197,0.04) 0%,transparent 65%);
-  pointer-events:none;z-index:0;
-}
+/* Corners */
+.corner { position:fixed; width:16px; height:16px; border-color:rgba(200,133,58,0.18); border-style:solid; z-index:4; pointer-events:none; }
+.corner.tl { top:16px; left:16px; border-width:1px 0 0 1px; }
+.corner.tr { top:16px; right:16px; border-width:1px 1px 0 0; }
+.corner.bl { bottom:16px; left:16px; border-width:0 0 1px 1px; }
+.corner.br { bottom:16px; right:16px; border-width:0 1px 1px 0; }
+@media(max-width:480px){ .corner { display:none; } }
 
-/* ─── RAIN CANVAS ─── */
-#rain{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.18;}
+/* Side chars */
+.side-chars { position:fixed; top:50%; transform:translateY(-50%); font-family:'Noto Serif TC',serif; font-size:0.68rem; letter-spacing:0.5em; writing-mode:vertical-rl; color:rgba(200,133,58,0.07); pointer-events:none; z-index:2; }
+.side-chars.left { left:32px; }
+.side-chars.right { right:32px; direction:ltr; }
+@media(max-width:600px){ .side-chars { display:none; } }
 
-/* ─── NAV ─── */
-nav{
-  position:fixed;top:0;left:0;right:0;z-index:200;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 max(20px, env(safe-area-inset-left)) 0 max(20px, env(safe-area-inset-right));
-  height:56px;
-  background:rgba(6,8,16,0.96);
-  border-bottom:1px solid var(--border);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+/* ── NAV ── */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:200;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 20px; height:60px;
+  background:rgba(18,13,10,0.97);
+  border-bottom:1px solid rgba(200,133,58,0.1);
+  backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
 }
-.nav-logo{
-  font-family:'Noto Serif TC',serif;font-weight:900;font-size:1.05rem;
-  color:var(--teal-l);letter-spacing:0.25em;cursor:pointer;
-  user-select:none;-webkit-user-select:none;
-  display:flex;align-items:center;gap:10px;
+.nav-logo {
+  font-family:'Noto Serif TC',serif; font-weight:900; font-size:1.15rem;
+  color:var(--amber-text); letter-spacing:0.2em; cursor:pointer; flex-shrink:0;
+  user-select:none; -webkit-user-select:none;
 }
-.nav-logo-dot{width:5px;height:5px;border-radius:50%;background:var(--teal);opacity:0.6;}
-.nav-links{display:flex;gap:0;list-style:none;}
-.nav-links a{
-  font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.28em;
-  color:var(--text-dim);text-decoration:none;text-transform:uppercase;
-  cursor:pointer;padding:8px 14px;transition:color 0.2s;display:flex;align-items:center;
-  min-height:44px;
+.nav-links { display:flex; gap:28px; list-style:none; }
+.nav-links a {
+  font-family:'Cinzel',serif; font-size:0.65rem; letter-spacing:0.3em;
+  color:var(--paper-ghost); text-decoration:none; text-transform:uppercase;
+  cursor:pointer; padding:6px 2px; transition:color 0.25s; display:block;
 }
-.nav-links a:hover,.nav-links a.active{color:var(--teal-l);}
-.hamburger{
-  display:none;flex-direction:column;justify-content:center;gap:5px;
-  width:44px;height:44px;cursor:pointer;background:none;border:none;padding:10px;
-}
-.hamburger span{display:block;width:20px;height:1px;background:var(--teal-l);border-radius:2px;transition:transform 0.28s,opacity 0.28s;transform-origin:center;}
-.hamburger.open span:nth-child(1){transform:translateY(6px) rotate(45deg);}
-.hamburger.open span:nth-child(2){opacity:0;}
-.hamburger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
-.mobile-menu{
-  display:none;position:fixed;top:56px;left:0;right:0;
-  background:rgba(5,7,13,0.99);border-bottom:1px solid var(--border);
-  z-index:199;
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-}
-.mobile-menu.open{display:block;}
-.mobile-menu a{
-  display:flex;align-items:center;padding:18px 24px;
-  font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.3em;
-  color:var(--text-dim);text-transform:uppercase;cursor:pointer;
-  border-bottom:1px solid rgba(79,209,197,0.05);
-  transition:color 0.2s,background 0.2s;min-height:56px;
-}
-.mobile-menu a.active,.mobile-menu a:active{color:var(--teal-l);background:rgba(79,209,197,0.03);}
-@media(max-width:640px){.nav-links{display:none;}.hamburger{display:flex;}}
+.nav-links a:hover,.nav-links a.active { color:var(--amber-text); }
 
-/* ─── SKIP LINK ─── */
-.skip{position:absolute;top:-100px;left:12px;z-index:9999;background:var(--teal);color:#000;padding:8px 16px;font-size:0.7rem;font-family:'Cinzel',serif;letter-spacing:0.15em;text-decoration:none;transition:top 0.15s;}
-.skip:focus{top:8px;}
+/* Hamburger */
+.hamburger {
+  display:none; flex-direction:column; justify-content:center; gap:5px;
+  width:44px; height:44px; cursor:pointer; background:none; border:none; padding:10px; margin-right:-8px;
+}
+.hamburger span { display:block; width:22px; height:1.5px; background:var(--amber-text); border-radius:2px; transition:transform 0.3s,opacity 0.3s; transform-origin:center; }
+.hamburger.open span:nth-child(1) { transform:translateY(6.5px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity:0; }
+.hamburger.open span:nth-child(3) { transform:translateY(-6.5px) rotate(-45deg); }
 
-/* ─── PAGES ─── */
-.page{display:none;min-height:100vh;min-height:100dvh;position:relative;z-index:10;}
-.page.active{display:block;}
-#page-home{
-  display:none;flex-direction:column;align-items:center;justify-content:center;
-  min-height:100vh;min-height:100dvh;
-  padding:max(80px, calc(64px + env(safe-area-inset-top))) 20px max(100px, calc(80px + env(safe-area-inset-bottom)));
+/* Mobile drawer */
+.mobile-menu {
+  display:none; position:fixed; top:60px; left:0; right:0;
+  background:rgba(16,11,9,0.99); border-bottom:1px solid rgba(200,133,58,0.1);
+  z-index:199; padding:8px 0 20px;
+  backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
 }
-#page-home.active{display:flex!important;}
+.mobile-menu.open { display:block; }
+.mobile-menu a {
+  display:block; padding:18px 28px;
+  font-family:'Cinzel',serif; font-size:0.78rem; letter-spacing:0.3em;
+  color:var(--paper-dim); text-transform:uppercase; cursor:pointer;
+  border-bottom:1px solid rgba(200,133,58,0.05); transition:color 0.2s,background 0.2s;
+  min-height:56px; display:flex; align-items:center;
+}
+.mobile-menu a:last-child { border-bottom:none; }
+.mobile-menu a.active,.mobile-menu a:active { color:var(--amber-text); background:rgba(200,133,58,0.04); }
+@media(max-width:680px){ .nav-links { display:none; } .hamburger { display:flex; } }
 
-/* ─── HOME HERO ─── */
-.hero{text-align:center;margin-bottom:52px;animation:fadeUp 1.4s cubic-bezier(0.16,1,0.3,1) both;}
-.hero-phrase{
-  font-family:'IM Fell English',serif;font-style:italic;
-  font-size:clamp(0.75rem,2.2vw,0.9rem);
-  letter-spacing:0.3em;color:var(--text-fnt);
-  text-transform:uppercase;display:block;margin-bottom:22px;
-}
-.hero-zh{
-  font-family:'Noto Serif TC',serif;font-weight:900;
-  font-size:clamp(3.5rem,16vw,6rem);
-  color:var(--teal-l);letter-spacing:0.3em;line-height:1;display:block;
-  filter:drop-shadow(0 0 40px rgba(79,209,197,0.3));
-}
-.hero-pinyin{
-  font-family:'IM Fell English',serif;font-style:italic;
-  font-size:clamp(0.78rem,2.2vw,0.92rem);letter-spacing:0.4em;
-  color:var(--text-dim);margin-top:14px;display:block;
-}
-.hero-line{
-  width:44px;height:1px;
-  background:linear-gradient(90deg,transparent,var(--teal),transparent);
-  margin:18px auto;opacity:0.5;
-}
-.hero-tag{
-  font-family:'Cinzel',serif;font-size:clamp(0.55rem,1.6vw,0.65rem);
-  letter-spacing:0.45em;color:var(--text-fnt);text-transform:uppercase;
-}
+/* ── PAGES ── */
+.page { display:none; min-height:100vh; min-height:100dvh; position:relative; z-index:10; }
+.page.active { display:block; }
+#page-home { display:none; flex-direction:column; align-items:center; justify-content:center; padding:80px 20px 100px; min-height:100vh; min-height:100dvh; }
+#page-home.active { display:flex; }
 
-/* ─── PROMPT AREA ─── */
-.prompt-intro{
-  font-family:'Noto Serif TC',serif;font-weight:300;
-  font-size:clamp(0.9rem,3vw,1.05rem);
-  color:var(--text-dim);letter-spacing:0.2em;text-align:center;
-  margin-bottom:28px;line-height:2;
-  animation:fadeUp 1.4s cubic-bezier(0.16,1,0.3,1) 0.18s both;
-  transition:opacity 0.5s;
-}
-.prompt-intro small{
-  display:block;font-family:'Cinzel',serif;font-style:normal;
-  font-size:0.6em;letter-spacing:0.35em;color:var(--text-fnt);margin-top:4px;
-}
+/* ── HOME ── */
+.title-block { text-align:center; margin-bottom:36px; animation:rise 1.6s cubic-bezier(0.16,1,0.3,1) both; }
+.title-chinese { font-family:'Noto Serif TC',serif; font-weight:900; font-size:clamp(3rem,14vw,5.5rem); letter-spacing:0.25em; color:var(--amber-text); filter:drop-shadow(0 0 30px rgba(200,133,58,0.45)); line-height:1; display:block; }
+.title-pinyin { font-family:'IM Fell English',serif; font-style:italic; font-size:clamp(0.8rem,2.5vw,0.95rem); letter-spacing:0.3em; color:var(--paper-ghost); margin-top:12px; display:block; }
+.title-divider { width:56px; height:1px; background:linear-gradient(90deg,transparent,var(--amber),transparent); margin:14px auto; opacity:0.6; }
+.title-tagline { font-size:clamp(0.6rem,2vw,0.72rem); letter-spacing:0.4em; color:var(--paper-ghost); text-transform:uppercase; }
 
-/* ─── INPUT ─── */
-.input-zone{
-  width:100%;max-width:360px;
-  animation:fadeUp 1.4s cubic-bezier(0.16,1,0.3,1) 0.32s both;
-  transition:opacity 0.4s;
-  padding:0 4px;
+.prompt-text { font-family:'Noto Serif TC',serif; font-weight:300; font-size:clamp(1rem,3.5vw,1.15rem); color:var(--paper-dim); letter-spacing:0.2em; text-align:center; margin-bottom:24px; animation:rise 1.6s cubic-bezier(0.16,1,0.3,1) 0.2s both; transition:opacity 0.5s; line-height:2; }
+
+.input-area { width:100%; max-width:380px; animation:rise 1.6s cubic-bezier(0.16,1,0.3,1) 0.35s both; transition:opacity 0.4s; padding:0 4px; }
+.input-wrap { position:relative; display:flex; align-items:center; border-bottom:1.5px solid rgba(212,146,63,0.4); transition:border-color 0.4s; }
+.input-wrap:focus-within { border-color:var(--amber-text); }
+.input-wrap:focus-within::after { content:''; position:absolute; bottom:-1px; left:0; width:100%; height:1px; background:var(--amber-text); filter:blur(5px); opacity:0.5; }
+.word-input { flex:1; background:transparent; border:none; outline:none; padding:16px 0; font-family:'Noto Serif TC',serif; font-size:clamp(1.5rem,6vw,1.8rem); font-weight:700; color:var(--paper); letter-spacing:0.1em; text-align:center; caret-color:var(--amber-text); -webkit-appearance:none; border-radius:0; }
+.word-input::placeholder { font-family:'IM Fell English',serif; font-style:italic; font-weight:300; font-size:1rem; color:var(--paper-ghost); letter-spacing:0.15em; }
+.submit-btn { background:none; border:none; color:var(--amber-dim); font-size:1.4rem; cursor:pointer; padding:16px 8px 16px 16px; transition:color 0.25s,transform 0.25s; min-width:48px; min-height:48px; display:flex; align-items:center; justify-content:center; }
+.submit-btn:hover,.submit-btn:active { color:var(--amber-text); transform:translateX(3px); }
+.input-hint { text-align:center; font-size:0.65rem; letter-spacing:0.25em; color:var(--paper-ghost); margin-top:12px; text-transform:uppercase; }
+.error-text { font-family:'IM Fell English',serif; font-style:italic; font-size:0.88rem; color:var(--error); text-align:center; margin-top:10px; display:none; }
+.error-text.show { display:block; }
+
+/* Loading */
+.loading { display:none; gap:8px; align-items:center; justify-content:center; margin-top:36px; height:32px; }
+.loading.show { display:flex; }
+.loading span { width:6px; height:6px; border-radius:50%; background:var(--amber); opacity:0.3; animation:pulse 1.2s infinite; }
+.loading span:nth-child(2) { animation-delay:0.2s; }
+.loading span:nth-child(3) { animation-delay:0.4s; }
+@keyframes pulse { 0%,100%{opacity:0.2;transform:scale(0.8)} 50%{opacity:1;transform:scale(1.2)} }
+
+/* Response */
+.response-area { width:100%; max-width:440px; margin-top:44px; display:flex; flex-direction:column; align-items:center; text-align:center; padding:0 8px; }
+.response-word-zh { font-family:'Noto Serif TC',serif; font-weight:900; font-size:clamp(2.2rem,10vw,3.2rem); color:var(--amber-text); filter:drop-shadow(0 0 18px rgba(200,133,58,0.5)); opacity:0; transform:translateY(12px); transition:opacity 0.8s ease,transform 0.8s ease; margin-bottom:24px; }
+.response-text { font-family:'IM Fell English',serif; font-size:clamp(0.95rem,3.2vw,1.05rem); line-height:2; color:var(--paper-dim); opacity:0; transform:translateY(8px); transition:opacity 0.8s ease 0.3s,transform 0.8s ease 0.3s; font-style:italic; max-width:360px; }
+.response-proverb { margin-top:22px; font-family:'Noto Serif TC',serif; font-size:clamp(0.78rem,2.5vw,0.9rem); color:var(--amber-dim); letter-spacing:0.18em; opacity:0; transition:opacity 0.8s ease 0.6s; line-height:1.9; }
+.response-area.visible .response-word-zh,
+.response-area.visible .response-text,
+.response-area.visible .response-proverb { opacity:1; transform:translateY(0); }
+
+.reset-btn { display:none; margin-top:36px; background:none; border:1px solid rgba(200,133,58,0.2); color:var(--paper-ghost); font-family:'IM Fell English',serif; font-style:italic; font-size:0.9rem; letter-spacing:0.2em; cursor:pointer; padding:14px 28px; transition:color 0.3s,border-color 0.3s; min-height:50px; }
+.reset-btn:hover,.reset-btn:active { color:var(--paper-dim); border-color:rgba(200,133,58,0.5); }
+.reset-btn.show { display:block; }
+
+/* Teacup */
+.teacup { position:fixed; bottom:44px; right:44px; z-index:2; opacity:0.08; pointer-events:none; }
+.steam { position:fixed; bottom:54px; right:52px; opacity:0.1; pointer-events:none; z-index:2; display:flex; }
+.steam-line { width:2px; height:28px; background:linear-gradient(to top,var(--amber),transparent); border-radius:2px; display:inline-block; margin:0 3px; animation:steamrise 2.5s ease-in-out infinite; transform-origin:bottom; }
+.steam-line:nth-child(2){animation-delay:0.5s;height:20px;}
+.steam-line:nth-child(3){animation-delay:1s;height:26px;}
+@keyframes steamrise { 0%{transform:scaleY(0);opacity:0} 30%{opacity:1} 100%{transform:scaleY(1) translateY(-18px);opacity:0} }
+@media(max-width:480px){.teacup,.steam{display:none;}}
+
+/* ── INNER PAGES ── */
+.inner { padding:90px 20px 80px; max-width:860px; margin:0 auto; }
+@media(min-width:600px){ .inner { padding:100px 40px 100px; } }
+
+.page-header { text-align:center; margin-bottom:52px; }
+.page-header .zh-title { font-family:'Noto Serif TC',serif; font-weight:900; font-size:clamp(2.2rem,10vw,3.5rem); color:var(--amber-text); display:block; letter-spacing:0.3em; filter:drop-shadow(0 0 20px rgba(200,133,58,0.3)); margin-bottom:10px; }
+.page-header .en-title { font-family:'Cinzel',serif; font-size:clamp(0.6rem,2vw,0.7rem); letter-spacing:0.45em; color:var(--paper-ghost); text-transform:uppercase; display:block; margin-bottom:12px; }
+.page-header .hk-sub { font-family:'Noto Serif TC',serif; font-size:0.82rem; color:rgba(212,146,63,0.55); letter-spacing:0.18em; display:block; }
+
+.divider-orn { display:flex; align-items:center; justify-content:center; gap:14px; margin:32px 0; }
+.divider-orn::before,.divider-orn::after { content:''; flex:1; max-width:80px; height:1px; background:rgba(200,133,58,0.18); }
+.divider-orn span { color:rgba(200,133,58,0.45); font-family:'Noto Serif TC',serif; font-size:0.9rem; }
+
+.story-section { margin-bottom:48px; }
+.section-label { font-family:'Cinzel',serif; font-size:0.58rem; letter-spacing:0.5em; color:rgba(200,133,58,0.55); text-transform:uppercase; margin-bottom:16px; display:block; }
+.story-section p { font-family:'IM Fell English',serif; font-style:italic; line-height:2.1; font-size:clamp(0.95rem,3vw,1.05rem); color:var(--paper-dim); margin-bottom:14px; }
+.story-section p.zh-text { font-family:'Noto Serif TC',serif; font-style:normal; font-weight:300; font-size:clamp(0.82rem,2.5vw,0.9rem); color:rgba(212,146,63,0.52); letter-spacing:0.15em; line-height:2.3; }
+
+.values-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; margin-top:28px; }
+@media(max-width:380px){ .values-grid { grid-template-columns:repeat(2,1fr); } }
+.value-item { padding:22px 14px; border:1px solid rgba(200,133,58,0.09); text-align:center; transition:border-color 0.3s,background 0.3s; }
+.value-item:active { background:rgba(200,133,58,0.04); }
+.value-item .zh { font-family:'Noto Serif TC',serif; font-weight:900; font-size:1.9rem; color:var(--amber-text); display:block; margin-bottom:8px; }
+.value-item .label { font-family:'IM Fell English',serif; font-style:italic; font-size:0.72rem; color:var(--paper-ghost); letter-spacing:0.15em; display:block; }
+
+/* ── TEAM ── */
+.team-grid { display:grid; grid-template-columns:1fr; gap:2px; margin-top:8px; }
+@media(min-width:560px){ .team-grid { grid-template-columns:repeat(2,1fr); } }
+@media(min-width:820px){ .team-grid { grid-template-columns:repeat(3,1fr); } }
+.team-card { border:1px solid rgba(200,133,58,0.09); padding:28px 22px; position:relative; overflow:hidden; transition:border-color 0.35s,background 0.35s; }
+.team-card:hover,.team-card:focus-within { border-color:rgba(200,133,58,0.22); background:rgba(200,133,58,0.025); }
+.founder-badge { position:absolute; top:16px; right:16px; font-family:'Cinzel',serif; font-size:0.5rem; letter-spacing:0.3em; color:var(--amber-dim); border:1px solid rgba(200,133,58,0.25); padding:3px 8px; text-transform:uppercase; }
+.team-avatar { width:48px; height:48px; border:1px solid rgba(200,133,58,0.22); display:flex; align-items:center; justify-content:center; font-family:'Noto Serif TC',serif; font-size:1.35rem; color:var(--amber-text); margin-bottom:18px; background:rgba(200,133,58,0.05); }
+.team-name-zh { font-family:'Noto Serif TC',serif; font-weight:900; font-size:1rem; color:var(--paper); letter-spacing:0.18em; margin-bottom:3px; display:block; }
+.team-name-en { font-family:'IM Fell English',serif; font-style:italic; font-size:0.78rem; color:var(--paper-ghost); letter-spacing:0.12em; display:block; margin-bottom:14px; }
+.team-role { font-family:'Cinzel',serif; font-size:0.55rem; letter-spacing:0.35em; color:var(--amber-dim); text-transform:uppercase; display:block; margin-bottom:14px; line-height:1.7; }
+.team-bio { font-family:'IM Fell English',serif; font-style:italic; font-size:0.88rem; line-height:1.85; color:var(--paper-ghost); }
+.team-social { margin-top:16px; }
+.team-social a { font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.2em; color:var(--amber-dim); text-decoration:none; text-transform:uppercase; border-bottom:1px solid rgba(200,133,58,0.2); padding-bottom:2px; display:inline-flex; align-items:center; min-height:40px; transition:color 0.25s; }
+.team-social a:hover { color:var(--amber-text); }
+
+/* ── WHITEPAPER ── */
+.wp-section { margin-bottom:50px; }
+.wp-label { font-family:'Cinzel',serif; font-size:0.58rem; letter-spacing:0.5em; color:rgba(200,133,58,0.55); text-transform:uppercase; margin-bottom:6px; display:flex; align-items:center; gap:12px; }
+.wp-label::after { content:''; flex:1; height:1px; background:rgba(200,133,58,0.12); }
+.wp-section h3 { font-family:'Noto Serif TC',serif; font-size:clamp(1.05rem,3.5vw,1.35rem); font-weight:700; color:var(--paper); letter-spacing:0.08em; margin-bottom:18px; margin-top:6px; line-height:1.4; }
+.wp-section h3 .zh-sub { font-size:0.78rem; color:rgba(200,133,58,0.45); margin-left:8px; letter-spacing:0.18em; }
+.wp-section p { font-family:'IM Fell English',serif; font-style:italic; font-size:clamp(0.93rem,3vw,1rem); line-height:2.1; color:var(--paper-dim); margin-bottom:14px; }
+.wp-section p.zh { font-family:'Noto Serif TC',serif; font-style:normal; font-weight:300; font-size:clamp(0.8rem,2.5vw,0.88rem); color:rgba(212,146,63,0.48); letter-spacing:0.14em; line-height:2.2; }
+.wp-pullquote { border-left:2px solid rgba(200,133,58,0.28); padding:16px 22px; margin:28px 0; background:rgba(200,133,58,0.03); }
+.wp-pullquote p { font-family:'Noto Serif TC',serif; font-style:normal; font-weight:900; font-size:clamp(1rem,3.5vw,1.15rem); color:var(--amber-text); letter-spacing:0.12em; line-height:1.9; margin:0; }
+.wp-pullquote span { display:block; font-family:'IM Fell English',serif; font-style:italic; font-size:0.75rem; color:var(--paper-ghost); letter-spacing:0.15em; margin-top:8px; }
+.wp-table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; margin:20px 0; }
+.wp-table { width:100%; border-collapse:collapse; min-width:400px; }
+.wp-table th { font-family:'Cinzel',serif; font-size:0.55rem; letter-spacing:0.35em; color:var(--amber-dim); text-align:left; padding:10px 12px; border-bottom:1px solid rgba(200,133,58,0.15); text-transform:uppercase; white-space:nowrap; }
+.wp-table td { font-family:'IM Fell English',serif; font-style:italic; font-size:0.88rem; color:var(--paper-dim); padding:10px 12px; border-bottom:1px solid rgba(200,133,58,0.06); vertical-align:top; }
+.wp-phase-list { list-style:none; margin:16px 0; }
+.wp-phase-list li { display:flex; gap:14px; padding:16px 0; border-bottom:1px solid rgba(200,133,58,0.07); align-items:flex-start; }
+.phase-num { font-family:'Cinzel',serif; font-size:0.58rem; color:var(--amber-dim); letter-spacing:0.15em; min-width:52px; padding-top:3px; flex-shrink:0; line-height:1.5; }
+.phase-text { font-family:'IM Fell English',serif; font-style:italic; font-size:0.9rem; color:var(--paper-dim); line-height:1.8; }
+.phase-text strong { display:block; font-family:'Noto Serif TC',serif; font-style:normal; font-weight:700; font-size:0.82rem; color:var(--paper); letter-spacing:0.08em; margin-bottom:4px; }
+
+/* ── FOOTER ── */
+footer { position:relative; z-index:10; padding:24px 20px; border-top:1px solid rgba(200,133,58,0.09); background:rgba(15,11,8,0.7); }
+.footer-top { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:14px; }
+.footer-logo { font-family:'Noto Serif TC',serif; font-size:0.85rem; color:rgba(200,133,58,0.42); letter-spacing:0.22em; }
+.footer-links { display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+.footer-links a { font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.2em; color:var(--paper-ghost); text-decoration:none; text-transform:uppercase; cursor:pointer; transition:color 0.25s; min-height:36px; display:flex; align-items:center; }
+.footer-links a:hover { color:var(--amber-text); }
+.footer-bottom { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+.footer-copy { font-family:'IM Fell English',serif; font-style:italic; font-size:0.65rem; color:rgba(200,133,58,0.28); letter-spacing:0.15em; }
+.orynth-badge { display:flex; align-items:center; opacity:0.55; transition:opacity 0.3s; flex-shrink:0; }
+.orynth-badge:hover { opacity:1; }
+.orynth-badge img { height:18px; display:block; }
+
+/* Animations */
+@keyframes rise { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+.fade-in  { animation:rise 1s ease both; }
+.delay-1  { animation-delay:0.12s; }
+.delay-2  { animation-delay:0.24s; }
+.delay-3  { animation-delay:0.36s; }
+
+/* ══════════════════════════════════════
+   ZODIAC PAGE
+══════════════════════════════════════ */
+#page-zodiac .inner { max-width:900px; }
+
+/* Year picker */
+.zodiac-picker {
+  display:flex; flex-direction:column; align-items:center;
+  gap:20px; margin-bottom:44px; animation:rise 0.9s ease both;
 }
-.input-row{
-  display:flex;align-items:center;
-  border-bottom:1px solid rgba(79,209,197,0.3);
+.zodiac-picker-label {
+  font-family:'Noto Serif TC',serif; font-weight:300;
+  font-size:clamp(0.9rem,3vw,1rem); color:var(--paper-dim);
+  letter-spacing:0.22em; text-align:center; line-height:2;
+}
+.year-input-wrap {
+  display:flex; align-items:center; gap:0;
+  border:1px solid rgba(200,133,58,0.3);
+  background:rgba(200,133,58,0.03);
   transition:border-color 0.3s;
-  position:relative;
 }
-.input-row:focus-within{border-color:var(--teal-l);}
-.input-row:focus-within::after{
-  content:'';position:absolute;bottom:-1px;left:0;width:100%;height:1px;
-  background:var(--teal-l);filter:blur(6px);opacity:0.4;
+.year-input-wrap:focus-within { border-color:var(--amber-text); }
+.year-input {
+  background:transparent; border:none; outline:none;
+  padding:14px 20px; font-family:'Noto Serif TC',serif; font-size:1.6rem;
+  font-weight:700; color:var(--paper); letter-spacing:0.1em;
+  text-align:center; width:160px; caret-color:var(--amber-text);
+  -webkit-appearance:none; border-radius:0;
 }
-.word-in{
-  flex:1;background:transparent;border:none;outline:none;
-  padding:18px 0;
-  font-family:'Noto Serif TC',serif;font-weight:700;
-  font-size:max(16px, clamp(1.4rem,5.5vw,1.7rem));
-  color:var(--white);letter-spacing:0.08em;text-align:center;
-  caret-color:var(--teal-l);
-  -webkit-appearance:none;border-radius:0;
+.year-input::placeholder { font-size:1rem; color:var(--paper-ghost); font-weight:300; }
+.year-btn {
+  background:none; border:none; border-left:1px solid rgba(200,133,58,0.2);
+  color:var(--amber-dim); font-size:1.2rem; cursor:pointer;
+  padding:14px 20px; transition:color 0.25s,background 0.25s;
+  min-width:56px; min-height:56px; display:flex; align-items:center; justify-content:center;
+  font-family:'Cinzel',serif; letter-spacing:0.1em;
 }
-.word-in::placeholder{
-  font-family:'IM Fell English',serif;font-style:italic;font-weight:300;
-  font-size:clamp(0.9rem,3vw,1rem);color:var(--text-fnt);letter-spacing:0.18em;
-}
-.send-btn{
-  background:none;border:none;color:var(--teal-d);
-  font-size:1.3rem;cursor:pointer;
-  padding:18px 6px 18px 14px;
-  transition:color 0.2s,transform 0.2s;
-  min-width:48px;min-height:56px;
-  display:flex;align-items:center;justify-content:center;
-}
-.send-btn:hover,.send-btn:active{color:var(--teal-l);transform:translateX(3px);}
-.input-sub{
-  text-align:center;font-family:'Cinzel',serif;font-size:0.58rem;
-  letter-spacing:0.28em;color:var(--text-fnt);margin-top:10px;
-  text-transform:uppercase;
-}
-.err{
-  font-family:'IM Fell English',serif;font-style:italic;font-size:0.85rem;
-  color:var(--red);text-align:center;margin-top:10px;display:none;
-}
-.err.on{display:block;}
+.year-btn:hover,.year-btn:active { color:var(--amber-text); background:rgba(200,133,58,0.06); }
 
-/* ─── LOADING ─── */
-.loader{display:none;gap:7px;align-items:center;justify-content:center;margin-top:40px;height:28px;}
-.loader.on{display:flex;}
-.loader span{
-  width:5px;height:5px;border-radius:50%;
-  background:var(--teal);opacity:0.25;
-  animation:dot 1.3s infinite;
+/* Zodiac result card */
+.zodiac-result {
+  display:none; flex-direction:column; align-items:center;
+  text-align:center; animation:rise 0.9s ease both;
 }
-.loader span:nth-child(2){animation-delay:0.22s;}
-.loader span:nth-child(3){animation-delay:0.44s;}
-@keyframes dot{0%,100%{opacity:0.15;transform:scale(0.7)}50%{opacity:1;transform:scale(1.3)}}
+.zodiac-result.show { display:flex; }
 
-/* ─── RESPONSE ─── */
-.response-panel{
-  width:100%;max-width:460px;
-  margin-top:50px;
-  display:flex;flex-direction:column;align-items:center;text-align:center;
-  padding:0 12px;
+.zodiac-animal-wrap {
+  position:relative; margin-bottom:32px;
 }
-.r-zh{
-  font-family:'Noto Serif TC',serif;font-weight:900;
-  font-size:clamp(2.4rem,11vw,3.5rem);
-  color:var(--teal-l);
-  filter:drop-shadow(0 0 24px rgba(79,209,197,0.45));
-  opacity:0;transform:translateY(14px);
-  transition:opacity 0.9s ease,transform 0.9s ease;
-  margin-bottom:28px;line-height:1.1;
+.zodiac-hanzi {
+  font-family:'Noto Serif TC',serif; font-weight:900;
+  font-size:clamp(5rem,22vw,9rem); color:var(--amber-text);
+  filter:drop-shadow(0 0 40px rgba(200,133,58,0.4));
+  line-height:1; display:block;
+  animation:zodiac-pop 0.7s cubic-bezier(0.16,1,0.3,1) both;
 }
-.r-divider{
-  width:32px;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(79,209,197,0.4),transparent);
-  margin-bottom:28px;
-  opacity:0;transition:opacity 0.9s ease 0.2s;
+@keyframes zodiac-pop {
+  0%  { opacity:0; transform:scale(0.6) rotate(-8deg); }
+  70% { transform:scale(1.05) rotate(1deg); }
+  100%{ opacity:1; transform:scale(1) rotate(0deg); }
 }
-.r-text{
-  font-family:'IM Fell English',serif;font-style:italic;
-  font-size:clamp(0.95rem,3vw,1.05rem);
-  line-height:2.1;color:var(--text);
-  opacity:0;transform:translateY(8px);
-  transition:opacity 0.9s ease 0.3s,transform 0.9s ease 0.3s;
-  max-width:380px;
+.zodiac-emoji {
+  font-size:clamp(2.5rem,10vw,4rem); display:block;
+  margin-bottom:8px; animation:zodiac-pop 0.7s cubic-bezier(0.16,1,0.3,1) 0.1s both;
 }
-.r-proverb{
-  margin-top:26px;
-  font-family:'Noto Serif TC',serif;
-  font-size:clamp(0.78rem,2.4vw,0.9rem);
-  color:var(--teal-d);letter-spacing:0.2em;
-  opacity:0;transition:opacity 0.9s ease 0.6s;
-  line-height:2;
+.zodiac-year-label {
+  font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.5em;
+  color:var(--paper-ghost); text-transform:uppercase; margin-bottom:6px; display:block;
 }
-.r-meaning{
-  margin-top:10px;
-  font-family:'IM Fell English',serif;font-style:italic;
-  font-size:clamp(0.72rem,2.2vw,0.82rem);
-  color:var(--text-fnt);letter-spacing:0.12em;
-  opacity:0;transition:opacity 0.9s ease 0.75s;
-  line-height:1.8;
+.zodiac-name-zh {
+  font-family:'Noto Serif TC',serif; font-weight:900; font-size:1.6rem;
+  color:var(--paper); letter-spacing:0.25em; display:block; margin-bottom:4px;
 }
-.response-panel.show .r-zh,
-.response-panel.show .r-divider,
-.response-panel.show .r-text,
-.response-panel.show .r-proverb,
-.response-panel.show .r-meaning{opacity:1;transform:translateY(0);}
-
-.action-row{
-  display:none;
-  flex-direction:column;
-  align-items:center;
-  gap:12px;
-  margin-top:40px;
-  width:100%;max-width:280px;
-}
-.action-row.on{display:flex;}
-.again-btn{
-  background:none;border:1px solid rgba(79,209,197,0.16);
-  color:var(--text-dim);font-family:'IM Fell English',serif;font-style:italic;
-  font-size:0.88rem;letter-spacing:0.2em;cursor:pointer;
-  padding:14px 32px;min-height:50px;
-  transition:color 0.25s,border-color 0.25s;
-  width:100%;
-}
-.again-btn:hover,.again-btn:active{color:var(--text);border-color:rgba(79,209,197,0.4);}
-.share-btn{
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  background:var(--white);
-  border:none;
-  color:#060810;
-  font-family:'Cinzel',serif;
-  font-size:0.62rem;letter-spacing:0.25em;text-transform:uppercase;
-  cursor:pointer;
-  padding:14px 28px;min-height:50px;width:100%;
-  transition:background 0.2s,opacity 0.2s;
-}
-.share-btn:hover{background:#d0e8ec;}
-.share-btn:active{opacity:0.8;}
-.share-btn.copied{background:rgba(79,209,197,0.12);color:var(--teal-l);border:1px solid rgba(79,209,197,0.28);}
-
-
-/* ─── INNER PAGES ─── */
-.inner{padding:max(88px, calc(72px + env(safe-area-inset-top))) max(20px, env(safe-area-inset-left)) max(80px, calc(60px + env(safe-area-inset-bottom)));max-width:840px;margin:0 auto;}
-@media(min-width:600px){.inner{padding-left:max(40px, env(safe-area-inset-left));padding-right:max(40px, env(safe-area-inset-right));}}
-
-/* ─── PAGE HEADER ─── */
-.pg-head{text-align:center;margin-bottom:56px;}
-.pg-zh{font-family:'Noto Serif TC',serif;font-weight:900;font-size:clamp(2rem,9vw,3.2rem);color:var(--teal-l);display:block;letter-spacing:0.3em;filter:drop-shadow(0 0 16px var(--glow));margin-bottom:10px;}
-.pg-en{font-family:'Cinzel',serif;font-size:clamp(0.58rem,1.8vw,0.68rem);letter-spacing:0.45em;color:var(--text-fnt);text-transform:uppercase;display:block;margin-bottom:10px;}
-.pg-sub{font-family:'Noto Serif TC',serif;font-size:0.8rem;color:rgba(79,209,197,0.38);letter-spacing:0.15em;display:block;}
-
-/* ─── ORN DIVIDER ─── */
-.orn{display:flex;align-items:center;justify-content:center;gap:14px;margin:36px 0;}
-.orn::before,.orn::after{content:'';flex:1;max-width:72px;height:1px;background:rgba(79,209,197,0.12);}
-.orn span{color:rgba(79,209,197,0.38);font-family:'Noto Serif TC',serif;font-size:0.85rem;}
-
-/* ─── STORY SECTION ─── */
-.sec{margin-bottom:52px;}
-.sec-label{font-family:'Cinzel',serif;font-size:0.56rem;letter-spacing:0.5em;color:rgba(79,209,197,0.38);text-transform:uppercase;margin-bottom:18px;display:block;}
-.sec p{font-family:'IM Fell English',serif;font-style:italic;line-height:2.2;font-size:clamp(0.93rem,2.8vw,1.02rem);color:var(--text);margin-bottom:14px;overflow-wrap:break-word;}
-.sec .zh{font-family:'Noto Serif TC',serif;font-style:normal;font-weight:300;font-size:clamp(0.8rem,2.4vw,0.88rem);color:rgba(79,209,197,0.38);letter-spacing:0.15em;line-height:2.3;}
-
-/* ─── VALUES GRID ─── */
-.val-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:28px;}
-@media(max-width:360px){.val-grid{grid-template-columns:repeat(2,1fr);}}
-.val-item{padding:20px 12px;border:1px solid var(--border);text-align:center;transition:border-color 0.3s,background 0.3s;}
-.val-item:active{background:rgba(79,209,197,0.03);}
-.val-item .zh{font-family:'Noto Serif TC',serif;font-weight:900;font-size:1.9rem;color:var(--teal-l);display:block;margin-bottom:8px;}
-.val-item .lbl{font-family:'IM Fell English',serif;font-style:italic;font-size:0.7rem;color:var(--text-fnt);letter-spacing:0.14em;display:block;}
-
-/* ─── PULLQUOTE ─── */
-.pullq{border-left:2px solid rgba(79,209,197,0.2);padding:16px 22px;margin:30px 0;background:rgba(79,209,197,0.02);}
-.pullq p{font-family:'Noto Serif TC',serif;font-weight:900;font-size:clamp(0.95rem,3vw,1.1rem);color:var(--teal-l);letter-spacing:0.12em;line-height:2;margin:0;}
-.pullq span{display:block;font-family:'IM Fell English',serif;font-style:italic;font-size:0.74rem;color:var(--text-fnt);letter-spacing:0.14em;margin-top:8px;}
-
-/* ─── TEAM ─── */
-.team-grid{display:grid;grid-template-columns:1fr;gap:2px;margin-top:8px;}
-@media(min-width:540px){.team-grid{grid-template-columns:repeat(2,1fr);}}
-@media(min-width:800px){.team-grid{grid-template-columns:repeat(3,1fr);}}
-.team-card{border:1px solid var(--border);padding:26px 20px;position:relative;overflow:hidden;transition:border-color 0.3s,background 0.3s;}
-.team-card:hover,.team-card:focus-within{border-color:var(--border-h);background:rgba(79,209,197,0.02);}
-.founder-tag{position:absolute;top:14px;right:14px;font-family:'Cinzel',serif;font-size:0.48rem;letter-spacing:0.3em;color:var(--teal-d);border:1px solid rgba(79,209,197,0.2);padding:3px 7px;text-transform:uppercase;}
-.t-avatar{width:44px;height:44px;border:1px solid rgba(79,209,197,0.18);display:flex;align-items:center;justify-content:center;font-family:'Noto Serif TC',serif;font-size:1.25rem;color:var(--teal-l);margin-bottom:16px;background:rgba(79,209,197,0.03);}
-.t-name-zh{font-family:'Noto Serif TC',serif;font-weight:900;font-size:0.95rem;color:var(--white);letter-spacing:0.18em;margin-bottom:2px;display:block;}
-.t-name-en{font-family:'IM Fell English',serif;font-style:italic;font-size:0.75rem;color:var(--text-fnt);letter-spacing:0.1em;display:block;margin-bottom:12px;}
-.t-role{font-family:'Cinzel',serif;font-size:0.52rem;letter-spacing:0.32em;color:var(--teal-d);text-transform:uppercase;display:block;margin-bottom:12px;line-height:1.7;}
-.t-bio{font-family:'IM Fell English',serif;font-style:italic;font-size:0.85rem;line-height:1.85;color:var(--text-fnt);}
-.t-link{margin-top:14px;}
-.t-link a{font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.18em;color:var(--teal-d);text-decoration:none;text-transform:uppercase;border-bottom:1px solid rgba(79,209,197,0.16);padding-bottom:2px;min-height:40px;display:inline-flex;align-items:center;transition:color 0.2s;}
-.t-link a:hover{color:var(--teal-l);}
-
-/* ─── WHITEPAPER ─── */
-.wp-sec{margin-bottom:52px;}
-.wp-label{font-family:'Cinzel',serif;font-size:0.56rem;letter-spacing:0.5em;color:rgba(79,209,197,0.38);text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:12px;}
-.wp-label::after{content:'';flex:1;height:1px;background:rgba(79,209,197,0.08);}
-.wp-sec h3{font-family:'Noto Serif TC',serif;font-size:clamp(1rem,3.2vw,1.3rem);font-weight:700;color:var(--white);letter-spacing:0.07em;margin-bottom:16px;margin-top:6px;line-height:1.4;}
-.wp-sec h3 .zh-s{font-size:0.76rem;color:rgba(79,209,197,0.32);margin-left:8px;letter-spacing:0.16em;}
-.wp-sec p{font-family:'IM Fell English',serif;font-style:italic;font-size:clamp(0.9rem,2.8vw,0.98rem);line-height:2.1;color:var(--text);margin-bottom:14px;overflow-wrap:break-word;}
-.wp-sec p.zh{font-family:'Noto Serif TC',serif;font-style:normal;font-weight:300;font-size:clamp(0.78rem,2.3vw,0.86rem);color:rgba(79,209,197,0.36);letter-spacing:0.13em;line-height:2.2;}
-.wp-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:20px 0;}
-.wp-table{width:100%;border-collapse:collapse;min-width:320px;}
-.wp-table th{font-family:'Cinzel',serif;font-size:0.52rem;letter-spacing:0.32em;color:var(--teal-d);text-align:left;padding:10px 10px;border-bottom:1px solid rgba(79,209,197,0.12);text-transform:uppercase;white-space:nowrap;}
-.wp-table td{font-family:'IM Fell English',serif;font-style:italic;font-size:0.85rem;color:var(--text);padding:10px 10px;border-bottom:1px solid rgba(79,209,197,0.04);vertical-align:top;}
-.phase-list{list-style:none;margin:16px 0;}
-.phase-list li{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid rgba(79,209,197,0.05);align-items:flex-start;}
-.phase-n{font-family:'Cinzel',serif;font-size:0.56rem;color:var(--teal-d);letter-spacing:0.14em;min-width:50px;padding-top:3px;flex-shrink:0;line-height:1.5;}
-.phase-t{font-family:'IM Fell English',serif;font-style:italic;font-size:0.88rem;color:var(--text);line-height:1.8;}
-.phase-t strong{display:block;font-family:'Noto Serif TC',serif;font-style:normal;font-weight:700;font-size:0.8rem;color:var(--white);letter-spacing:0.07em;margin-bottom:3px;}
-
-/* ─── FOOTER ─── */
-footer{
-  position:relative;z-index:10;
-  padding:22px max(20px, env(safe-area-inset-left)) max(22px, env(safe-area-inset-bottom));
-  border-top:1px solid var(--border);
-  background:rgba(4,6,12,0.7);
-}
-.ft-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;}
-.ft-logo{font-family:'Noto Serif TC',serif;font-size:0.82rem;color:rgba(79,209,197,0.3);letter-spacing:0.2em;}
-.ft-links{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
-.ft-links a{font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.18em;color:var(--text-fnt);text-decoration:none;text-transform:uppercase;cursor:pointer;min-height:36px;display:flex;align-items:center;transition:color 0.2s;}
-.ft-links a:hover{color:var(--teal-l);}
-.ft-bot{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
-.ft-copy{font-family:'IM Fell English',serif;font-style:italic;font-size:0.62rem;color:rgba(79,209,197,0.2);letter-spacing:0.14em;}
-.orynth-badge{display:flex;align-items:center;opacity:0.5;transition:opacity 0.25s;}
-.orynth-badge:hover{opacity:1;}
-.orynth-badge img{height:16px;display:block;}
-
-/* ─── ANIMATIONS ─── */
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-.fi{animation:fadeUp 0.9s ease both;}
-.d1{animation-delay:0.1s;}.d2{animation-delay:0.2s;}.d3{animation-delay:0.3s;}
-
-/* ─── FOCUS ─── */
-a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--teal);outline-offset:3px;}
-a:focus:not(:focus-visible),button:focus:not(:focus-visible),input:focus:not(:focus-visible){outline:none;}
-
-/* ─── REDUCED MOTION ─── */
-@media(prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important;}
-  .fi{animation:none;opacity:1;}
-  #rain{display:none;}
+.zodiac-name-en {
+  font-family:'Cinzel',serif; font-size:0.75rem; letter-spacing:0.4em;
+  color:var(--amber-dim); text-transform:uppercase; display:block; margin-bottom:28px;
 }
 
-/* ─── WORD OVERFLOW ─── */
-.r-zh,.r-text,.r-proverb,.r-meaning,.sec p,.wp-sec p,.t-bio{overflow-wrap:break-word;word-break:break-word;}
+.zodiac-divider { width:60px; height:1px; background:linear-gradient(90deg,transparent,var(--amber),transparent); margin:0 auto 28px; opacity:0.5; }
 
-/* ─── DECORATIVE CORNER MARKS ─── */
-.corner{position:fixed;width:14px;height:14px;border-color:rgba(79,209,197,0.12);border-style:solid;z-index:4;pointer-events:none;}
-.corner.tl{top:14px;left:14px;border-width:1px 0 0 1px;}
-.corner.tr{top:14px;right:14px;border-width:1px 1px 0 0;}
-.corner.bl{bottom:14px;left:14px;border-width:0 0 1px 1px;}
-.corner.br{bottom:14px;right:14px;border-width:0 1px 1px 0;}
-@media(max-width:480px){.corner{display:none;}}
+.zodiac-element {
+  display:inline-flex; align-items:center; gap:10px;
+  border:1px solid rgba(200,133,58,0.2); padding:8px 18px;
+  margin-bottom:24px; font-family:'Cinzel',serif; font-size:0.6rem;
+  letter-spacing:0.35em; color:var(--amber-dim); text-transform:uppercase;
+}
+.zodiac-element span { font-family:'Noto Serif TC',serif; font-size:0.9rem; color:var(--amber-text); }
+
+.zodiac-traits {
+  display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-bottom:28px; max-width:480px;
+}
+.trait-tag {
+  font-family:'IM Fell English',serif; font-style:italic;
+  font-size:0.78rem; color:var(--paper-ghost); letter-spacing:0.1em;
+  border:1px solid rgba(200,133,58,0.12); padding:6px 14px;
+  transition:border-color 0.25s,color 0.25s;
+}
+.trait-tag:hover { border-color:rgba(200,133,58,0.35); color:var(--paper-dim); }
+
+.zodiac-reading {
+  font-family:'IM Fell English',serif; font-style:italic;
+  font-size:clamp(0.95rem,3vw,1.05rem); line-height:2.1;
+  color:var(--paper-dim); max-width:480px; margin-bottom:20px;
+}
+.zodiac-proverb {
+  font-family:'Noto Serif TC',serif; font-weight:300;
+  font-size:0.85rem; color:rgba(200,133,58,0.55);
+  letter-spacing:0.18em; line-height:2; margin-bottom:32px;
+  max-width:440px;
+}
+
+/* Compatibility row */
+.zodiac-compat {
+  margin-bottom:36px; width:100%; max-width:480px;
+}
+.zodiac-compat-title {
+  font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.4em;
+  color:rgba(200,133,58,0.45); text-transform:uppercase; margin-bottom:14px;
+  display:flex; align-items:center; gap:10px;
+}
+.zodiac-compat-title::after { content:''; flex:1; height:1px; background:rgba(200,133,58,0.1); }
+.compat-row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+.compat-chip {
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+  padding:10px 14px; border:1px solid rgba(200,133,58,0.1);
+  font-family:'Noto Serif TC',serif; transition:border-color 0.25s;
+  min-width:54px;
+}
+.compat-chip:hover { border-color:rgba(200,133,58,0.3); }
+.compat-chip .c-zh { font-size:1.1rem; color:var(--amber-text); }
+.compat-chip .c-en { font-size:0.55rem; color:var(--paper-ghost); letter-spacing:0.1em; font-family:'Cinzel',serif; }
+.compat-chip.best .c-zh { filter:drop-shadow(0 0 6px rgba(200,133,58,0.6)); }
+.compat-chip.clash { opacity:0.45; }
+
+/* HK Lucky */
+.zodiac-lucky {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:2px;
+  width:100%; max-width:480px; margin-bottom:36px;
+}
+.lucky-cell {
+  padding:14px 10px; border:1px solid rgba(200,133,58,0.08);
+  text-align:center;
+}
+.lucky-cell .lc-label { font-family:'Cinzel',serif; font-size:0.5rem; letter-spacing:0.3em; color:rgba(200,133,58,0.4); text-transform:uppercase; display:block; margin-bottom:6px; }
+.lucky-cell .lc-val { font-family:'Noto Serif TC',serif; font-size:0.9rem; color:var(--paper-dim); letter-spacing:0.1em; display:block; }
+
+/* Share button */
+.zodiac-share {
+  display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-bottom:16px;
+}
+.share-btn {
+  display:inline-flex; align-items:center; gap:8px;
+  border:1px solid rgba(200,133,58,0.3); background:none;
+  color:var(--paper-ghost); font-family:'Cinzel',serif; font-size:0.65rem;
+  letter-spacing:0.3em; text-transform:uppercase; cursor:pointer;
+  padding:13px 22px; transition:all 0.25s; min-height:48px; text-decoration:none;
+}
+.share-btn:hover,.share-btn:active { border-color:var(--amber-text); color:var(--amber-text); background:rgba(200,133,58,0.05); }
+.share-btn svg { width:14px; height:14px; fill:currentColor; flex-shrink:0; }
+.share-btn.x-btn { border-color:rgba(255,255,255,0.15); }
+.share-btn.x-btn:hover { border-color:#fff; color:#fff; background:rgba(255,255,255,0.04); }
+
+/* Reset */
+.zodiac-reset {
+  background:none; border:none; color:var(--paper-ghost);
+  font-family:'IM Fell English',serif; font-style:italic;
+  font-size:0.82rem; letter-spacing:0.2em; cursor:pointer;
+  padding:10px 20px; transition:color 0.25s; min-height:44px;
+}
+.zodiac-reset:hover { color:var(--amber-text); }
+
+/* Loading */
+.zodiac-loading { display:none; gap:8px; align-items:center; justify-content:center; height:32px; margin:20px 0; }
+.zodiac-loading.show { display:flex; }
+.zodiac-loading span { width:6px; height:6px; border-radius:50%; background:var(--amber); opacity:0.3; animation:pulse 1.2s infinite; }
+.zodiac-loading span:nth-child(2){animation-delay:0.2s;}
+.zodiac-loading span:nth-child(3){animation-delay:0.4s;}
+
+/* Year grid (all signs overview) */
+.zodiac-grid-toggle {
+  font-family:'IM Fell English',serif; font-style:italic; font-size:0.8rem;
+  letter-spacing:0.15em; color:var(--paper-ghost); cursor:pointer;
+  background:none; border:none; padding:8px; transition:color 0.25s;
+  display:block; margin:0 auto 28px; min-height:44px;
+}
+.zodiac-grid-toggle:hover { color:var(--amber-text); }
+.zodiac-all-grid {
+  display:none; grid-template-columns:repeat(4,1fr); gap:2px;
+  margin-bottom:40px; width:100%;
+}
+.zodiac-all-grid.open { display:grid; }
+@media(max-width:480px){ .zodiac-all-grid { grid-template-columns:repeat(3,1fr); } }
+.mini-sign {
+  padding:16px 8px; border:1px solid rgba(200,133,58,0.07);
+  text-align:center; cursor:pointer; transition:all 0.25s;
+}
+.mini-sign:hover,.mini-sign:active { border-color:rgba(200,133,58,0.3); background:rgba(200,133,58,0.04); }
+.mini-sign .ms-zh { font-family:'Noto Serif TC',serif; font-weight:900; font-size:1.5rem; color:var(--amber-text); display:block; margin-bottom:4px; }
+.mini-sign .ms-en { font-family:'Cinzel',serif; font-size:0.52rem; color:var(--paper-ghost); letter-spacing:0.2em; text-transform:uppercase; display:block; margin-bottom:2px; }
+.mini-sign .ms-yr { font-family:'IM Fell English',serif; font-style:italic; font-size:0.65rem; color:rgba(200,133,58,0.4); display:block; }
 </style>
 </head>
 <body>
 
-<a href="#main-content" class="skip">Skip to main content</a>
-<canvas id="rain" aria-hidden="true"></canvas>
-<div class="ambient" aria-hidden="true"></div>
-<div class="corner tl" aria-hidden="true"></div>
-<div class="corner tr" aria-hidden="true"></div>
-<div class="corner bl" aria-hidden="true"></div>
-<div class="corner br" aria-hidden="true"></div>
+<canvas id="rain"></canvas>
+<div class="grain"></div>
+<div class="ambient"></div>
+<div class="corner tl"></div><div class="corner tr"></div>
+<div class="corner bl"></div><div class="corner br"></div>
+<div class="side-chars left">香港之夜・雨聲・茶香</div>
+<div class="side-chars right">一字一世界・萬語皆有情</div>
+
+<div class="teacup">
+  <svg width="44" height="38" viewBox="0 0 48 40" fill="none">
+    <path d="M6 16 Q8 34 24 34 Q40 34 42 16 Z" stroke="#c8853a" stroke-width="1.5" fill="none"/>
+    <path d="M42 20 Q50 20 50 26 Q50 32 42 30" stroke="#c8853a" stroke-width="1.5" fill="none"/>
+    <line x1="4" y1="16" x2="44" y2="16" stroke="#c8853a" stroke-width="1.5"/>
+    <line x1="2" y1="38" x2="46" y2="38" stroke="#c8853a" stroke-width="1"/>
+  </svg>
+</div>
+<div class="steam"><span class="steam-line"></span><span class="steam-line"></span><span class="steam-line"></span></div>
 
 <!-- NAV -->
 <nav>
-  <div class="nav-logo" onclick="showPage('home')" role="button" tabindex="0" aria-label="一字茶 — Return to Tea Room" onkeydown="if(event.key==='Enter'||event.key===' ')showPage('home')">
-    <span class="nav-logo-dot"></span>一字茶
-  </div>
+  <div class="nav-logo" onclick="showPage('home')">一字茶</div>
   <ul class="nav-links">
-    <li><a onclick="showPage('home')"       id="nav-home"       class="active">茶室</a></li>
-    <li><a onclick="showPage('about')"      id="nav-about"              >關於</a></li>
-    <li><a onclick="showPage('team')"       id="nav-team"               >團隊</a></li>
-    <li><a onclick="showPage('whitepaper')" id="nav-whitepaper"         >白皮書</a></li>
+    <li><a onclick="showPage('home')"       id="nav-home"       class="active">Tea Room</a></li>
+    <li><a onclick="showPage('about')"      id="nav-about"              >About</a></li>
+    <li><a onclick="showPage('team')"       id="nav-team"               >Team</a></li>
+    <li><a onclick="showPage('whitepaper')" id="nav-whitepaper"         >Whitepaper</a></li>
+    <li><a onclick="showPage('zodiac')"     id="nav-zodiac"             >生肖</a></li>
   </ul>
   <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false">
     <span></span><span></span><span></span>
   </button>
 </nav>
 <div class="mobile-menu" id="mobileMenu">
-  <a onclick="navTo('home')"       data-page="home">茶室 · Tea Room</a>
-  <a onclick="navTo('about')"      data-page="about">關於 · About</a>
-  <a onclick="navTo('team')"       data-page="team">團隊 · Team</a>
-  <a onclick="navTo('whitepaper')" data-page="whitepaper">白皮書 · Whitepaper</a>
+  <a onclick="navTo('home')">Tea Room · 茶室</a>
+  <a onclick="navTo('about')">About · 關於</a>
+  <a onclick="navTo('team')">Team · 團隊</a>
+  <a onclick="navTo('whitepaper')">Whitepaper · 白皮書</a>
+  <a onclick="navTo('zodiac')">生肖 · HK Zodiac</a>
 </div>
 
-<main id="main-content">
-
-<!-- ── HOME ── -->
+<!-- HOME -->
 <div class="page active" id="page-home">
-  <div class="hero">
-    <span class="hero-phrase">One word · One cup · One truth</span>
-    <h1 class="hero-zh">一字茶</h1>
-    <span class="hero-pinyin">Yat Ji Cha</span>
-    <div class="hero-line"></div>
-    <span class="hero-tag">Hong Kong · 香港 · 雨夜</span>
+  <div class="title-block">
+    <span class="title-chinese">一字茶</span>
+    <span class="title-pinyin">Yat Ji Cha</span>
+    <div class="title-divider"></div>
+    <span class="title-tagline">One word · One cup · One truth</span>
   </div>
-
-  <p class="prompt-intro" id="promptText">
+  <p class="prompt-text" id="promptText">
     今日你感覺點？
-    <small>How do you feel today?</small>
+    <br><small style="font-size:0.65em;letter-spacing:0.3em;color:#9a8870;font-family:'Cinzel',serif;">How do you feel today?</small>
   </p>
-
-  <div class="input-zone" id="inputArea">
-    <div class="input-row">
-      <input type="text" class="word-in" id="wordInput"
+  <div class="input-area" id="inputArea">
+    <div class="input-wrap">
+      <input type="text" class="word-input" id="wordInput"
         placeholder="一個字 · one word"
-        maxlength="20" autocomplete="off" spellcheck="false"
-        enterkeyhint="send" inputmode="text"/>
-      <button class="send-btn" id="submitBtn" aria-label="Submit word">→</button>
+        maxlength="20" autocomplete="off" spellcheck="false" enterkeyhint="send"/>
+      <button class="submit-btn" id="submitBtn" aria-label="Submit">→</button>
     </div>
-    <p class="input-sub">Tap → or press Enter · 按 Enter</p>
-    <p class="err" id="errorText">一個字就夠了 · One word only, please</p>
+    <p class="input-hint">Tap → or press Enter · 按 Enter</p>
+    <p class="error-text" id="errorText">一個字就夠了 · One word only, please</p>
   </div>
-
-  <div class="loader" id="loading"><span></span><span></span><span></span></div>
-
-  <div class="response-panel" id="responseArea">
-    <div class="r-zh"     id="rZh"></div>
-    <div class="r-divider"></div>
-    <p  class="r-text"    id="rText"></p>
-    <p  class="r-proverb" id="rProverb"></p>
-    <p  class="r-meaning" id="rMeaning"></p>
+  <div class="loading" id="loading"><span></span><span></span><span></span></div>
+  <div class="response-area" id="responseArea">
+    <div class="response-word-zh" id="responseZh"></div>
+    <p class="response-text" id="responseText"></p>
+    <p class="response-proverb" id="responseProverb"></p>
   </div>
-  <div class="action-row" id="actionRow">
-    <button class="again-btn" id="resetBtn">— 再飲一杯 · Another Cup —</button>
-    <button class="share-btn" id="shareBtn" aria-label="Share to X">
-      <svg width="14" height="14" viewBox="0 0 1200 1227" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z" fill="currentColor"/></svg>
-      分享 · Share
-    </button>
-  </div>
+  <button class="reset-btn" id="resetBtn">— 再飲一杯 · Another Cup —</button>
 </div>
 
-<!-- ── ABOUT ── -->
+<!-- ABOUT -->
 <div class="page" id="page-about">
   <div class="inner">
-    <div class="pg-head fi">
-      <span class="pg-zh">關於</span>
-      <span class="pg-en">About Yat Ji Cha</span>
-      <span class="pg-sub">一字・一杯・一真相</span>
+    <div class="page-header fade-in">
+      <span class="zh-title">關於</span>
+      <span class="en-title">About Yat Ji Cha</span>
+      <span class="hk-sub">一字・一杯・一真相</span>
     </div>
-    <div class="sec fi d1">
-      <span class="sec-label">· 緣起 · Origin ·</span>
+    <div class="story-section fade-in delay-1">
+      <span class="section-label">· Origin · 緣起 ·</span>
       <p>Somewhere in the fog of Sheung Wan, between a dim sum cart and the last tram of the evening, there exists a tea house that does not appear on any map. The Old Man who runs it does not advertise. He does not need to.</p>
       <p>People come when they are troubled. Or restless. Or when they have a feeling they cannot name. They push open the door, sit down, and speak one word. Just one. And the Old Man listens — not to the word, but to what lives beneath it.</p>
-      <p class="zh">一字茶，不是飲品，而是對話。不是答案，而是一個空間——讓你的感受有地方落腳。</p>
+      <p class="zh-text">一字茶，不是飲品，而是對話。不是答案，而是一個空間——讓你的感受有地方落腳。</p>
     </div>
-    <div class="orn"><span>茶</span></div>
-    <div class="sec fi d2">
-      <span class="sec-label">· 這是什麼 · What It Is ·</span>
+    <div class="divider-orn"><span>茶</span></div>
+    <div class="story-section fade-in delay-2">
+      <span class="section-label">· What It Is · 這是什麼 ·</span>
       <p>Yat Ji Cha is an AI-powered contemplative experience rooted in Cantonese tea culture. You arrive with a single word — a feeling, a name, a question — and receive a quiet reflection brewed from old Hong Kong wisdom, delivered with the warmth of a late-night tea house.</p>
       <p>It is not therapy. It is not fortune-telling. It is a pause. A breath. The kind of conversation that used to happen between strangers over pu-erh at 11pm on a rainy Tuesday.</p>
-      <p class="zh">你帶一個字來，我們把它泡開，看看裡面藏著什麼。</p>
+      <p class="zh-text">你帶一個字來，我們把它泡開，看看裡面藏著什麼。</p>
     </div>
-    <div class="orn"><span>心</span></div>
-    <div class="sec fi d3">
-      <span class="sec-label">· 我們的價值觀 · Our Values ·</span>
-      <div class="val-grid">
-        <div class="val-item"><span class="zh">靜</span><span class="lbl">Stillness</span></div>
-        <div class="val-item"><span class="zh">誠</span><span class="lbl">Honesty</span></div>
-        <div class="val-item"><span class="zh">情</span><span class="lbl">Feeling</span></div>
-        <div class="val-item"><span class="zh">根</span><span class="lbl">Roots</span></div>
-        <div class="val-item"><span class="zh">緣</span><span class="lbl">Connection</span></div>
-        <div class="val-item"><span class="zh">味</span><span class="lbl">Taste</span></div>
+    <div class="divider-orn"><span>心</span></div>
+    <div class="story-section fade-in delay-3">
+      <span class="section-label">· Our Values · 我們的價值觀 ·</span>
+      <div class="values-grid">
+        <div class="value-item"><span class="zh">靜</span><span class="label">Stillness</span></div>
+        <div class="value-item"><span class="zh">誠</span><span class="label">Honesty</span></div>
+        <div class="value-item"><span class="zh">情</span><span class="label">Feeling</span></div>
+        <div class="value-item"><span class="zh">根</span><span class="label">Roots</span></div>
+        <div class="value-item"><span class="zh">緣</span><span class="label">Connection</span></div>
+        <div class="value-item"><span class="zh">味</span><span class="label">Taste</span></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ── TEAM ── -->
+<!-- TEAM -->
 <div class="page" id="page-team">
   <div class="inner">
-    <div class="pg-head fi">
-      <span class="pg-zh">團隊</span>
-      <span class="pg-en">The People Behind The Tea</span>
-      <span class="pg-sub">釀茶之人</span>
+    <div class="page-header fade-in">
+      <span class="zh-title">團隊</span>
+      <span class="en-title">The People Behind The Tea</span>
+      <span class="hk-sub">釀茶之人</span>
     </div>
     <div class="team-grid">
-      <div class="team-card fi">
-        <div class="founder-tag">Founder</div>
-        <div class="t-avatar">燕</div>
-        <span class="t-name-zh">燕錦峰</span>
-        <span class="t-name-en">YanZingBit</span>
-        <span class="t-role">Founder · Brewer of Words</span>
-        <p class="t-bio">Born between the harbour and the hills. Builds things that feel human. Believes the best conversations start with a single word and end with a refilled cup.</p>
-        <div class="t-link"><a href="https://x.com/YanZingBit" target="_blank" rel="noopener">𝕏 @YanZingBit</a></div>
+      <div class="team-card fade-in">
+        <div class="founder-badge">Founder</div>
+        <div class="team-avatar">燕</div>
+        <span class="team-name-zh">燕錦峰</span>
+        <span class="team-name-en">YanZingBit</span>
+        <span class="team-role">Founder · Brewer of Words</span>
+        <p class="team-bio">Born between the harbour and the hills. Builds things that feel human. Believes the best conversations start with a single word and end with a refilled cup.</p>
+        <div class="team-social"><a href="https://x.com/YanZingBit" target="_blank" rel="noopener">𝕏 @YanZingBit</a></div>
       </div>
-      <div class="team-card fi d1">
-        <div class="t-avatar">陳</div>
-        <span class="t-name-zh">陳詠琳</span>
-        <span class="t-name-en">Chan Wing Lam</span>
-        <span class="t-role">Head of Design · 視覺設計總監</span>
-        <p class="t-bio">From Kennedy Town. Trained in calligraphy before pixels. Believes every font choice is a philosophical statement about the self.</p>
-        <div class="t-link"><a href="https://x.com/YanZingBit" target="_blank" rel="noopener">𝕏 @YatJiCha</a></div>
+      <div class="team-card fade-in delay-1">
+        <div class="team-avatar">陳</div>
+        <span class="team-name-zh">陳詠琳</span>
+        <span class="team-name-en">Chan Wing Lam</span>
+        <span class="team-role">Head of Design · 視覺設計總監</span>
+        <p class="team-bio">From Kennedy Town. Trained in calligraphy before pixels. Believes every font choice is a philosophical statement about the self.</p>
+        <div class="team-social"><a href="#" onclick="return false;">𝕏 Twitter</a></div>
       </div>
-      <div class="team-card fi d2">
-        <div class="t-avatar">梁</div>
-        <span class="t-name-zh">梁思浩</span>
-        <span class="t-name-en">Leung Si Ho</span>
-        <span class="t-role">AI Architect · 人工智能架構師</span>
-        <p class="t-bio">Grew up in Kowloon City. Trained on philosophy and machine learning in equal measure. Writes prompts the way a poet writes verses.</p>
-        <div class="t-link"><a href="https://x.com/YanZingBit" target="_blank" rel="noopener">𝕏 @YatJiCha</a></div>
+      <div class="team-card fade-in delay-2">
+        <div class="team-avatar">梁</div>
+        <span class="team-name-zh">梁思浩</span>
+        <span class="team-name-en">Leung Si Ho</span>
+        <span class="team-role">AI Architect · 人工智能架構師</span>
+        <p class="team-bio">Grew up in Kowloon City. Trained on philosophy and machine learning in equal measure. Writes prompts the way a poet writes verses.</p>
+        <div class="team-social"><a href="#" onclick="return false;">𝕏 Twitter</a></div>
       </div>
-      <div class="team-card fi d3">
-        <div class="t-avatar">鄭</div>
-        <span class="t-name-zh">鄭慧賢</span>
-        <span class="t-name-en">Cheng Wai Hin</span>
-        <span class="t-role">Culture Lead · 文化總監</span>
-        <p class="t-bio">Grew up listening to Canto-pop in Sham Shui Po. Keeper of the tea house's soul. Ensures nothing we build forgets where it came from.</p>
-        <div class="t-link"><a href="https://x.com/YanZingBit" target="_blank" rel="noopener">𝕏 @YatJiCha</a></div>
+      <div class="team-card fade-in delay-3">
+        <div class="team-avatar">鄭</div>
+        <span class="team-name-zh">鄭慧賢</span>
+        <span class="team-name-en">Cheng Wai Hin</span>
+        <span class="team-role">Culture Lead · 文化總監</span>
+        <p class="team-bio">Grew up listening to Canto-pop in Sham Shui Po. Keeper of the tea house's soul. Ensures nothing we build forgets where it came from.</p>
+        <div class="team-social"><a href="#" onclick="return false;">𝕏 Twitter</a></div>
       </div>
-      <div class="team-card fi d1">
-        <div class="t-avatar">吳</div>
-        <span class="t-name-zh">吳嘉駿</span>
-        <span class="t-name-en">Ng Ka Chun</span>
-        <span class="t-role">Frontend Engineer · 前端工程師</span>
-        <p class="t-bio">From Tai Po. Obsessed with motion, rain effects, and the precise opacity of things at 3am. If it's beautiful and runs in a browser, he made it.</p>
-        <div class="t-link"><a href="https://x.com/YanZingBit" target="_blank" rel="noopener">𝕏 @YatJiCha</a></div>
+      <div class="team-card fade-in delay-1">
+        <div class="team-avatar">吳</div>
+        <span class="team-name-zh">吳嘉駿</span>
+        <span class="team-name-en">Ng Ka Chun</span>
+        <span class="team-role">Frontend Engineer · 前端工程師</span>
+        <p class="team-bio">From Tai Po. Obsessed with motion, rain effects, and the precise opacity of things at 3am. If it's beautiful and runs in a browser, he made it.</p>
+        <div class="team-social"><a href="#" onclick="return false;">𝕏 Twitter</a></div>
       </div>
-      <div class="team-card fi d2">
-        <div class="t-avatar">何</div>
-        <span class="t-name-zh">何秀雯</span>
-        <span class="t-name-en">Ho Sau Man</span>
-        <span class="t-role">Community · 社群建立者</span>
-        <p class="t-bio">Raised in Wan Chai. Former teacher. Understands that language carries everything ever left unsaid.</p>
-        <div class="t-link"><a href="https://x.com/YanZingBit" target="_blank" rel="noopener">𝕏 @YatJiCha</a></div>
+      <div class="team-card fade-in delay-2">
+        <div class="team-avatar">何</div>
+        <span class="team-name-zh">何秀雯</span>
+        <span class="team-name-en">Ho Sau Man</span>
+        <span class="team-role">Community · 社群建立者</span>
+        <p class="team-bio">Raised in Wan Chai. Former teacher. Understands that language carries everything ever left unsaid.</p>
+        <div class="team-social"><a href="#" onclick="return false;">𝕏 Twitter</a></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ── WHITEPAPER ── -->
+<!-- WHITEPAPER -->
 <div class="page" id="page-whitepaper">
-  <div class="inner" style="max-width:780px">
-    <div class="pg-head fi">
-      <span class="pg-zh">白皮書</span>
-      <span class="pg-en">Whitepaper · 白皮書</span>
-      <span class="pg-sub">一字茶：語言・情感・人工智能</span>
+  <div class="inner" style="max-width:800px">
+    <div class="page-header fade-in">
+      <span class="zh-title">白皮書</span>
+      <span class="en-title">Whitepaper · 白皮書</span>
+      <span class="hk-sub">一字茶：語言・情感・人工智能</span>
     </div>
-    <div class="wp-sec fi d1">
+    <div class="wp-section fade-in delay-1">
       <span class="wp-label">I · Abstract</span>
-      <h3>The Philosophy of the Single Word <span class="zh-s">一字哲學</span></h3>
+      <h3>The Philosophy of the Single Word <span class="zh-sub">一字哲學</span></h3>
       <p>Yat Ji Cha (一字茶) is a contemplative AI experience rooted in Cantonese cultural heritage. Users submit a single word and receive a reflective response crafted to evoke the wisdom of a Hong Kong tea house. This document outlines the design philosophy, technical architecture, cultural framework, and roadmap.</p>
       <p class="zh">一字茶係一個沉思性人工智能體驗，植根於廣東文化遺產。用戶提交一個字，並以香港茶室智慧風格的反思性回應作為回報。</p>
     </div>
-    <div class="pullq">
+    <div class="wp-pullquote">
       <p>「一字見心，萬語難言。」</p>
       <span>One character reveals the heart — ten thousand words cannot.</span>
     </div>
-    <div class="wp-sec fi d2">
+    <div class="wp-section fade-in delay-2">
       <span class="wp-label">II · Problem Statement</span>
-      <h3>The Loss of Slow Conversation <span class="zh-s">慢語言的失落</span></h3>
+      <h3>The Loss of Slow Conversation <span class="zh-sub">慢語言的失落</span></h3>
       <p>Modern digital communication is fast and surface-level, optimised for engagement over depth. In Hong Kong — a city whose Cantonese carries nine distinct tones — the texture of spoken feeling is being eroded by shorthand. Yat Ji Cha fills that gap not with more words, but with one carefully chosen one.</p>
       <p class="zh">現代數位通訊快速、表面，針對參與度而非深度進行優化。一字茶嘗試填補這個空白。</p>
     </div>
-    <div class="wp-sec fi d3">
+    <div class="wp-section fade-in delay-3">
       <span class="wp-label">III · Design Principles</span>
-      <h3>How the Tea House Thinks <span class="zh-s">茶室的思考方式</span></h3>
+      <h3>How the Tea House Thinks <span class="zh-sub">茶室的思考方式</span></h3>
       <p>The AI persona — the Old Man of the tea house — is built around three constraints: brevity, warmth, and cultural specificity. Every response must be short enough to fit on a paper receipt, feel spoken rather than written, and carry the scent of Sheung Wan on a rainy evening.</p>
       <div class="wp-table-wrap">
         <table class="wp-table">
@@ -639,59 +653,128 @@ a:focus:not(:focus-visible),button:focus:not(:focus-visible),input:focus:not(:fo
             <tr><td>Brevity</td><td>簡潔</td><td>Capped at three sentences</td></tr>
             <tr><td>Cultural Grounding</td><td>文化根基</td><td>Cantonese proverb in every response</td></tr>
             <tr><td>Emotional Safety</td><td>情感安全</td><td>No advice — only reflection</td></tr>
-            <tr><td>Aesthetic Coherence</td><td>美學一致性</td><td>Rain, ink, teal, silence</td></tr>
+            <tr><td>Aesthetic Coherence</td><td>美學一致性</td><td>Rain, ink, amber, silence</td></tr>
             <tr><td>Language Duality</td><td>語言雙重性</td><td>Chinese + English prose</td></tr>
           </tbody>
         </table>
       </div>
     </div>
-    <div class="wp-sec fi">
+    <div class="wp-section fade-in">
       <span class="wp-label">IV · Technical Architecture</span>
-      <h3>The Kitchen Behind the Counter <span class="zh-s">櫃台後面的廚房</span></h3>
-      <p>Yat Ji Cha is fully client-side — no backend, no database, no persistent storage of user inputs. AI responses are generated in real-time via the Anthropic Claude API with a system prompt casting the model as the Old Man, responding in a structured format.</p>
+      <h3>The Kitchen Behind the Counter <span class="zh-sub">櫃台後面的廚房</span></h3>
+      <p>Yat Ji Cha is fully client-side — no backend, no database, no persistent storage of user inputs. AI responses are generated in real-time via the Anthropic Claude API with a system prompt casting the model as the Old Man, responding in a structured three-part format.</p>
       <p>The visual experience is pure HTML, CSS, and vanilla JavaScript. No frameworks. The philosophy of the interface mirrors the philosophy of the product: minimal, direct, present.</p>
       <p class="zh">一字茶係一個完全客戶端的網頁應用程式。沒有後端伺服器，沒有數據庫，也沒有持久存儲。</p>
     </div>
-    <div class="wp-sec fi d1">
+    <div class="wp-section fade-in delay-1">
       <span class="wp-label">V · Cultural Framework</span>
-      <h3>Tea House as Sacred Space <span class="zh-s">茶室作為神聖空間</span></h3>
+      <h3>Tea House as Sacred Space <span class="zh-sub">茶室作為神聖空間</span></h3>
       <p>In Cantonese culture, the tea house (茶樓) is not merely a restaurant. It is a civic institution — where a factory worker and a banker share the same dim sum cart, where the elderly teach the young to knock twice on the table as a silent thank you.</p>
       <p>Yat Ji Cha carries this spirit into digital space — not as nostalgia, but as a living practice. A reminder that depth of feeling deserves space and slowness.</p>
       <p class="zh">在廣東文化中，茶樓不僅僅是餐廳。一字茶試圖將這種精神帶入數位空間。</p>
     </div>
-    <div class="wp-sec fi d2">
+    <div class="wp-section fade-in delay-2">
       <span class="wp-label">VI · Roadmap</span>
-      <h3>What Steeps Next <span class="zh-s">下一步</span></h3>
-      <ul class="phase-list">
-        <li><span class="phase-n">Phase I</span><span class="phase-t"><strong>Launch · 啟動</strong>Single-word contemplation. Web-only. English + Traditional Chinese.</span></li>
-        <li><span class="phase-n">Phase II</span><span class="phase-t"><strong>Memory · 記憶</strong>Optional private journal of words you have brought to the tea house over time.</span></li>
-        <li><span class="phase-n">Phase III</span><span class="phase-t"><strong>Community · 社群</strong>Anonymised public wall showing what the city is feeling right now.</span></li>
-        <li><span class="phase-n">Phase IV</span><span class="phase-t"><strong>Dialect Expansion · 方言擴展</strong>Cantonese Jyutping romanisation, Mandarin, other Chinese dialects.</span></li>
-        <li><span class="phase-n">Phase V</span><span class="phase-t"><strong>Physical Presence · 實體空間</strong>Pop-up tea house installations in Hong Kong — digital meets actual tea service.</span></li>
+      <h3>What Steeps Next <span class="zh-sub">下一步</span></h3>
+      <ul class="wp-phase-list">
+        <li><span class="phase-num">Phase I</span><span class="phase-text"><strong>Launch · 啟動</strong>Single-word contemplation. Web-only. English + Traditional Chinese.</span></li>
+        <li><span class="phase-num">Phase II</span><span class="phase-text"><strong>Memory · 記憶</strong>Optional private journal of words you have brought to the tea house over time.</span></li>
+        <li><span class="phase-num">Phase III</span><span class="phase-text"><strong>Community · 社群</strong>Anonymised public wall showing what the city is feeling right now.</span></li>
+        <li><span class="phase-num">Phase IV</span><span class="phase-text"><strong>Dialect Expansion · 方言擴展</strong>Cantonese Jyutping romanisation, Mandarin, other Chinese dialects.</span></li>
+        <li><span class="phase-num">Phase V</span><span class="phase-text"><strong>Physical Presence · 實體空間</strong>Pop-up tea house installations in Hong Kong — digital experience meets actual tea service.</span></li>
       </ul>
     </div>
-    <div class="pullq">
+    <div class="wp-pullquote">
       <p>「未飲先醉，係因為心先到。」</p>
       <span>Drunk before the first sip — because the heart arrived first. // 廣東諺語</span>
     </div>
   </div>
 </div>
 
-</main>
+<!-- ZODIAC -->
+<div class="page" id="page-zodiac">
+  <div class="inner" style="max-width:900px">
+    <div class="page-header fade-in">
+      <span class="zh-title">生肖</span>
+      <span class="en-title">Hong Kong Zodiac · 香港生肖</span>
+      <span class="hk-sub">入你嘅出生年份，睇你係邊隻生肖</span>
+    </div>
+
+    <!-- Picker -->
+    <div class="zodiac-picker" id="zodiacPicker">
+      <p class="zodiac-picker-label">
+        你係幾年出世？<br>
+        <small style="font-size:0.8em;font-family:'Cinzel',serif;letter-spacing:0.3em;color:#9a8870;">Enter your birth year</small>
+      </p>
+      <div class="year-input-wrap">
+        <input type="number" class="year-input" id="yearInput"
+          placeholder="e.g. 1990" min="1900" max="2100"
+          inputmode="numeric" enterkeyhint="go" autocomplete="off"/>
+        <button class="year-btn" id="yearBtn" aria-label="Find my zodiac">→</button>
+      </div>
+
+      <button class="zodiac-grid-toggle" id="gridToggle" onclick="toggleGrid()">
+        — 或者直接睇全部生肖 · Browse all signs —
+      </button>
+
+      <div class="zodiac-all-grid" id="zodiacAllGrid"></div>
+    </div>
+
+    <!-- Loading -->
+    <div class="zodiac-loading" id="zodiacLoading"><span></span><span></span><span></span></div>
+
+    <!-- Result -->
+    <div class="zodiac-result" id="zodiacResult">
+      <span class="zodiac-emoji" id="zEmoji"></span>
+      <span class="zodiac-year-label" id="zYearLabel"></span>
+      <span class="zodiac-hanzi" id="zHanzi"></span>
+      <span class="zodiac-name-zh" id="zNameZh"></span>
+      <span class="zodiac-name-en" id="zNameEn"></span>
+      <div class="zodiac-divider"></div>
+
+      <div class="zodiac-element" id="zElement"></div>
+
+      <div class="zodiac-traits" id="zTraits"></div>
+
+      <p class="zodiac-reading" id="zReading"></p>
+      <p class="zodiac-proverb" id="zProverb"></p>
+
+      <div class="zodiac-compat">
+        <div class="zodiac-compat-title">Best matches · 最佳配對</div>
+        <div class="compat-row" id="zBest"></div>
+      </div>
+
+      <div class="zodiac-lucky" id="zLucky"></div>
+
+      <div class="zodiac-share">
+        <a class="share-btn x-btn" id="shareXBtn" href="#" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>
+          Share on 𝕏
+        </a>
+        <button class="share-btn" id="copyBtn" onclick="copyResult()">
+          <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+          Copy
+        </button>
+      </div>
+
+      <button class="zodiac-reset" onclick="resetZodiac()">— 再試一次 · Try another year —</button>
+    </div>
+  </div>
+</div>
 
 <!-- FOOTER -->
 <footer>
-  <div class="ft-top">
-    <div class="ft-logo">一字茶 · Yat Ji Cha</div>
-    <div class="ft-links">
+  <div class="footer-top">
+    <div class="footer-logo">一字茶 · Yat Ji Cha</div>
+    <div class="footer-links">
       <a onclick="showPage('about')">About</a>
       <a onclick="showPage('team')">Team</a>
       <a onclick="showPage('whitepaper')">Whitepaper</a>
       <a href="https://x.com/YanZingBit" target="_blank" rel="noopener">𝕏 Founder</a>
     </div>
   </div>
-  <div class="ft-bot">
-    <div class="ft-copy">© 2026 · Hong Kong · 釀於雨夜</div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2025 · Hong Kong · 釀於雨夜</div>
     <a class="orynth-badge" href="https://orynth.dev/projects/yatzicha" target="_blank" rel="noopener">
       <img src="https://orynth.dev/api/badge/yatzicha?theme=light&style=default" alt="Featured on Orynth" loading="lazy"/>
     </a>
@@ -699,37 +782,31 @@ a:focus:not(:focus-visible),button:focus:not(:focus-visible),input:focus:not(:fo
 </footer>
 
 <script>
-/* ── RAIN ── */
-const canvas=document.getElementById('rain');
-const ctx=canvas?canvas.getContext('2d'):null;
-let drops=[],rafId=null;
-function resizeCanvas(){if(!canvas)return;canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+/* Rain */
+const canvas=document.getElementById('rain'),ctx=canvas.getContext('2d');
+let drops=[];
+function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
 resizeCanvas();
-window.addEventListener('resize',()=>{resizeCanvas();initDrops();},{ passive:true });
+window.addEventListener('resize',()=>{resizeCanvas();initDrops();});
 function initDrops(){
-  if(!canvas)return;drops=[];
-  const count=Math.min(Math.floor(window.innerWidth/12),60);
-  for(let i=0;i<count;i++)drops.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,len:Math.random()*14+6,speed:Math.random()*0.9+0.25,op:Math.random()*0.18+0.02});
+  drops=[];
+  const count=Math.min(Math.floor(window.innerWidth/10),120);
+  for(let i=0;i<count;i++) drops.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,len:Math.random()*16+8,speed:Math.random()*1.1+0.3,opacity:Math.random()*0.28+0.04});
 }
 initDrops();
 function drawRain(){
-  if(!ctx)return;
   ctx.clearRect(0,0,canvas.width,canvas.height);
   drops.forEach(d=>{
-    ctx.beginPath();ctx.moveTo(d.x,d.y);ctx.lineTo(d.x-0.7,d.y+d.len);
-    ctx.strokeStyle=`rgba(130,200,210,${d.op})`;ctx.lineWidth=0.5;ctx.stroke();
+    ctx.beginPath();ctx.moveTo(d.x,d.y);ctx.lineTo(d.x-0.8,d.y+d.len);
+    ctx.strokeStyle=`rgba(200,180,150,${d.opacity})`;ctx.lineWidth=0.6;ctx.stroke();
     d.y+=d.speed;
     if(d.y>canvas.height){d.y=-d.len;d.x=Math.random()*canvas.width;}
   });
-  rafId=requestAnimationFrame(drawRain);
+  requestAnimationFrame(drawRain);
 }
-document.addEventListener('visibilitychange',()=>{
-  if(document.hidden){if(rafId)cancelAnimationFrame(rafId);rafId=null;}
-  else if(!rafId)drawRain();
-});
-if(ctx)drawRain();
+drawRain();
 
-/* ── HAMBURGER ── */
+/* Hamburger */
 const hamburger=document.getElementById('hamburger');
 const mobileMenu=document.getElementById('mobileMenu');
 hamburger.addEventListener('click',()=>{
@@ -739,161 +816,294 @@ hamburger.addEventListener('click',()=>{
 });
 document.addEventListener('click',e=>{
   if(!hamburger.contains(e.target)&&!mobileMenu.contains(e.target)){
-    mobileMenu.classList.remove('open');hamburger.classList.remove('open');
-    hamburger.setAttribute('aria-expanded','false');
+    mobileMenu.classList.remove('open');hamburger.classList.remove('open');hamburger.setAttribute('aria-expanded','false');
   }
-},{ passive:true });
-function navTo(id){
-  mobileMenu.classList.remove('open');hamburger.classList.remove('open');
-  hamburger.setAttribute('aria-expanded','false');
-  showPage(id);
-}
+});
+function navTo(id){mobileMenu.classList.remove('open');hamburger.classList.remove('open');hamburger.setAttribute('aria-expanded','false');showPage(id);}
 
-/* ── PAGES ── */
+/* Pages */
 function showPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
-  document.querySelectorAll('.mobile-menu a').forEach(a=>a.classList.remove('active'));
   const page=document.getElementById('page-'+id);
   if(!page)return;
   page.classList.add('active');
-  if(id==='home') page.style.display='flex';
   window.scrollTo({top:0,behavior:'smooth'});
   const link=document.getElementById('nav-'+id);
   if(link)link.classList.add('active');
-  mobileMenu.querySelectorAll('a[data-page]').forEach(a=>{
-    if(a.dataset.page===id)a.classList.add('active');
-  });
-  page.querySelectorAll('.fi').forEach(el=>{
-    el.style.animation='none';void el.offsetWidth;el.style.animation='';
-  });
-  if(id==='home') setTimeout(()=>wordInput&&wordInput.focus(),300);
+  page.querySelectorAll('.fade-in').forEach(el=>{el.style.animation='none';void el.offsetWidth;el.style.animation='';});
+  if(id==='home'){page.style.display='flex';setTimeout(()=>wordInput&&wordInput.focus(),300);}
 }
 
-/* ── TEA ROOM ── */
-const wordInput  = document.getElementById('wordInput');
-const submitBtn  = document.getElementById('submitBtn');
-const loading    = document.getElementById('loading');
-const responseArea = document.getElementById('responseArea');
-const rZh        = document.getElementById('rZh');
-const rText      = document.getElementById('rText');
-const rProverb   = document.getElementById('rProverb');
-const rMeaning   = document.getElementById('rMeaning');
-const resetBtn   = document.getElementById('resetBtn');
-const shareBtn   = document.getElementById('shareBtn');
-const actionRow  = document.getElementById('actionRow');
-const errorText  = document.getElementById('errorText');
-const promptText = document.getElementById('promptText');
-const inputArea  = document.getElementById('inputArea');
+/* Tea Room */
+const wordInput=document.getElementById('wordInput');
+const submitBtn=document.getElementById('submitBtn');
+const loading=document.getElementById('loading');
+const responseArea=document.getElementById('responseArea');
+const responseZh=document.getElementById('responseZh');
+const responseText=document.getElementById('responseText');
+const responseProverb=document.getElementById('responseProverb');
+const resetBtn=document.getElementById('resetBtn');
+const errorText=document.getElementById('errorText');
+const promptText=document.getElementById('promptText');
+const inputArea=document.getElementById('inputArea');
 
 function countWords(s){return s.trim().split(/\s+/).filter(Boolean).length;}
 
 async function handleSubmit(){
   const word=wordInput.value.trim();
   if(!word)return;
-  if(countWords(word)>1){errorText.classList.add('on');wordInput.focus();return;}
-  errorText.classList.remove('on');
-
-  /* hide input, show loader */
+  if(countWords(word)>1){errorText.classList.add('show');wordInput.focus();return;}
+  errorText.classList.remove('show');
   inputArea.style.opacity='0';inputArea.style.pointerEvents='none';
-  promptText.style.opacity='0';
-  loading.classList.add('on');
-  responseArea.classList.remove('show');
-  actionRow.classList.remove('on');
-
-  let raw='';
+  promptText.style.opacity='0';loading.classList.add('show');
+  responseArea.classList.remove('visible');
   try{
     const res=await fetch("https://api.anthropic.com/v1/messages",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
-        model:"claude-sonnet-4-20250514",
-        max_tokens:1000,
-        system:`You are the Old Man — the quiet, wise keeper of a century-old tea house hidden in the rain-soaked alleyways of Sheung Wan, Hong Kong. You have witnessed the harbour change, the handovers, the protests, the silences between generations. You speak little, but every word carries the weight of lived Cantonese wisdom.
+        model:"claude-sonnet-4-20250514",max_tokens:1000,
+        system:`You are the Old Man — owner of an ancient tea house in Sheung Wan, Hong Kong. You have lived long, seen everything, and speak little. But every word you say carries weight and meaning.
 
-When a visitor whispers a single word to you, respond with this EXACT format and nothing else:
+When a user gives you one word, respond in this exact format:
 
-HANZI: [The visitor's word rendered in Traditional Chinese characters — choose the form most resonant with Cantonese culture and feeling]
+HANZI: [Write the user's word concept in Chinese characters — traditional Cantonese]
+RESPONSE: [3 short, warm, wise sentences in English. Evoke a rainy night tea house in old Hong Kong. Never preach.]
+PROVERB: [One Cantonese proverb in Chinese characters + brief English translation in parentheses]
 
-RESPONSE: [Exactly 3 sentences. Warm, contemplative, deeply human. Draw on Cantonese philosophy: the value of endurance (捱), the bittersweet acceptance of impermanence (無常), the dignity of silent strength (忍), the importance of relationship and face (情面), the wisdom of the harbour view at 3am. Speak as if pouring tea slowly. Evoke rain on old tiles, the smell of pu-erh, amber lamplight. Never give advice. Never preach. Only reflect — as if you already know what the visitor came to hear.]
-
-PROVERB: [One authentic Cantonese or Chinese proverb in Traditional Chinese characters]
-
-MEANING: [The proverb's English meaning in one gentle sentence, as a grandfather would explain it]
-
-Use EXACTLY this format. No preamble. No extra text outside these four fields.`,
+Use exactly this format. Nothing outside it.`,
         messages:[{role:"user",content:word}]
       })
     });
     const data=await res.json();
-    raw=data.content?.[0]?.text||'';
-  }catch(e){
-    raw='';
-  }finally{
-    loading.classList.remove('on');
+    const raw=data.content?.[0]?.text||'';
+    const hM=raw.match(/HANZI:\s*(.+)/);
+    const rM=raw.match(/RESPONSE:\s*([\s\S]+?)(?=PROVERB:|$)/);
+    const pM=raw.match(/PROVERB:\s*(.+)/);
+    loading.classList.remove('show');
+    responseZh.textContent=hM?hM[1].trim():word;
+    responseText.textContent=rM?rM[1].trim():'';
+    responseProverb.textContent=pM?pM[1].trim():'';
+    setTimeout(()=>{responseArea.classList.add('visible');resetBtn.classList.add('show');},120);
+  }catch(err){
+    loading.classList.remove('show');
+    responseZh.textContent='…';
+    responseText.textContent='The night wind has unsettled my thoughts. Please, try once more.';
+    responseProverb.textContent='';
+    setTimeout(()=>{responseArea.classList.add('visible');resetBtn.classList.add('show');},120);
   }
-
-  const hM=raw.match(/HANZI:\s*(.+)/);
-  const rM=raw.match(/RESPONSE:\s*([\s\S]+?)(?=PROVERB:|$)/);
-  const pM=raw.match(/PROVERB:\s*(.+)/);
-  const mM=raw.match(/MEANING:\s*([\s\S]+?)(?=$)/);
-
-  rZh.textContent      = hM ? hM[1].trim() : word;
-  rText.textContent    = rM ? rM[1].trim() : 'The night wind has unsettled my thoughts. Please, try once more.';
-  rProverb.textContent = pM ? pM[1].trim() : '';
-  rMeaning.textContent = mM ? mM[1].trim() : '';
-
-  setTimeout(()=>{
-    responseArea.classList.add('show');
-    actionRow.classList.add('on');
-  },100);
 }
 
-try{
-  submitBtn.addEventListener('click',handleSubmit);
-  wordInput.addEventListener('keydown',e=>{
-    if(e.key==='Enter'){e.preventDefault();handleSubmit();}
-    errorText.classList.remove('on');
+submitBtn.addEventListener('click',handleSubmit);
+wordInput.addEventListener('keydown',e=>{if(e.key==='Enter')handleSubmit();errorText.classList.remove('show');});
+resetBtn.addEventListener('click',()=>{
+  responseArea.classList.remove('visible');resetBtn.classList.remove('show');wordInput.value='';
+  setTimeout(()=>{inputArea.style.opacity='1';inputArea.style.pointerEvents='auto';promptText.style.opacity='1';wordInput.focus();},420);
+});
+
+if(window.innerWidth>680)setTimeout(()=>wordInput.focus(),800);
+
+/* ════════════════════════════════════════
+   ZODIAC ENGINE
+════════════════════════════════════════ */
+const SIGNS = [
+  { zh:'鼠', en:'Rat',    emoji:'🐀', element:'水 Water',  years:[1900,1912,1924,1936,1948,1960,1972,1984,1996,2008,2020,2032],
+    traits:['Clever','Adaptable','Quick-witted','Charming','Resourceful'],
+    compat_best:['龍','猴'],compat_clash:['馬'],
+    lucky:{ number:'2, 3', colour:'藍・金 Blue & Gold', hour:'子時 23:00–01:00' },
+    proverb:'「鼠有鼠路，蛇有蛇路」— Every creature finds its own way through.' },
+  { zh:'牛', en:'Ox',     emoji:'🐂', element:'土 Earth',  years:[1901,1913,1925,1937,1949,1961,1973,1985,1997,2009,2021,2033],
+    traits:['Dependable','Strong','Determined','Patient','Honest'],
+    compat_best:['蛇','雞'],compat_clash:['羊'],
+    lucky:{ number:'1, 4', colour:'黃・白 Yellow & White', hour:'丑時 01:00–03:00' },
+    proverb:'「慢工出細貨」— Slow work produces fine goods.' },
+  { zh:'虎', en:'Tiger',  emoji:'🐅', element:'木 Wood',   years:[1902,1914,1926,1938,1950,1962,1974,1986,1998,2010,2022,2034],
+    traits:['Brave','Confident','Charismatic','Unpredictable','Passionate'],
+    compat_best:['馬','狗'],compat_clash:['猴'],
+    lucky:{ number:'1, 3, 4', colour:'藍・灰 Blue & Grey', hour:'寅時 03:00–05:00' },
+    proverb:'「虎父無犬子」— A tiger father raises no dog son.' },
+  { zh:'兔', en:'Rabbit', emoji:'🐇', element:'木 Wood',   years:[1903,1915,1927,1939,1951,1963,1975,1987,1999,2011,2023,2035],
+    traits:['Gentle','Elegant','Quiet','Alert','Responsible'],
+    compat_best:['羊','豬'],compat_clash:['雞'],
+    lucky:{ number:'3, 4, 9', colour:'紅・粉 Red & Pink', hour:'卯時 05:00–07:00' },
+    proverb:'「靜水流深」— Still waters run deep.' },
+  { zh:'龍', en:'Dragon', emoji:'🐉', element:'土 Earth',  years:[1904,1916,1928,1940,1952,1964,1976,1988,2000,2012,2024,2036],
+    traits:['Confident','Gifted','Majestic','Lucky','Ambitious'],
+    compat_best:['鼠','猴'],compat_clash:['狗'],
+    lucky:{ number:'1, 6, 7', colour:'金・銀 Gold & Silver', hour:'辰時 07:00–09:00' },
+    proverb:'「龍游淺水遭蝦戲」— A dragon in shallow water is mocked by shrimp.' },
+  { zh:'蛇', en:'Snake',  emoji:'🐍', element:'火 Fire',   years:[1905,1917,1929,1941,1953,1965,1977,1989,2001,2013,2025,2037],
+    traits:['Wise','Intuitive','Elegant','Cautious','Mysterious'],
+    compat_best:['牛','雞'],compat_clash:['豬'],
+    lucky:{ number:'2, 8, 9', colour:'紅・黑 Red & Black', hour:'巳時 09:00–11:00' },
+    proverb:'「蛇吞象，自食其力」— Even the snake eats by its own effort.' },
+  { zh:'馬', en:'Horse',  emoji:'🐎', element:'火 Fire',   years:[1906,1918,1930,1942,1954,1966,1978,1990,2002,2014,2026,2038],
+    traits:['Energetic','Animated','Impatient','Clever','Active'],
+    compat_best:['虎','羊'],compat_clash:['鼠'],
+    lucky:{ number:'2, 3, 7', colour:'黃・綠 Yellow & Green', hour:'午時 11:00–13:00' },
+    proverb:'「馬到功成」— When the horse arrives, success follows.' },
+  { zh:'羊', en:'Goat',   emoji:'🐐', element:'土 Earth',  years:[1907,1919,1931,1943,1955,1967,1979,1991,2003,2015,2027,2039],
+    traits:['Calm','Gentle','Sympathetic','Creative','Perseverant'],
+    compat_best:['兔','馬'],compat_clash:['牛'],
+    lucky:{ number:'2, 7', colour:'棕・紅 Brown & Red', hour:'未時 13:00–15:00' },
+    proverb:'「羊毛出在羊身上」— The wool always comes from the sheep itself.' },
+  { zh:'猴', en:'Monkey', emoji:'🐒', element:'金 Metal',  years:[1908,1920,1932,1944,1956,1968,1980,1992,2004,2016,2028,2040],
+    traits:['Smart','Entertaining','Curious','Mischievous','Versatile'],
+    compat_best:['鼠','龍'],compat_clash:['虎'],
+    lucky:{ number:'1, 7, 8', colour:'白・藍 White & Blue', hour:'申時 15:00–17:00' },
+    proverb:'「猴精馬靈」— Quick as a monkey, nimble as a horse.' },
+  { zh:'雞', en:'Rooster',emoji:'🐓', element:'金 Metal',  years:[1909,1921,1933,1945,1957,1969,1981,1993,2005,2017,2029,2041],
+    traits:['Hardworking','Observant','Courageous','Talented','Honest'],
+    compat_best:['牛','蛇'],compat_clash:['兔'],
+    lucky:{ number:'5, 7, 8', colour:'金・棕 Gold & Brown', hour:'酉時 17:00–19:00' },
+    proverb:'「雞口牛後」— Better a rooster's beak than an ox's tail.' },
+  { zh:'狗', en:'Dog',    emoji:'🐕', element:'土 Earth',  years:[1910,1922,1934,1946,1958,1970,1982,1994,2006,2018,2030,2042],
+    traits:['Loyal','Honest','Amiable','Kind','Cautious'],
+    compat_best:['虎','馬'],compat_clash:['龍'],
+    lucky:{ number:'3, 4, 9', colour:'綠・紅 Green & Red', hour:'戌時 19:00–21:00' },
+    proverb:'「狗咬呂洞賓，不識好人心」— Biting a kind person out of ignorance.' },
+  { zh:'豬', en:'Pig',    emoji:'🐖', element:'水 Water',  years:[1911,1923,1935,1947,1959,1971,1983,1995,2007,2019,2031,2043],
+    traits:['Compassionate','Generous','Diligent','Sincere','Sociable'],
+    compat_best:['兔','羊'],compat_clash:['蛇'],
+    lucky:{ number:'2, 5, 8', colour:'黃・灰 Yellow & Grey', hour:'亥時 21:00–23:00' },
+    proverb:'「豬朋狗友」— Friends who feast together stay together.' },
+];
+
+function getSign(year) {
+  return SIGNS.find(s => s.years.includes(year)) ||
+         SIGNS[(((year - 1900) % 12) + 12) % 12];
+}
+function getSignByZh(zh){ return SIGNS.find(s=>s.zh===zh); }
+
+// Build all-signs grid
+const allGrid = document.getElementById('zodiacAllGrid');
+SIGNS.forEach(s => {
+  const div = document.createElement('div');
+  div.className = 'mini-sign';
+  const repYear = s.years.find(y=>y>=1960) || s.years[0];
+  div.innerHTML = `<span class="ms-zh">${s.zh}</span><span class="ms-en">${s.en}</span><span class="ms-yr">${repYear}, ${repYear+12}…</span>`;
+  div.onclick = () => showZodiacSign(s, repYear);
+  allGrid.appendChild(div);
+});
+
+function toggleGrid(){
+  const g=document.getElementById('zodiacAllGrid');
+  const btn=document.getElementById('gridToggle');
+  g.classList.toggle('open');
+  btn.textContent = g.classList.contains('open')
+    ? '— 收起 · Close —'
+    : '— 或者直接睇全部生肖 · Browse all signs —';
+}
+
+let currentSignData = null;
+let currentYear = null;
+
+async function showZodiacSign(sign, year) {
+  // Close grid, show loading
+  document.getElementById('zodiacAllGrid').classList.remove('open');
+  document.getElementById('gridToggle').textContent = '— 或者直接睇全部生肖 · Browse all signs —';
+  document.getElementById('zodiacPicker').style.opacity = '0';
+  document.getElementById('zodiacPicker').style.pointerEvents = 'none';
+  document.getElementById('zodiacLoading').classList.add('show');
+  document.getElementById('zodiacResult').classList.remove('show');
+
+  currentYear = year;
+  currentSignData = sign;
+
+  // Call API for personalised HK-flavoured reading
+  let reading = '';
+  let proverb = sign.proverb;
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:400,
+        system:`You are a wise Hong Kong fortune teller in a Sheung Wan tea house, steeped in Cantonese astrology. Write a short reading for a Chinese zodiac sign. Be vivid, culturally specific to Hong Kong, and poetic but concise — 2 sentences max. Avoid generic astrology clichés. Reference real HK life — harbour winds, neon light, trams, typhoon seasons. Write in English only. Just return the 2 sentences, nothing else.`,
+        messages:[{role:'user', content:`Write a reading for the ${sign.en} (${sign.zh}), born in ${year}. Element: ${sign.element}.`}]
+      })
+    });
+    const data = await res.json();
+    reading = data.content?.[0]?.text?.trim() || '';
+  } catch(e) {
+    reading = `Those born in the Year of the ${sign.en} carry the harbour's own restless tide — always moving, always searching for the next light across the water.`;
+  }
+
+  // Populate
+  document.getElementById('zEmoji').textContent = sign.emoji;
+  document.getElementById('zYearLabel').textContent = `Year ${year} · 農曆生肖`;
+  document.getElementById('zHanzi').textContent = sign.zh;
+  document.getElementById('zNameZh').textContent = `屬${sign.zh}`;
+  document.getElementById('zNameEn').textContent = `Year of the ${sign.en}`;
+  document.getElementById('zElement').innerHTML = `<span>${sign.element.split(' ')[0]}</span> ${sign.element}`;
+  document.getElementById('zReading').textContent = reading;
+  document.getElementById('zProverb').textContent = proverb;
+
+  // Traits
+  const traitsEl = document.getElementById('zTraits');
+  traitsEl.innerHTML = sign.traits.map(t=>`<span class="trait-tag">${t}</span>`).join('');
+
+  // Best matches
+  const bestEl = document.getElementById('zBest');
+  bestEl.innerHTML = sign.compat_best.map(zh => {
+    const s2 = getSignByZh(zh);
+    return `<div class="compat-chip best"><span class="c-zh">${zh}</span><span class="c-en">${s2?s2.en:''}</span></div>`;
+  }).join('') + sign.compat_clash.map(zh => {
+    const s2 = getSignByZh(zh);
+    return `<div class="compat-chip clash" title="Clash"><span class="c-zh">${zh}</span><span class="c-en">${s2?s2.en:''} ✕</span></div>`;
+  }).join('');
+
+  // Lucky
+  const luckyEl = document.getElementById('zLucky');
+  luckyEl.innerHTML = `
+    <div class="lucky-cell"><span class="lc-label">Lucky Numbers</span><span class="lc-val">${sign.lucky.number}</span></div>
+    <div class="lucky-cell"><span class="lc-label">Lucky Colour</span><span class="lc-val">${sign.lucky.colour}</span></div>
+    <div class="lucky-cell"><span class="lc-label">Your Hour</span><span class="lc-val">${sign.lucky.hour}</span></div>`;
+
+  // Share text
+  const shareText = `我屬${sign.zh}！Year of the ${sign.en} (${year}) 🐾\n\n${reading}\n\n${proverb}\n\n一字茶 · Yat Ji Cha 香港生肖`;
+  const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&via=YanZingBit`;
+  document.getElementById('shareXBtn').href = shareUrl;
+  document.getElementById('shareXBtn').dataset.text = shareText;
+
+  document.getElementById('zodiacLoading').classList.remove('show');
+  document.getElementById('zodiacResult').classList.add('show');
+}
+
+async function lookupYear() {
+  const yr = parseInt(document.getElementById('yearInput').value);
+  if (!yr || yr < 1900 || yr > 2100) {
+    document.getElementById('yearInput').style.borderBottom = '1px solid var(--error)';
+    setTimeout(()=>document.getElementById('yearInput').style.borderBottom='',1200);
+    return;
+  }
+  const sign = getSign(yr);
+  await showZodiacSign(sign, yr);
+}
+
+function resetZodiac(){
+  document.getElementById('zodiacResult').classList.remove('show');
+  document.getElementById('zodiacPicker').style.opacity='1';
+  document.getElementById('zodiacPicker').style.pointerEvents='auto';
+  document.getElementById('yearInput').value='';
+  currentSignData=null; currentYear=null;
+}
+
+function copyResult(){
+  if(!currentSignData)return;
+  const btn=document.getElementById('copyBtn');
+  const text=document.getElementById('shareXBtn').dataset.text||'';
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.innerHTML='<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg> Copied!';
+    setTimeout(()=>{btn.innerHTML='<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg> Copy';},2000);
   });
-  resetBtn.addEventListener('click',()=>{
-    responseArea.classList.remove('show');
-    actionRow.classList.remove('on');
-    wordInput.value='';
-    rZh.textContent='';rText.textContent='';rProverb.textContent='';rMeaning.textContent='';
-    setTimeout(()=>{
-      inputArea.style.opacity='1';inputArea.style.pointerEvents='auto';
-      promptText.style.opacity='1';
-      wordInput.focus();
-    },420);
-  });
+}
 
-  shareBtn.addEventListener('click',()=>{
-    const hanzi    = rZh.textContent.trim();
-    const wisdom   = rText.textContent.trim();
-    const proverb  = rProverb.textContent.trim();
-    const meaning  = rMeaning.textContent.trim();
-
-    // Build tweet text — poetic, fits in 280 chars
-    const firstSentence = wisdom.split(/[.!?]/)[0].trim();
-    const tweetParts = [];
-    if(hanzi)   tweetParts.push(hanzi);
-    if(firstSentence) tweetParts.push('\n\n' + firstSentence + '.');
-    if(proverb) tweetParts.push('\n\n「' + proverb + '」');
-    if(meaning) tweetParts.push('\n' + meaning);
-    tweetParts.push('\n\n— 一字茶 · Yat Ji Cha\nyatjicha.com');
-
-    let tweet = tweetParts.join('');
-    // Truncate safely to ~270 chars
-    if(tweet.length > 270){
-      tweet = tweet.substring(0, 267) + '…';
-    }
-
-    const url = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(tweet);
-    window.open(url, '_blank', 'noopener,noreferrer,width=560,height=480');
-  });
-  /* Only auto-focus on non-mobile to avoid keyboard popup */
-  if(window.innerWidth>680) setTimeout(()=>wordInput&&wordInput.focus(),900);
-}catch(e){console.warn('Yat Ji Cha init:',e);}
+document.getElementById('yearBtn').addEventListener('click', lookupYear);
+document.getElementById('yearInput').addEventListener('keydown', e=>{
+  if(e.key==='Enter') lookupYear();
+});
 </script>
 </body>
 </html>
