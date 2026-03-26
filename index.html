@@ -8,228 +8,122 @@
 <script src="https://cdn.tailwindcss.com"></script>
 
 <style>
-html { scroll-behavior: smooth; }
 body { background:#0b0b0b; color:#e5e5e5; }
-
 .fade-in { animation: fadeIn .6s ease; }
 @keyframes fadeIn {
   from {opacity:0; transform:translateY(20px)}
   to {opacity:1; transform:translateY(0)}
 }
-
-.card:hover {
-  transform: translateY(-6px);
-  transition: .3s;
-}
-
-.soft-glow {
-  box-shadow: 0 0 40px rgba(255,255,255,0.05);
-}
+.card:hover { transform: translateY(-5px); transition:.3s;}
 </style>
 </head>
 
 <body>
 
-<!-- HEADER -->
-<header class="border-b border-white/10 sticky top-0 backdrop-blur z-50">
-<div class="max-w-6xl mx-auto flex justify-between p-4">
-  <h1 class="text-lg tracking-widest">yatjizha 命理館</h1>
-  <nav class="space-x-4 text-sm text-gray-400">
-    <a href="#about">關於</a>
-    <a href="#whitepaper">白皮書</a>
-    <a href="#team">團隊</a>
-  </nav>
-</div>
-</header>
-
 <!-- HERO -->
 <section class="text-center py-20">
-<h2 class="text-3xl mb-4 tracking-wide">探索你嘅命盤</h2>
-<p class="text-gray-500">一種關於能量、象徵與自我定位嘅系統</p>
-
-<div class="mt-8 flex justify-center">
-<a href="https://orynth.dev/projects/yatzicha" target="_blank">
-<img src="https://orynth.dev/api/badge/yatzicha?theme=light&style=default" width="240">
-</a>
-</div>
+<h1 class="text-2xl tracking-widest">yatjizha 命理館</h1>
+<p class="text-gray-500 mt-2">Symbolic Identity System</p>
 </section>
 
-<!-- RITUAL EXPERIENCE -->
-<section class="text-center py-20 border-t border-white/10">
-<h2 class="text-xl mb-6">開始你的命盤解讀</h2>
-
+<!-- RITUAL -->
+<section class="text-center py-16">
 <input type="date" id="birth-date" class="text-black p-2 rounded">
 
 <div class="mt-6">
-<button onclick="startReading()" class="px-6 py-3 border border-white/20 rounded-full hover:bg-white hover:text-black transition">
+<button onclick="generateReading()" class="px-6 py-3 border border-white/20 rounded-full">
 開始解讀
 </button>
 </div>
 
-<div id="ritual" class="mt-10 opacity-0 transition duration-700 text-gray-500"></div>
+<div id="loading" class="mt-6 text-gray-500"></div>
 
 <div id="result-box" class="hidden mt-10 fade-in max-w-xl mx-auto">
-<h3 class="text-2xl mb-3">命盤結果</h3>
-<p id="result-text" class="text-gray-400 leading-relaxed"></p>
+<h3 class="text-xl mb-3">你的能量結構</h3>
+<p id="reading"></p>
+
+<div class="mt-6">
+<button onclick="saveProfile()" class="border px-4 py-2 mr-2">保存</button>
+<button onclick="shareCard()" class="border px-4 py-2">分享</button>
+</div>
 </div>
 </section>
 
-<!-- ZODIAC GRID -->
-<section class="max-w-6xl mx-auto py-16 grid md:grid-cols-2 gap-10">
-
-<div>
-<h3 class="mb-4 text-gray-400">西方星座</h3>
-<div id="western-grid" class="grid grid-cols-4 gap-3"></div>
+<!-- SHARE CARD -->
+<div id="share-card" class="hidden text-center mt-10 p-6 border border-white/10 max-w-sm mx-auto">
+<h3 class="text-lg mb-2">Energy Profile</h3>
+<p id="card-text" class="text-gray-400"></p>
 </div>
 
-<div>
-<h3 class="mb-4 text-gray-400">生肖系統</h3>
-<div id="chinese-grid" class="grid grid-cols-4 gap-3"></div>
-</div>
-
-</section>
-
-<!-- COMPAT -->
-<section class="text-center py-16 border-t border-white/10">
-<h2 class="mb-6">能量配對</h2>
-
-<select id="sign1" class="text-black p-2"></select>
-<select id="sign2" class="text-black p-2"></select>
-
-<div class="mt-4">
-<button onclick="checkCompat()" class="px-5 py-2 border border-white/20 rounded">
-分析
-</button>
-</div>
-
-<div id="compat" class="mt-4 text-gray-400"></div>
-</section>
-
-<!-- ABOUT -->
-<section id="about" class="max-w-3xl mx-auto py-20 text-center">
-<h2 class="text-2xl mb-4">關於</h2>
-<p class="text-gray-500 leading-relaxed">
-yatjizha 並非傳統命理工具，而係一種策展式系統。
-我哋將象徵、能量與結構重新編排，
-讓個體可以在數碼空間中重新理解自己。
-</p>
-</section>
-
-<!-- WHITEPAPER -->
-<section id="whitepaper" class="py-20 border-t border-white/10 text-center">
-<h2 class="text-2xl mb-4">白皮書</h2>
-<p class="text-gray-500 max-w-2xl mx-auto">
-本系統融合東西方命理邏輯，
-透過資料結構與符號語言，
-建立一種可擴展嘅身份解讀模型。
-</p>
-</section>
-
-<!-- TEAM -->
-<section id="team" class="max-w-5xl mx-auto py-20 text-center">
-<h2 class="text-2xl mb-6">團隊</h2>
-
-<div class="grid md:grid-cols-3 gap-6">
-
-<div class="card soft-glow p-5 rounded">
-<h3>Yan Zing</h3>
-<p class="text-gray-500 text-sm">Founder</p>
-<a href="https://x.com/YanZingBit" target="_blank" class="text-blue-400 text-sm">Profile</a>
-</div>
-
-<div class="card soft-glow p-5 rounded">
-<h3>Li Chen</h3>
-<p class="text-gray-500 text-sm">System Architect</p>
-</div>
-
-<div class="card soft-glow p-5 rounded">
-<h3>Wong Kai</h3>
-<p class="text-gray-500 text-sm">Design Curator</p>
-</div>
-
-</div>
-</section>
-
-<!-- MODAL -->
-<div id="modal" class="fixed inset-0 bg-black/70 hidden items-center justify-center">
-<div class="bg-[#111] p-6 rounded max-w-md w-full fade-in">
-<button onclick="closeModal()" class="float-right">✕</button>
-<div id="modal-content"></div>
-</div>
-</div>
+<!-- BADGE (dipindah bawah & kecil) -->
+<footer class="text-center py-10 text-gray-600">
+<a href="https://orynth.dev/projects/yatzicha" target="_blank">
+<img src="https://orynth.dev/api/badge/yatzicha?theme=light&style=default" width="140" class="mx-auto opacity-70">
+</a>
+</footer>
 
 <script>
-// DATA
-const western = [["白羊座","♈"],["金牛座","♉"],["雙子座","♊"],["巨蟹座","♋"],
-["獅子座","♌"],["處女座","♍"],["天秤座","♎"],["天蠍座","♏"],
-["人馬座","♐"],["山羊座","♑"],["水瓶座","♒"],["雙魚座","♓"]];
-
-const chinese = [["鼠","🐀"],["牛","🐂"],["虎","🐅"],["兔","🐇"],
-["龍","🐉"],["蛇","🐍"],["馬","🐎"],["羊","🐐"],
-["猴","🐒"],["雞","🐓"],["狗","🐕"],["豬","🐖"]];
-
-// RENDER
-function render(){
-  western.forEach(z=>{
-    let d=document.createElement("div");
-    d.className="card p-3 text-center border border-white/10 rounded cursor-pointer";
-    d.innerHTML=`${z[1]}<br>${z[0]}`;
-    d.onclick=()=>openModal(z);
-    westernGrid.appendChild(d);
-  });
-
-  chinese.forEach(z=>{
-    let d=document.createElement("div");
-    d.className="card p-3 text-center border border-white/10 rounded cursor-pointer";
-    d.innerHTML=`${z[1]}<br>${z[0]}`;
-    d.onclick=()=>openModal(z);
-    chineseGrid.appendChild(d);
-  });
-
-  [...western,...chinese].forEach(z=>{
-    sign1.add(new Option(z[0],z[0]));
-    sign2.add(new Option(z[0],z[0]));
-  });
-}
-render();
-
-// MODAL
-function openModal(z){
-  modal.style.display="flex";
-  modalContent.innerHTML=`<div class="text-4xl">${z[1]}</div><h2 class="mt-3">${z[0]}</h2>`;
-}
-function closeModal(){ modal.style.display="none"; }
-
-// RITUAL
-function startReading(){
-  const ritual=document.getElementById("ritual");
-  const box=document.getElementById("result-box");
-  const text=document.getElementById("result-text");
-
-  ritual.style.opacity=1;
-  ritual.innerText="正在解析命盤...";
-
-  setTimeout(()=> ritual.innerText="能量正在重組...",1200);
-  setTimeout(()=> ritual.innerText="符號開始對齊...",2500);
-
-  setTimeout(()=>{
-    ritual.style.opacity=0;
-    box.classList.remove("hidden");
-
-    const insights=[
-      "你嘅能量偏向流動型，適合在變化中尋找定位。",
-      "你擁有雙重性格結構，理性與直覺並存。",
-      "你正處於轉換週期之中。",
-      "你嘅命盤顯示一種未完全穩定嘅能量狀態。"
-    ];
-
-    text.innerText=insights[Math.floor(Math.random()*insights.length)];
-  },4000);
+// ===== ZODIAC CALC =====
+function getZodiac(month, day){
+if((month==3&&day>=21)||(month==4&&day<=19)) return "白羊座";
+if((month==4&&day>=20)||(month==5&&day<=20)) return "金牛座";
+if((month==5&&day>=21)||(month==6&&day<=21)) return "雙子座";
+if((month==6&&day>=22)||(month==7&&day<=22)) return "巨蟹座";
+if((month==7&&day>=23)||(month==8&&day<=22)) return "獅子座";
+if((month==8&&day>=23)||(month==9&&day<=22)) return "處女座";
+if((month==9&&day>=23)||(month==10&&day<=23)) return "天秤座";
+if((month==10&&day>=24)||(month==11&&day<=22)) return "天蠍座";
+if((month==11&&day>=23)||(month==12&&day<=21)) return "人馬座";
+if((month==12&&day>=22)||(month==1&&day<=19)) return "山羊座";
+if((month==1&&day>=20)||(month==2&&day<=18)) return "水瓶座";
+return "雙魚座";
 }
 
-// COMPAT
-function checkCompat(){
-  compat.innerText="兩者之間存在微妙能量共振。";
+// ===== AI STYLE READING (deterministic) =====
+function generateReading(){
+const input=document.getElementById("birth-date").value;
+if(!input) return;
+
+const d=new Date(input);
+const m=d.getMonth()+1;
+const day=d.getDate();
+
+const zodiac=getZodiac(m,day);
+
+// deterministic "AI"
+const seed=m*day;
+const types=["流動型","穩定型","分裂型","轉換型"];
+const traits=["直覺強","理性高","情緒敏感","結構清晰"];
+
+const type=types[seed%types.length];
+const trait=traits[(seed+3)%traits.length];
+
+const text=`你屬於${zodiac}，能量結構為「${type}」。
+你嘅特質傾向於${trait}，顯示你喺現實與內在之間持續調整。
+當前階段，你正進入一個轉化周期。`;
+
+document.getElementById("loading").innerText="解析中...";
+setTimeout(()=>{
+document.getElementById("loading").innerText="";
+document.getElementById("result-box").classList.remove("hidden");
+document.getElementById("reading").innerText=text;
+window.currentProfile=text;
+},1500);
+}
+
+// ===== SAVE =====
+function saveProfile(){
+localStorage.setItem("yatjizha_profile", window.currentProfile);
+alert("已保存");
+}
+
+// ===== SHARE =====
+function shareCard(){
+const card=document.getElementById("share-card");
+card.classList.remove("hidden");
+document.getElementById("card-text").innerText=window.currentProfile;
+
+navigator.clipboard.writeText(window.currentProfile);
 }
 </script>
 
