@@ -3,8 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://api.anthropic.com; img-src 'self' data: https://orynth.dev; frame-ancestors 'none';">
 <meta name="theme-color" content="#1a1410">
-<title>一字茶 · Yat Ji Cha</title>
+<title>一字茶 · Yat Ji Cha — AI Tea House from Hong Kong</title>
+<meta name="description" content="一字茶 (Yat Ji Cha) is an AI contemplative experience rooted in Cantonese tea culture. Speak one word. Receive wisdom brewed from old Hong Kong — rain, ink, amber, silence." />
+<link rel="canonical" href="https://yatjicha.com" />
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://yatjicha.com" />
+<meta property="og:title" content="一字茶 · Yat Ji Cha — One Word. One Cup. One Truth." />
+<meta property="og:description" content="An AI-powered contemplative experience rooted in Cantonese tea culture. Submit one word. Receive a quiet reflection brewed from old Hong Kong wisdom." />
+<meta property="og:image" content="https://yatjicha.com/og-image.png" />
+<meta property="og:site_name" content="一字茶 · Yat Ji Cha" />
+<meta property="og:locale" content="zh_HK" />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content="@YanZingBit" />
+<meta name="twitter:title" content="一字茶 · Yat Ji Cha — One Word. One Cup. One Truth." />
+<meta name="twitter:description" content="Speak one word to the Old Man of a Sheung Wan tea house. Receive Cantonese wisdom on a rainy night. Built on Claude AI." />
+<meta name="twitter:image" content="https://yatjicha.com/og-image.png" />
+
+<!-- Favicon — ink brush 茶 -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%231a1410'/><text x='3' y='26' font-size='22' fill='%23d4923f' font-family='serif'>茶</text></svg>" />
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;700;900&family=IM+Fell+English:ital@0;1&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -114,7 +141,8 @@ nav {
 
 /* ── HOME ── */
 .title-block { text-align:center; margin-bottom:36px; animation:rise 1.6s cubic-bezier(0.16,1,0.3,1) both; }
-.title-chinese { font-family:'Noto Serif TC',serif; font-weight:900; font-size:clamp(3rem,14vw,5.5rem); letter-spacing:0.25em; color:var(--amber-text); filter:drop-shadow(0 0 30px rgba(200,133,58,0.45)); line-height:1; display:block; }
+.title-chinese { font-family:'Noto Serif TC',serif; font-weight:900; font-size:clamp(3rem,14vw,5.5rem); letter-spacing:0.25em; color:var(--amber-text); filter:drop-shadow(0 0 30px rgba(200,133,58,0.45)); line-height:1; display:block; margin:0; }
+h1.title-chinese { font-size:clamp(3rem,14vw,5.5rem); } /* reset h1 UA styles */
 .title-pinyin { font-family:'IM Fell English',serif; font-style:italic; font-size:clamp(0.8rem,2.5vw,0.95rem); letter-spacing:0.3em; color:var(--paper-ghost); margin-top:12px; display:block; }
 .title-divider { width:56px; height:1px; background:linear-gradient(90deg,transparent,var(--amber),transparent); margin:14px auto; opacity:0.6; }
 .title-tagline { font-size:clamp(0.6rem,2vw,0.72rem); letter-spacing:0.4em; color:var(--paper-ghost); text-transform:uppercase; }
@@ -244,19 +272,101 @@ footer { position:relative; z-index:10; padding:24px 20px; border-top:1px solid 
 .delay-1  { animation-delay:0.12s; }
 .delay-2  { animation-delay:0.24s; }
 .delay-3  { animation-delay:0.36s; }
+
+/* ── SKIP LINK ── */
+.skip-link {
+  position:absolute; top:-100px; left:12px; z-index:9999;
+  background:var(--amber); color:#000;
+  padding:10px 18px; font-size:0.7rem; letter-spacing:0.15em;
+  text-transform:uppercase; text-decoration:none; font-weight:700;
+  font-family:'Cinzel',serif; transition:top 0.15s;
+}
+.skip-link:focus { top:8px; }
+
+/* ── FOCUS VISIBLE ── */
+a:focus-visible, button:focus-visible, input:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 3px;
+}
+a:focus:not(:focus-visible),
+button:focus:not(:focus-visible),
+input:focus:not(:focus-visible) { outline: none; }
+
+/* ── REDUCED MOTION ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .fade-in { animation: none; opacity: 1; }
+  #rain { display: none; }
+  .steam-line { animation: none; }
+}
+
+/* ── MOBILE SAFE AREA (iPhone notch / Dynamic Island) ── */
+nav {
+  padding-top: env(safe-area-inset-top);
+  padding-left: max(20px, env(safe-area-inset-left));
+  padding-right: max(20px, env(safe-area-inset-right));
+}
+footer {
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  padding-left: max(20px, env(safe-area-inset-left));
+  padding-right: max(20px, env(safe-area-inset-right));
+}
+#page-home {
+  padding-bottom: max(100px, calc(80px + env(safe-area-inset-bottom)));
+}
+
+/* ── MOBILE INPUT IMPROVEMENTS ── */
+@media (max-width: 480px) {
+  .word-input { font-size: 1.5rem; }
+  .input-area { padding: 0 8px; }
+  .response-area { padding: 0 12px; }
+  .reset-btn { width: 100%; max-width: 320px; }
+  /* Prevent zoom on input focus (iOS) */
+  input[type="text"] { font-size: max(16px, 1.5rem); }
+}
+
+/* ── TOUCH TARGET SIZES (min 44px) ── */
+.submit-btn, .hamburger, .reset-btn,
+.nav-links a, .mobile-menu a,
+.team-social a, .footer-links a { min-height: 44px; }
+
+/* ── WHITEPAPER TABLE MOBILE ── */
+@media (max-width: 540px) {
+  .wp-table th, .wp-table td { padding: 8px 8px; font-size: 0.78rem; }
+  .wp-table { min-width: 320px; }
+}
+
+/* ── TEAM GRID SINGLE COL ON VERY SMALL SCREENS ── */
+@media (max-width: 360px) {
+  .team-grid { grid-template-columns: 1fr; }
+  .values-grid { grid-template-columns: repeat(2,1fr); }
+}
+
+/* ── LONG WORD OVERFLOW PROTECTION ── */
+.response-word-zh, .response-text, .response-proverb,
+.story-section p, .wp-section p, .team-bio {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
 </style>
 </head>
 <body>
 
-<canvas id="rain"></canvas>
-<div class="grain"></div>
-<div class="ambient"></div>
-<div class="corner tl"></div><div class="corner tr"></div>
-<div class="corner bl"></div><div class="corner br"></div>
-<div class="side-chars left">香港之夜・雨聲・茶香</div>
-<div class="side-chars right">一字一世界・萬語皆有情</div>
+<a href="#main-content" class="skip-link">Skip to main content</a>
 
-<div class="teacup">
+<canvas id="rain" aria-hidden="true" role="presentation"></canvas>
+<div class="grain" aria-hidden="true"></div>
+<div class="ambient" aria-hidden="true"></div>
+<div class="corner tl" aria-hidden="true"></div><div class="corner tr" aria-hidden="true"></div>
+<div class="corner bl" aria-hidden="true"></div><div class="corner br" aria-hidden="true"></div>
+<div class="side-chars left" aria-hidden="true">香港之夜・雨聲・茶香</div>
+<div class="side-chars right" aria-hidden="true">一字一世界・萬語皆有情</div>
+
+<div class="teacup" aria-hidden="true">
   <svg width="44" height="38" viewBox="0 0 48 40" fill="none">
     <path d="M6 16 Q8 34 24 34 Q40 34 42 16 Z" stroke="#c8853a" stroke-width="1.5" fill="none"/>
     <path d="M42 20 Q50 20 50 26 Q50 32 42 30" stroke="#c8853a" stroke-width="1.5" fill="none"/>
@@ -264,11 +374,11 @@ footer { position:relative; z-index:10; padding:24px 20px; border-top:1px solid 
     <line x1="2" y1="38" x2="46" y2="38" stroke="#c8853a" stroke-width="1"/>
   </svg>
 </div>
-<div class="steam"><span class="steam-line"></span><span class="steam-line"></span><span class="steam-line"></span></div>
+<div class="steam" aria-hidden="true"><span class="steam-line"></span><span class="steam-line"></span><span class="steam-line"></span></div>
 
 <!-- NAV -->
 <nav>
-  <div class="nav-logo" onclick="showPage('home')">一字茶</div>
+  <div class="nav-logo" onclick="showPage('home')" role="button" tabindex="0" aria-label="一字茶 — Return to Tea Room" onkeydown="if(event.key==='Enter'||event.key===' ')showPage('home')">一字茶</div>
   <ul class="nav-links">
     <li><a onclick="showPage('home')"       id="nav-home"       class="active">Tea Room</a></li>
     <li><a onclick="showPage('about')"      id="nav-about"              >About</a></li>
@@ -287,9 +397,10 @@ footer { position:relative; z-index:10; padding:24px 20px; border-top:1px solid 
 </div>
 
 <!-- HOME -->
+<main id="main-content">
 <div class="page active" id="page-home">
   <div class="title-block">
-    <span class="title-chinese">一字茶</span>
+    <h1 class="title-chinese">一字茶</h1>
     <span class="title-pinyin">Yat Ji Cha</span>
     <div class="title-divider"></div>
     <span class="title-tagline">One word · One cup · One truth</span>
@@ -488,6 +599,8 @@ footer { position:relative; z-index:10; padding:24px 20px; border-top:1px solid 
   </div>
 </div>
 
+</main><!-- /#main-content -->
+
 <!-- FOOTER -->
 <footer>
   <div class="footer-top">
@@ -500,7 +613,7 @@ footer { position:relative; z-index:10; padding:24px 20px; border-top:1px solid 
     </div>
   </div>
   <div class="footer-bottom">
-    <div class="footer-copy">© 2025 · Hong Kong · 釀於雨夜</div>
+    <div class="footer-copy">© 2026 · Hong Kong · 釀於雨夜</div>
     <a class="orynth-badge" href="https://orynth.dev/projects/yatzicha" target="_blank" rel="noopener">
       <img src="https://orynth.dev/api/badge/yatzicha?theme=light&style=default" alt="Featured on Orynth" loading="lazy"/>
     </a>
@@ -508,19 +621,22 @@ footer { position:relative; z-index:10; padding:24px 20px; border-top:1px solid 
 </footer>
 
 <script>
-/* Rain */
-const canvas=document.getElementById('rain'),ctx=canvas.getContext('2d');
-let drops=[];
-function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+/* Rain — with null guard + RAF cancel to prevent memory leak */
+const canvas=document.getElementById('rain');
+const ctx=canvas?canvas.getContext('2d'):null;
+let drops=[], rafId=null;
+function resizeCanvas(){if(!canvas)return;canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
 resizeCanvas();
 window.addEventListener('resize',()=>{resizeCanvas();initDrops();});
 function initDrops(){
+  if(!canvas)return;
   drops=[];
-  const count=Math.min(Math.floor(window.innerWidth/10),120);
+  const count=Math.min(Math.floor(window.innerWidth/10),80);
   for(let i=0;i<count;i++) drops.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,len:Math.random()*16+8,speed:Math.random()*1.1+0.3,opacity:Math.random()*0.28+0.04});
 }
 initDrops();
 function drawRain(){
+  if(!ctx)return;
   ctx.clearRect(0,0,canvas.width,canvas.height);
   drops.forEach(d=>{
     ctx.beginPath();ctx.moveTo(d.x,d.y);ctx.lineTo(d.x-0.8,d.y+d.len);
@@ -528,9 +644,14 @@ function drawRain(){
     d.y+=d.speed;
     if(d.y>canvas.height){d.y=-d.len;d.x=Math.random()*canvas.width;}
   });
-  requestAnimationFrame(drawRain);
+  rafId=requestAnimationFrame(drawRain);
 }
-drawRain();
+/* Pause rain when tab hidden — saves battery & memory */
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){if(rafId)cancelAnimationFrame(rafId);rafId=null;}
+  else if(!rafId){drawRain();}
+});
+if(ctx)drawRain();
 
 /* Hamburger */
 const hamburger=document.getElementById('hamburger');
@@ -621,14 +742,15 @@ Use exactly this format. Nothing outside it.`,
   }
 }
 
-submitBtn.addEventListener('click',handleSubmit);
-wordInput.addEventListener('keydown',e=>{if(e.key==='Enter')handleSubmit();errorText.classList.remove('show');});
-resetBtn.addEventListener('click',()=>{
-  responseArea.classList.remove('visible');resetBtn.classList.remove('show');wordInput.value='';
-  setTimeout(()=>{inputArea.style.opacity='1';inputArea.style.pointerEvents='auto';promptText.style.opacity='1';wordInput.focus();},420);
-});
-
-if(window.innerWidth>680)setTimeout(()=>wordInput.focus(),800);
+try {
+  submitBtn.addEventListener('click',handleSubmit);
+  wordInput.addEventListener('keydown',e=>{if(e.key==='Enter')handleSubmit();errorText.classList.remove('show');});
+  resetBtn.addEventListener('click',()=>{
+    responseArea.classList.remove('visible');resetBtn.classList.remove('show');wordInput.value='';
+    setTimeout(()=>{inputArea.style.opacity='1';inputArea.style.pointerEvents='auto';promptText.style.opacity='1';wordInput.focus();},420);
+  });
+  if(window.innerWidth>680)setTimeout(()=>wordInput&&wordInput.focus(),800);
+} catch(e){ console.warn('Yat Ji Cha init error:',e); }
 </script>
 </body>
 </html>
