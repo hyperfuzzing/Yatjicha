@@ -1,290 +1,198 @@
-```html id="r8m2za"
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-HK">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Yatjicha</title>
+<meta charset="UTF-8">
+<title>yatjizha 命理館</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://cdn.tailwindcss.com"></script>
 
 <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #000;
-  color: #fff;
-  overflow-x: hidden;
-}
-
-/* FADE IN GLOBAL */
-body {
-  animation: fadeIn 1.2s ease;
-}
+html { scroll-behavior: smooth; }
+.fade-in { animation: fadeIn .4s ease; }
 @keyframes fadeIn {
-  from { opacity: 0; filter: blur(10px);}
-  to { opacity: 1; filter: blur(0);}
+  from {opacity:0; transform:translateY(10px)}
+  to {opacity:1; transform:translateY(0)}
 }
-
-section {
-  padding: 80px 20px;
-  text-align: center;
-  max-width: 900px;
-  margin: auto;
-}
-
-.label {
-  font-size: 11px;
-  letter-spacing: 3px;
-  opacity: 0.5;
-}
-
-h1 {
-  font-size: 34px;
-  margin: 20px 0;
-  line-height: 1.4;
-}
-
-/* TEXT REVEAL */
-.reveal {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: all 1s ease;
-}
-.reveal.active {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.sub {
-  opacity: 0.7;
-  max-width: 600px;
-  margin: auto;
-}
-
-/* BUTTON */
-button {
-  padding: 12px 26px;
-  margin: 8px;
-  border: none;
-  cursor: pointer;
-  background: #fff;
-  color: #000;
-  font-weight: bold;
-  transition: all 0.3s ease;
-}
-
-button:hover {
-  transform: translateY(-2px);
-  opacity: 0.8;
-}
-
-button.secondary {
-  background: transparent;
-  color: #fff;
-  border: 1px solid #fff;
-}
-
-/* GRID */
-.grid {
-  display: grid;
-  gap: 25px;
-  margin-top: 40px;
-}
-
-/* APP BOX */
-#app {
-  margin-top: 40px;
-  padding: 50px;
-  border: 1px solid rgba(255,255,255,0.08);
-  backdrop-filter: blur(10px);
-}
-
-/* OUTPUT TYPEWRITER */
-.output {
-  margin-top: 25px;
-  font-size: 20px;
-  letter-spacing: 1px;
-}
-
-/* CURSOR EFFECT */
-.cursor {
-  display: inline-block;
-  width: 8px;
-  background: #fff;
-  margin-left: 4px;
-  animation: blink 1s infinite;
-}
-@keyframes blink {
-  50% { opacity: 0; }
-}
-
-/* GUIDE */
-.guide {
-  opacity: 0.5;
-  font-style: italic;
-  margin-top: 20px;
-}
-
-/* FOOTER */
-footer {
-  opacity: 0.4;
-  font-size: 13px;
-  padding: 60px 20px;
-}
-
-/* AMBIENT GLOW */
-.glow {
-  position: fixed;
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(255,255,255,0.06), transparent);
-  top: 20%;
-  left: 50%;
-  transform: translateX(-50%);
-  filter: blur(80px);
-  animation: float 12s ease-in-out infinite;
-  pointer-events: none;
-}
-
-@keyframes float {
-  0% { transform: translate(-50%, 0px);}
-  50% { transform: translate(-50%, 40px);}
-  100% { transform: translate(-50%, 0px);}
-}
+.card:hover { transform:translateY(-5px); }
 </style>
 </head>
 
-<body>
+<body class="bg-gray-50 text-gray-800">
 
-<div class="glow"></div>
+<!-- HEADER -->
+<header class="bg-white shadow sticky top-0 z-50">
+<div class="max-w-6xl mx-auto flex justify-between p-4">
+  <h1 class="font-bold text-red-600 text-xl">🐉 yatjizha 命理館</h1>
+  <nav class="space-x-4 text-sm">
+    <a href="#about">關於</a>
+    <a href="#whitepaper">白皮書</a>
+    <a href="#team">團隊</a>
+  </nav>
+</div>
+</header>
 
-<section class="reveal">
-  <p class="label">YATJICHA / DIGITAL CONSTRUCT</p>
+<!-- HERO -->
+<section class="bg-red-600 text-white py-16 text-center">
+<h2 class="text-3xl font-bold">探索你嘅命盤</h2>
+<p class="mt-3">古老智慧 · 現代詮釋</p>
 
-  <h1>
-    A system for generating presence<br/>
-    beyond fixed identity.
-  </h1>
-
-  <p class="sub">
-    Yatjicha is not a tool in the traditional sense.  
-    It is a space where fragments of identity are assembled,  
-    reinterpreted, and released back into the network.
-  </p>
-
-  <button onclick="startExperience()">Enter</button>
-  <button class="secondary" onclick="learnMore()">What is this?</button>
+<!-- ORYNTH BADGE -->
+<div class="mt-6 flex justify-center">
+<a href="https://orynth.dev/projects/yatzicha" target="_blank" rel="noopener">
+<img src="https://orynth.dev/api/badge/yatzicha?theme=light&style=default" width="260">
+</a>
+</div>
 </section>
 
-<section class="reveal">
-  <p>
-    In a network where identity is reduced to metrics,  
-    Yatjicha proposes something else.
-  </p>
-
-  <p style="font-size:20px; margin:20px 0;">
-    identity as a living construct
-  </p>
-
-  <p>
-    Each interaction produces something that did not exist before.
-  </p>
+<!-- FINDER -->
+<section class="p-6 text-center">
+<input type="date" id="birth-date" class="border p-2 rounded">
+<button onclick="findZodiac()" class="bg-red-600 text-white px-4 py-2 rounded ml-2">
+查詢命盤
+</button>
+<div id="result" class="mt-4 font-semibold"></div>
 </section>
 
-<section class="reveal">
-  <h2>What Yatjicha Does</h2>
+<!-- ZODIAC -->
+<section class="max-w-6xl mx-auto p-6 grid md:grid-cols-2 gap-6">
 
-  <div class="grid">
-    <div>
-      <h3>Generate</h3>
-      <p>Construct symbolic identities</p>
-    </div>
-    <div>
-      <h3>Transform</h3>
-      <p>Shift meaning through iteration</p>
-    </div>
-    <div>
-      <h3>Release</h3>
-      <p>Let identities exist independently</p>
-    </div>
-  </div>
+<div>
+<h3 class="font-bold mb-3">西方星座</h3>
+<div id="western-grid" class="grid grid-cols-4 gap-2"></div>
+</div>
+
+<div>
+<h3 class="font-bold mb-3">生肖命盤</h3>
+<div id="chinese-grid" class="grid grid-cols-4 gap-2"></div>
+</div>
+
 </section>
 
-<section id="app" class="reveal">
-  <h2>Begin</h2>
-
-  <button onclick="generate()">Generate Identity</button>
-
-  <p class="guide">
-    Begin with nothing. Let the system respond.
-  </p>
-
-  <div class="output" id="output"></div>
+<!-- COMPAT -->
+<section class="text-center p-6">
+<select id="sign1"></select>
+<select id="sign2"></select>
+<button onclick="checkCompat()" class="bg-yellow-500 px-4 py-2 rounded text-white">
+配對分析
+</button>
+<div id="compat" class="mt-3"></div>
 </section>
 
-<footer class="reveal">
-  <p>
-    An open digital construct.  
-    Built through ongoing exploration.
-  </p>
-</footer>
+<!-- ABOUT -->
+<section id="about" class="max-w-4xl mx-auto p-8 text-center">
+<h2 class="text-2xl font-bold mb-4">關於 yatjizha</h2>
+<p class="text-gray-600 leading-relaxed">
+yatjizha 並非一個普通命理網站，而係一個以策展視角構建嘅數碼空間。
+我哋相信，每一個命盤都唔只係分類，而係一種敘事，一種能量位置。
+透過簡潔介面與深層象徵，我哋重新詮釋古老系統，讓其在當代語境中重新流動。
+</p>
+</section>
+
+<!-- WHITEPAPER -->
+<section id="whitepaper" class="bg-white py-10">
+<div class="max-w-4xl mx-auto text-center">
+<h2 class="text-2xl font-bold mb-4">白皮書</h2>
+<p class="text-gray-600 mb-4">
+本項目旨在建立一個融合東西方命理系統之數碼架構，
+透過資料、符號與互動設計，創造一種新型態嘅理解方式。
+</p>
+<ul class="text-gray-500 text-sm space-y-2">
+<li>• 雙系統架構（西方 + 東方）</li>
+<li>• 用戶輸入 → 命盤映射</li>
+<li>• 未來：AI 解讀 + 個人化命理分析</li>
+</ul>
+</div>
+</section>
+
+<!-- TEAM -->
+<section id="team" class="max-w-5xl mx-auto py-10 text-center">
+<h2 class="text-2xl font-bold mb-6">團隊</h2>
+
+<div class="grid md:grid-cols-3 gap-6">
+
+<div class="bg-white p-4 rounded shadow">
+<h3 class="font-bold">Yan Zing</h3>
+<p class="text-sm text-gray-500">Founder</p>
+<a href="https://x.com/YanZingBit" target="_blank" class="text-blue-500 text-sm">X Profile</a>
+</div>
+
+<div class="bg-white p-4 rounded shadow">
+<h3 class="font-bold">Li Chen</h3>
+<p class="text-sm text-gray-500">System Architect</p>
+</div>
+
+<div class="bg-white p-4 rounded shadow">
+<h3 class="font-bold">Wong Kai</h3>
+<p class="text-sm text-gray-500">Design Curator</p>
+</div>
+
+</div>
+</section>
+
+<!-- MODAL -->
+<div id="modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center">
+<div class="bg-white p-6 rounded max-w-md w-full fade-in">
+<button onclick="closeModal()" class="float-right">✕</button>
+<div id="modal-content"></div>
+</div>
+</div>
 
 <script>
-// SCROLL REVEAL
-const reveals = document.querySelectorAll(".reveal");
-window.addEventListener("scroll", () => {
-  reveals.forEach(r => {
-    const top = r.getBoundingClientRect().top;
-    if (top < window.innerHeight - 80) {
-      r.classList.add("active");
-    }
+// DATA
+const western = [["白羊座","♈"],["金牛座","♉"],["雙子座","♊"],["巨蟹座","♋"],
+["獅子座","♌"],["處女座","♍"],["天秤座","♎"],["天蠍座","♏"],
+["人馬座","♐"],["山羊座","♑"],["水瓶座","♒"],["雙魚座","♓"]];
+
+const chinese = [["鼠","🐀"],["牛","🐂"],["虎","🐅"],["兔","🐇"],
+["龍","🐉"],["蛇","🐍"],["馬","🐎"],["羊","🐐"],
+["猴","🐒"],["雞","🐓"],["狗","🐕"],["豬","🐖"]];
+
+// RENDER
+function render(){
+  western.forEach(z=>{
+    let d=document.createElement("div");
+    d.className="card bg-white p-3 text-center rounded cursor-pointer";
+    d.innerHTML=`${z[1]}<br>${z[0]}`;
+    d.onclick=()=>openModal(z);
+    westernGrid.appendChild(d);
   });
-});
 
-// SCROLL
-function startExperience() {
-  document.getElementById("app").scrollIntoView({ behavior: "smooth" });
+  chinese.forEach(z=>{
+    let d=document.createElement("div");
+    d.className="card bg-white p-3 text-center rounded cursor-pointer";
+    d.innerHTML=`${z[1]}<br>${z[0]}`;
+    d.onclick=()=>openModal(z);
+    chineseGrid.appendChild(d);
+  });
+
+  [...western,...chinese].forEach(z=>{
+    let o1=new Option(z[0],z[0]);
+    let o2=new Option(z[0],z[0]);
+    sign1.add(o1); sign2.add(o2);
+  });
+}
+render();
+
+// MODAL
+function openModal(z){
+  modal.style.display="flex";
+  modalContent.innerHTML=`<div class="text-4xl">${z[1]}</div><h2>${z[0]}</h2>`;
+}
+function closeModal(){ modal.style.display="none"; }
+
+// FIND
+function findZodiac(){
+  let d=new Date(birth-date.value);
+  if(!d) return;
+  result.innerText="命盤已生成";
 }
 
-// ALERT
-function learnMore() {
-  alert("Yatjicha is an experimental identity generator.");
-}
-
-// TYPEWRITER OUTPUT
-function typeText(text, el) {
-  el.innerHTML = "";
-  let i = 0;
-
-  function typing() {
-    if (i < text.length) {
-      el.innerHTML += text.charAt(i);
-      i++;
-      setTimeout(typing, 40);
-    } else {
-      el.innerHTML += '<span class="cursor"></span>';
-    }
-  }
-  typing();
-}
-
-// GENERATOR
-function generate() {
-  const fragments = [
-    "nocturnal signal",
-    "fractured archive",
-    "synthetic memory",
-    "unresolved entity",
-    "latent construct",
-    "echo identity"
-  ];
-
-  const result = fragments[Math.floor(Math.random() * fragments.length)];
-  const output = document.getElementById("output");
-
-  typeText(result, output);
+// COMPAT
+function checkCompat(){
+  compat.innerText="配對結果：能量相容";
 }
 </script>
 
 </body>
 </html>
-```
