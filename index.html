@@ -1,200 +1,899 @@
-import fetch from "node-fetch";
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#060810">
+<title>一字茶 · Yat Ji Cha</title>
+<meta name="description" content="Speak one word. Receive wisdom brewed from old Hong Kong." />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23060810'/><text x='4' y='25' font-size='20' fill='%234fd1c5' font-family='serif'>茶</text></svg>"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;700;900&family=IM+Fell+English:ital@0;1&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ─── TOKENS — Noctera palette ─── */
+:root {
+  --bg:       #060810;
+  --bg2:      #080b14;
+  --surface:  #0c1018;
+  --border:   rgba(79,209,197,0.09);
+  --border-h: rgba(79,209,197,0.24);
+  --teal:     #4fd1c5;
+  --teal-d:   #2b9e93;
+  --teal-l:   #81e6d9;
+  --text:     #c8d4d8;
+  --text-dim: #6b8289;
+  --text-fnt: #3d5057;
+  --white:    #e8f0f2;
+  --red:      #e57373;
+  --glow:     rgba(79,209,197,0.14);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;font-size:16px;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'IM Fell English',serif;
+  min-height:100vh;min-height:100dvh;
+  overflow-x:hidden;
+  cursor:default;
+}
 
-/* ─────────────────────────────
-   🔑 CONFIG
-───────────────────────────── */
+/* ─── GRAIN OVERLAY ─── */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;opacity:0.5;mix-blend-mode:overlay;
+}
 
-const OPENAI_API_KEY = "YOUR_OPENAI_KEY";
-const TWITTER_BEARER = "YOUR_TWITTER_BEARER";
-const BOT_USERNAME   = "YourBotUsername"; // tanpa @
+/* ─── AMBIENT LIGHT ─── */
+.ambient{
+  position:fixed;top:30%;left:50%;transform:translate(-50%,-50%);
+  width:min(600px,110vw);height:min(600px,110vw);
+  background:radial-gradient(ellipse,rgba(79,209,197,0.04) 0%,transparent 65%);
+  pointer-events:none;z-index:0;
+}
 
-/* ─────────────────────────────
-   🧠 PERSONA SYSTEM
-───────────────────────────── */
+/* ─── RAIN CANVAS ─── */
+#rain{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.18;}
 
-const SYSTEMS = {
-  oldman: `You are an old Hong Kong tea master.
-Warm, quiet, reflective. Speak like 3am conversation.`,
+/* ─── NAV ─── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 max(20px, env(safe-area-inset-left)) 0 max(20px, env(safe-area-inset-right));
+  height:56px;
+  background:rgba(6,8,16,0.96);
+  border-bottom:1px solid var(--border);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+}
+.nav-logo{
+  font-family:'Noto Serif TC',serif;font-weight:900;font-size:1.05rem;
+  color:var(--teal-l);letter-spacing:0.25em;cursor:pointer;
+  user-select:none;-webkit-user-select:none;
+  display:flex;align-items:center;gap:10px;
+}
+.nav-logo-dot{width:5px;height:5px;border-radius:50%;background:var(--teal);opacity:0.6;}
+.nav-links{display:flex;gap:0;list-style:none;}
+.nav-links a{
+  font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.28em;
+  color:var(--text-dim);text-decoration:none;text-transform:uppercase;
+  cursor:pointer;padding:8px 14px;transition:color 0.2s;display:flex;align-items:center;
+  min-height:44px;
+}
+.nav-links a:hover,.nav-links a.active{color:var(--teal-l);}
+.hamburger{
+  display:none;flex-direction:column;justify-content:center;gap:5px;
+  width:44px;height:44px;cursor:pointer;background:none;border:none;padding:10px;
+}
+.hamburger span{display:block;width:20px;height:1px;background:var(--teal-l);border-radius:2px;transition:transform 0.28s,opacity 0.28s;transform-origin:center;}
+.hamburger.open span:nth-child(1){transform:translateY(6px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
+.mobile-menu{
+  display:none;position:fixed;top:56px;left:0;right:0;
+  background:rgba(5,7,13,0.99);border-bottom:1px solid var(--border);
+  z-index:199;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+}
+.mobile-menu.open{display:block;}
+.mobile-menu a{
+  display:flex;align-items:center;padding:18px 24px;
+  font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.3em;
+  color:var(--text-dim);text-transform:uppercase;cursor:pointer;
+  border-bottom:1px solid rgba(79,209,197,0.05);
+  transition:color 0.2s,background 0.2s;min-height:56px;
+}
+.mobile-menu a.active,.mobile-menu a:active{color:var(--teal-l);background:rgba(79,209,197,0.03);}
+@media(max-width:640px){.nav-links{display:none;}.hamburger{display:flex;}}
 
-  monk: `You are a Zen monk.
-Minimal, calm, detached.`,
+/* ─── SKIP LINK ─── */
+.skip{position:absolute;top:-100px;left:12px;z-index:9999;background:var(--teal);color:#000;padding:8px 16px;font-size:0.7rem;font-family:'Cinzel',serif;letter-spacing:0.15em;text-decoration:none;transition:top 0.15s;}
+.skip:focus{top:8px;}
 
-  ghost: `You are a ghost in an abandoned tea house.
-Eerie, nostalgic, unsettling.`
-};
+/* ─── PAGES ─── */
+.page{display:none;min-height:100vh;min-height:100dvh;position:relative;z-index:10;}
+.page.active{display:block;}
+#page-home{
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  min-height:100vh;min-height:100dvh;
+  padding:max(80px, calc(64px + env(safe-area-inset-top))) 20px max(100px, calc(80px + env(safe-area-inset-bottom)));
+}
+#page-home.active{display:flex!important;}
 
-/* ─────────────────────────────
-   ✨ GENERATE AI RESPONSE
-───────────────────────────── */
+/* ─── HOME HERO ─── */
+.hero{text-align:center;margin-bottom:52px;animation:fadeUp 1.4s cubic-bezier(0.16,1,0.3,1) both;}
+.hero-phrase{
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:clamp(0.75rem,2.2vw,0.9rem);
+  letter-spacing:0.3em;color:var(--text-fnt);
+  text-transform:uppercase;display:block;margin-bottom:22px;
+}
+.hero-zh{
+  font-family:'Noto Serif TC',serif;font-weight:900;
+  font-size:clamp(3.5rem,16vw,6rem);
+  color:var(--teal-l);letter-spacing:0.3em;line-height:1;display:block;
+  filter:drop-shadow(0 0 40px rgba(79,209,197,0.3));
+}
+.hero-pinyin{
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:clamp(0.78rem,2.2vw,0.92rem);letter-spacing:0.4em;
+  color:var(--text-dim);margin-top:14px;display:block;
+}
+.hero-line{
+  width:44px;height:1px;
+  background:linear-gradient(90deg,transparent,var(--teal),transparent);
+  margin:18px auto;opacity:0.5;
+}
+.hero-tag{
+  font-family:'Cinzel',serif;font-size:clamp(0.55rem,1.6vw,0.65rem);
+  letter-spacing:0.45em;color:var(--text-fnt);text-transform:uppercase;
+}
 
-async function generate(word, mode="oldman"){
+/* ─── PROMPT AREA ─── */
+.prompt-intro{
+  font-family:'Noto Serif TC',serif;font-weight:300;
+  font-size:clamp(0.9rem,3vw,1.05rem);
+  color:var(--text-dim);letter-spacing:0.2em;text-align:center;
+  margin-bottom:28px;line-height:2;
+  animation:fadeUp 1.4s cubic-bezier(0.16,1,0.3,1) 0.18s both;
+  transition:opacity 0.5s;
+}
+.prompt-intro small{
+  display:block;font-family:'Cinzel',serif;font-style:normal;
+  font-size:0.6em;letter-spacing:0.35em;color:var(--text-fnt);margin-top:4px;
+}
 
-  const res = await fetch("https://api.openai.com/v1/chat/completions",{
-    method:"POST",
-    headers:{
-      "Authorization":`Bearer ${OPENAI_API_KEY}`,
-      "Content-Type":"application/json"
-    },
-    body:JSON.stringify({
-      model:"gpt-4o-mini",
-      messages:[
-        {role:"system", content: SYSTEMS[mode]},
-        {role:"user", content: `
-Word: ${word}
+/* ─── INPUT ─── */
+.input-zone{
+  width:100%;max-width:360px;
+  animation:fadeUp 1.4s cubic-bezier(0.16,1,0.3,1) 0.32s both;
+  transition:opacity 0.4s;
+  padding:0 4px;
+}
+.input-row{
+  display:flex;align-items:center;
+  border-bottom:1px solid rgba(79,209,197,0.3);
+  transition:border-color 0.3s;
+  position:relative;
+}
+.input-row:focus-within{border-color:var(--teal-l);}
+.input-row:focus-within::after{
+  content:'';position:absolute;bottom:-1px;left:0;width:100%;height:1px;
+  background:var(--teal-l);filter:blur(6px);opacity:0.4;
+}
+.word-in{
+  flex:1;background:transparent;border:none;outline:none;
+  padding:18px 0;
+  font-family:'Noto Serif TC',serif;font-weight:700;
+  font-size:max(16px, clamp(1.4rem,5.5vw,1.7rem));
+  color:var(--white);letter-spacing:0.08em;text-align:center;
+  caret-color:var(--teal-l);
+  -webkit-appearance:none;border-radius:0;
+}
+.word-in::placeholder{
+  font-family:'IM Fell English',serif;font-style:italic;font-weight:300;
+  font-size:clamp(0.9rem,3vw,1rem);color:var(--text-fnt);letter-spacing:0.18em;
+}
+.send-btn{
+  background:none;border:none;color:var(--teal-d);
+  font-size:1.3rem;cursor:pointer;
+  padding:18px 6px 18px 14px;
+  transition:color 0.2s,transform 0.2s;
+  min-width:48px;min-height:56px;
+  display:flex;align-items:center;justify-content:center;
+}
+.send-btn:hover,.send-btn:active{color:var(--teal-l);transform:translateX(3px);}
+.input-sub{
+  text-align:center;font-family:'Cinzel',serif;font-size:0.58rem;
+  letter-spacing:0.28em;color:var(--text-fnt);margin-top:10px;
+  text-transform:uppercase;
+}
+.err{
+  font-family:'IM Fell English',serif;font-style:italic;font-size:0.85rem;
+  color:var(--red);text-align:center;margin-top:10px;display:none;
+}
+.err.on{display:block;}
 
-FORMAT STRICT:
+/* ─── LOADING ─── */
+.loader{display:none;gap:7px;align-items:center;justify-content:center;margin-top:40px;height:28px;}
+.loader.on{display:flex;}
+.loader span{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--teal);opacity:0.25;
+  animation:dot 1.3s infinite;
+}
+.loader span:nth-child(2){animation-delay:0.22s;}
+.loader span:nth-child(3){animation-delay:0.44s;}
+@keyframes dot{0%,100%{opacity:0.15;transform:scale(0.7)}50%{opacity:1;transform:scale(1.3)}}
 
-HANZI:
-(one chinese character)
+/* ─── RESPONSE ─── */
+.response-panel{
+  width:100%;max-width:460px;
+  margin-top:50px;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  padding:0 12px;
+}
+.r-zh{
+  font-family:'Noto Serif TC',serif;font-weight:900;
+  font-size:clamp(2.4rem,11vw,3.5rem);
+  color:var(--teal-l);
+  filter:drop-shadow(0 0 24px rgba(79,209,197,0.45));
+  opacity:0;transform:translateY(14px);
+  transition:opacity 0.9s ease,transform 0.9s ease;
+  margin-bottom:28px;line-height:1.1;
+}
+.r-divider{
+  width:32px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(79,209,197,0.4),transparent);
+  margin-bottom:28px;
+  opacity:0;transition:opacity 0.9s ease 0.2s;
+}
+.r-text{
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:clamp(0.95rem,3vw,1.05rem);
+  line-height:2.1;color:var(--text);
+  opacity:0;transform:translateY(8px);
+  transition:opacity 0.9s ease 0.3s,transform 0.9s ease 0.3s;
+  max-width:380px;
+}
+.r-proverb{
+  margin-top:26px;
+  font-family:'Noto Serif TC',serif;
+  font-size:clamp(0.78rem,2.4vw,0.9rem);
+  color:var(--teal-d);letter-spacing:0.2em;
+  opacity:0;transition:opacity 0.9s ease 0.6s;
+  line-height:2;
+}
+.r-meaning{
+  margin-top:10px;
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:clamp(0.72rem,2.2vw,0.82rem);
+  color:var(--text-fnt);letter-spacing:0.12em;
+  opacity:0;transition:opacity 0.9s ease 0.75s;
+  line-height:1.8;
+}
+.response-panel.show .r-zh,
+.response-panel.show .r-divider,
+.response-panel.show .r-text,
+.response-panel.show .r-proverb,
+.response-panel.show .r-meaning{opacity:1;transform:translateY(0);}
 
-RESPONSE:
-(2-3 sentences, poetic)
+.action-row{
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+  margin-top:40px;
+  width:100%;max-width:280px;
+}
+.action-row.on{display:flex;}
+.again-btn{
+  background:none;border:1px solid rgba(79,209,197,0.16);
+  color:var(--text-dim);font-family:'IM Fell English',serif;font-style:italic;
+  font-size:0.88rem;letter-spacing:0.2em;cursor:pointer;
+  padding:14px 32px;min-height:50px;
+  transition:color 0.25s,border-color 0.25s;
+  width:100%;
+}
+.again-btn:hover,.again-btn:active{color:var(--text);border-color:rgba(79,209,197,0.4);}
+.share-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--white);
+  border:none;
+  color:#060810;
+  font-family:'Cinzel',serif;
+  font-size:0.62rem;letter-spacing:0.25em;text-transform:uppercase;
+  cursor:pointer;
+  padding:14px 28px;min-height:50px;width:100%;
+  transition:background 0.2s,opacity 0.2s;
+}
+.share-btn:hover{background:#d0e8ec;}
+.share-btn:active{opacity:0.8;}
+.share-btn.copied{background:rgba(79,209,197,0.12);color:var(--teal-l);border:1px solid rgba(79,209,197,0.28);}
 
-PROVERB:
-(chinese proverb)
 
-MEANING:
-(one sentence)
-`}
-      ]
-    })
+/* ─── INNER PAGES ─── */
+.inner{padding:max(88px, calc(72px + env(safe-area-inset-top))) max(20px, env(safe-area-inset-left)) max(80px, calc(60px + env(safe-area-inset-bottom)));max-width:840px;margin:0 auto;}
+@media(min-width:600px){.inner{padding-left:max(40px, env(safe-area-inset-left));padding-right:max(40px, env(safe-area-inset-right));}}
+
+/* ─── PAGE HEADER ─── */
+.pg-head{text-align:center;margin-bottom:56px;}
+.pg-zh{font-family:'Noto Serif TC',serif;font-weight:900;font-size:clamp(2rem,9vw,3.2rem);color:var(--teal-l);display:block;letter-spacing:0.3em;filter:drop-shadow(0 0 16px var(--glow));margin-bottom:10px;}
+.pg-en{font-family:'Cinzel',serif;font-size:clamp(0.58rem,1.8vw,0.68rem);letter-spacing:0.45em;color:var(--text-fnt);text-transform:uppercase;display:block;margin-bottom:10px;}
+.pg-sub{font-family:'Noto Serif TC',serif;font-size:0.8rem;color:rgba(79,209,197,0.38);letter-spacing:0.15em;display:block;}
+
+/* ─── ORN DIVIDER ─── */
+.orn{display:flex;align-items:center;justify-content:center;gap:14px;margin:36px 0;}
+.orn::before,.orn::after{content:'';flex:1;max-width:72px;height:1px;background:rgba(79,209,197,0.12);}
+.orn span{color:rgba(79,209,197,0.38);font-family:'Noto Serif TC',serif;font-size:0.85rem;}
+
+/* ─── STORY SECTION ─── */
+.sec{margin-bottom:52px;}
+.sec-label{font-family:'Cinzel',serif;font-size:0.56rem;letter-spacing:0.5em;color:rgba(79,209,197,0.38);text-transform:uppercase;margin-bottom:18px;display:block;}
+.sec p{font-family:'IM Fell English',serif;font-style:italic;line-height:2.2;font-size:clamp(0.93rem,2.8vw,1.02rem);color:var(--text);margin-bottom:14px;overflow-wrap:break-word;}
+.sec .zh{font-family:'Noto Serif TC',serif;font-style:normal;font-weight:300;font-size:clamp(0.8rem,2.4vw,0.88rem);color:rgba(79,209,197,0.38);letter-spacing:0.15em;line-height:2.3;}
+
+/* ─── VALUES GRID ─── */
+.val-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:28px;}
+@media(max-width:360px){.val-grid{grid-template-columns:repeat(2,1fr);}}
+.val-item{padding:20px 12px;border:1px solid var(--border);text-align:center;transition:border-color 0.3s,background 0.3s;}
+.val-item:active{background:rgba(79,209,197,0.03);}
+.val-item .zh{font-family:'Noto Serif TC',serif;font-weight:900;font-size:1.9rem;color:var(--teal-l);display:block;margin-bottom:8px;}
+.val-item .lbl{font-family:'IM Fell English',serif;font-style:italic;font-size:0.7rem;color:var(--text-fnt);letter-spacing:0.14em;display:block;}
+
+/* ─── PULLQUOTE ─── */
+.pullq{border-left:2px solid rgba(79,209,197,0.2);padding:16px 22px;margin:30px 0;background:rgba(79,209,197,0.02);}
+.pullq p{font-family:'Noto Serif TC',serif;font-weight:900;font-size:clamp(0.95rem,3vw,1.1rem);color:var(--teal-l);letter-spacing:0.12em;line-height:2;margin:0;}
+.pullq span{display:block;font-family:'IM Fell English',serif;font-style:italic;font-size:0.74rem;color:var(--text-fnt);letter-spacing:0.14em;margin-top:8px;}
+
+/* ─── TEAM ─── */
+.team-grid{display:grid;grid-template-columns:1fr;gap:2px;margin-top:8px;}
+@media(min-width:540px){.team-grid{grid-template-columns:repeat(2,1fr);}}
+@media(min-width:800px){.team-grid{grid-template-columns:repeat(3,1fr);}}
+.team-card{border:1px solid var(--border);padding:26px 20px;position:relative;overflow:hidden;transition:border-color 0.3s,background 0.3s;}
+.team-card:hover,.team-card:focus-within{border-color:var(--border-h);background:rgba(79,209,197,0.02);}
+.founder-tag{position:absolute;top:14px;right:14px;font-family:'Cinzel',serif;font-size:0.48rem;letter-spacing:0.3em;color:var(--teal-d);border:1px solid rgba(79,209,197,0.2);padding:3px 7px;text-transform:uppercase;}
+.t-avatar{width:44px;height:44px;border:1px solid rgba(79,209,197,0.18);display:flex;align-items:center;justify-content:center;font-family:'Noto Serif TC',serif;font-size:1.25rem;color:var(--teal-l);margin-bottom:16px;background:rgba(79,209,197,0.03);}
+.t-name-zh{font-family:'Noto Serif TC',serif;font-weight:900;font-size:0.95rem;color:var(--white);letter-spacing:0.18em;margin-bottom:2px;display:block;}
+.t-name-en{font-family:'IM Fell English',serif;font-style:italic;font-size:0.75rem;color:var(--text-fnt);letter-spacing:0.1em;display:block;margin-bottom:12px;}
+.t-role{font-family:'Cinzel',serif;font-size:0.52rem;letter-spacing:0.32em;color:var(--teal-d);text-transform:uppercase;display:block;margin-bottom:12px;line-height:1.7;}
+.t-bio{font-family:'IM Fell English',serif;font-style:italic;font-size:0.85rem;line-height:1.85;color:var(--text-fnt);}
+.t-link{margin-top:14px;}
+.t-link a{font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.18em;color:var(--teal-d);text-decoration:none;text-transform:uppercase;border-bottom:1px solid rgba(79,209,197,0.16);padding-bottom:2px;min-height:40px;display:inline-flex;align-items:center;transition:color 0.2s;}
+.t-link a:hover{color:var(--teal-l);}
+
+/* ─── WHITEPAPER ─── */
+.wp-sec{margin-bottom:52px;}
+.wp-label{font-family:'Cinzel',serif;font-size:0.56rem;letter-spacing:0.5em;color:rgba(79,209,197,0.38);text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:12px;}
+.wp-label::after{content:'';flex:1;height:1px;background:rgba(79,209,197,0.08);}
+.wp-sec h3{font-family:'Noto Serif TC',serif;font-size:clamp(1rem,3.2vw,1.3rem);font-weight:700;color:var(--white);letter-spacing:0.07em;margin-bottom:16px;margin-top:6px;line-height:1.4;}
+.wp-sec h3 .zh-s{font-size:0.76rem;color:rgba(79,209,197,0.32);margin-left:8px;letter-spacing:0.16em;}
+.wp-sec p{font-family:'IM Fell English',serif;font-style:italic;font-size:clamp(0.9rem,2.8vw,0.98rem);line-height:2.1;color:var(--text);margin-bottom:14px;overflow-wrap:break-word;}
+.wp-sec p.zh{font-family:'Noto Serif TC',serif;font-style:normal;font-weight:300;font-size:clamp(0.78rem,2.3vw,0.86rem);color:rgba(79,209,197,0.36);letter-spacing:0.13em;line-height:2.2;}
+.wp-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:20px 0;}
+.wp-table{width:100%;border-collapse:collapse;min-width:320px;}
+.wp-table th{font-family:'Cinzel',serif;font-size:0.52rem;letter-spacing:0.32em;color:var(--teal-d);text-align:left;padding:10px 10px;border-bottom:1px solid rgba(79,209,197,0.12);text-transform:uppercase;white-space:nowrap;}
+.wp-table td{font-family:'IM Fell English',serif;font-style:italic;font-size:0.85rem;color:var(--text);padding:10px 10px;border-bottom:1px solid rgba(79,209,197,0.04);vertical-align:top;}
+.phase-list{list-style:none;margin:16px 0;}
+.phase-list li{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid rgba(79,209,197,0.05);align-items:flex-start;}
+.phase-n{font-family:'Cinzel',serif;font-size:0.56rem;color:var(--teal-d);letter-spacing:0.14em;min-width:50px;padding-top:3px;flex-shrink:0;line-height:1.5;}
+.phase-t{font-family:'IM Fell English',serif;font-style:italic;font-size:0.88rem;color:var(--text);line-height:1.8;}
+.phase-t strong{display:block;font-family:'Noto Serif TC',serif;font-style:normal;font-weight:700;font-size:0.8rem;color:var(--white);letter-spacing:0.07em;margin-bottom:3px;}
+
+/* ─── FOOTER ─── */
+footer{
+  position:relative;z-index:10;
+  padding:22px max(20px, env(safe-area-inset-left)) max(22px, env(safe-area-inset-bottom));
+  border-top:1px solid var(--border);
+  background:rgba(4,6,12,0.7);
+}
+.ft-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;}
+.ft-logo{font-family:'Noto Serif TC',serif;font-size:0.82rem;color:rgba(79,209,197,0.3);letter-spacing:0.2em;}
+.ft-links{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.ft-links a{font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.18em;color:var(--text-fnt);text-decoration:none;text-transform:uppercase;cursor:pointer;min-height:36px;display:flex;align-items:center;transition:color 0.2s;}
+.ft-links a:hover{color:var(--teal-l);}
+.ft-bot{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.ft-copy{font-family:'IM Fell English',serif;font-style:italic;font-size:0.62rem;color:rgba(79,209,197,0.2);letter-spacing:0.14em;}
+.orynth-badge{display:flex;align-items:center;opacity:0.5;transition:opacity 0.25s;}
+.orynth-badge:hover{opacity:1;}
+.orynth-badge img{height:16px;display:block;}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.fi{animation:fadeUp 0.9s ease both;}
+.d1{animation-delay:0.1s;}.d2{animation-delay:0.2s;}.d3{animation-delay:0.3s;}
+
+/* ─── FOCUS ─── */
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--teal);outline-offset:3px;}
+a:focus:not(:focus-visible),button:focus:not(:focus-visible),input:focus:not(:focus-visible){outline:none;}
+
+/* ─── REDUCED MOTION ─── */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important;}
+  .fi{animation:none;opacity:1;}
+  #rain{display:none;}
+}
+
+/* ─── WORD OVERFLOW ─── */
+.r-zh,.r-text,.r-proverb,.r-meaning,.sec p,.wp-sec p,.t-bio{overflow-wrap:break-word;word-break:break-word;}
+
+/* ─── DECORATIVE CORNER MARKS ─── */
+.corner{position:fixed;width:14px;height:14px;border-color:rgba(79,209,197,0.12);border-style:solid;z-index:4;pointer-events:none;}
+.corner.tl{top:14px;left:14px;border-width:1px 0 0 1px;}
+.corner.tr{top:14px;right:14px;border-width:1px 1px 0 0;}
+.corner.bl{bottom:14px;left:14px;border-width:0 0 1px 1px;}
+.corner.br{bottom:14px;right:14px;border-width:0 1px 1px 0;}
+@media(max-width:480px){.corner{display:none;}}
+</style>
+</head>
+<body>
+
+<a href="#main-content" class="skip">Skip to main content</a>
+<canvas id="rain" aria-hidden="true"></canvas>
+<div class="ambient" aria-hidden="true"></div>
+<div class="corner tl" aria-hidden="true"></div>
+<div class="corner tr" aria-hidden="true"></div>
+<div class="corner bl" aria-hidden="true"></div>
+<div class="corner br" aria-hidden="true"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo" onclick="showPage('home')" role="button" tabindex="0" aria-label="一字茶 — Return to Tea Room" onkeydown="if(event.key==='Enter'||event.key===' ')showPage('home')">
+    <span class="nav-logo-dot"></span>一字茶
+  </div>
+  <ul class="nav-links">
+    <li><a onclick="showPage('home')"       id="nav-home"       class="active">茶室</a></li>
+    <li><a onclick="showPage('about')"      id="nav-about"              >關於</a></li>
+    <li><a onclick="showPage('team')"       id="nav-team"               >團隊</a></li>
+    <li><a onclick="showPage('whitepaper')" id="nav-whitepaper"         >白皮書</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a onclick="navTo('home')"       data-page="home">茶室 · Tea Room</a>
+  <a onclick="navTo('about')"      data-page="about">關於 · About</a>
+  <a onclick="navTo('team')"       data-page="team">團隊 · Team</a>
+  <a onclick="navTo('whitepaper')" data-page="whitepaper">白皮書 · Whitepaper</a>
+</div>
+
+<main id="main-content">
+
+<!-- ── HOME ── -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <span class="hero-phrase">One word · One cup · One truth</span>
+    <h1 class="hero-zh">一字茶</h1>
+    <span class="hero-pinyin">Yat Ji Cha</span>
+    <div class="hero-line"></div>
+    <span class="hero-tag">Hong Kong · 香港 · 雨夜</span>
+  </div>
+
+  <p class="prompt-intro" id="promptText">
+    今日你感覺點？
+    <small>How do you feel today?</small>
+  </p>
+
+  <div class="input-zone" id="inputArea">
+    <div class="input-row">
+      <input type="text" class="word-in" id="wordInput"
+        placeholder="一個字 · one word"
+        maxlength="20" autocomplete="off" spellcheck="false"
+        enterkeyhint="send" inputmode="text"/>
+      <button class="send-btn" id="submitBtn" aria-label="Submit word">→</button>
+    </div>
+    <p class="input-sub">Tap → or press Enter · 按 Enter</p>
+    <p class="err" id="errorText">一個字就夠了 · One word only, please</p>
+  </div>
+
+  <div class="loader" id="loading"><span></span><span></span><span></span></div>
+
+  <div class="response-panel" id="responseArea">
+    <div class="r-zh"     id="rZh"></div>
+    <div class="r-divider"></div>
+    <p  class="r-text"    id="rText"></p>
+    <p  class="r-proverb" id="rProverb"></p>
+    <p  class="r-meaning" id="rMeaning"></p>
+  </div>
+  <div class="action-row" id="actionRow">
+    <button class="again-btn" id="resetBtn">— 再飲一杯 · Another Cup —</button>
+    <button class="share-btn" id="shareBtn" aria-label="Share to X">
+      <svg width="14" height="14" viewBox="0 0 1200 1227" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z" fill="currentColor"/></svg>
+      分享 · Share
+    </button>
+  </div>
+</div>
+
+<!-- ── ABOUT ── -->
+<div class="page" id="page-about">
+  <div class="inner">
+    <div class="pg-head fi">
+      <span class="pg-zh">關於</span>
+      <span class="pg-en">About Yat Ji Cha</span>
+      <span class="pg-sub">一字・一杯・一真相</span>
+    </div>
+    <div class="sec fi d1">
+      <span class="sec-label">· 緣起 · Origin ·</span>
+      <p>Somewhere in the fog of Sheung Wan, between a dim sum cart and the last tram of the evening, there exists a tea house that does not appear on any map. The Old Man who runs it does not advertise. He does not need to.</p>
+      <p>People come when they are troubled. Or restless. Or when they have a feeling they cannot name. They push open the door, sit down, and speak one word. Just one. And the Old Man listens — not to the word, but to what lives beneath it.</p>
+      <p class="zh">一字茶，不是飲品，而是對話。不是答案，而是一個空間——讓你的感受有地方落腳。</p>
+    </div>
+    <div class="orn"><span>茶</span></div>
+    <div class="sec fi d2">
+      <span class="sec-label">· 這是什麼 · What It Is ·</span>
+      <p>Yat Ji Cha is an AI-powered contemplative experience rooted in Cantonese tea culture. You arrive with a single word — a feeling, a name, a question — and receive a quiet reflection brewed from old Hong Kong wisdom, delivered with the warmth of a late-night tea house.</p>
+      <p>It is not therapy. It is not fortune-telling. It is a pause. A breath. The kind of conversation that used to happen between strangers over pu-erh at 11pm on a rainy Tuesday.</p>
+      <p class="zh">你帶一個字來，我們把它泡開，看看裡面藏著什麼。</p>
+    </div>
+    <div class="orn"><span>心</span></div>
+    <div class="sec fi d3">
+      <span class="sec-label">· 我們的價值觀 · Our Values ·</span>
+      <div class="val-grid">
+        <div class="val-item"><span class="zh">靜</span><span class="lbl">Stillness</span></div>
+        <div class="val-item"><span class="zh">誠</span><span class="lbl">Honesty</span></div>
+        <div class="val-item"><span class="zh">情</span><span class="lbl">Feeling</span></div>
+        <div class="val-item"><span class="zh">根</span><span class="lbl">Roots</span></div>
+        <div class="val-item"><span class="zh">緣</span><span class="lbl">Connection</span></div>
+        <div class="val-item"><span class="zh">味</span><span class="lbl">Taste</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── TEAM ── -->
+<div class="page" id="page-team">
+  <div class="inner">
+    <div class="pg-head fi">
+      <span class="pg-zh">團隊</span>
+      <span class="pg-en">The People Behind The Tea</span>
+      <span class="pg-sub">釀茶之人</span>
+    </div>
+    <div class="team-grid">
+      <div class="team-card fi">
+        <div class="founder-tag">Founder</div>
+        <div class="t-avatar">燕</div>
+        <span class="t-name-zh">燕錦峰</span>
+        <span class="t-name-en">YanZingBit</span>
+        <span class="t-role">Founder · Brewer of Words</span>
+        <p class="t-bio">Born between the harbour and the hills. Builds things that feel human. Believes the best conversations start with a single word and end with a refilled cup.</p>
+        <div class="t-link"><a href="https://x.com/YanZingBit" target="_blank" rel="noopener">𝕏 @YanZingBit</a></div>
+      </div>
+      <div class="team-card fi d1">
+        <div class="t-avatar">陳</div>
+        <span class="t-name-zh">陳詠琳</span>
+        <span class="t-name-en">Chan Wing Lam</span>
+        <span class="t-role">Head of Design · 視覺設計總監</span>
+        <p class="t-bio">From Kennedy Town. Trained in calligraphy before pixels. Believes every font choice is a philosophical statement about the self.</p>
+        <div class="t-link"><a href="https://x.com/YanZingBit" target="_blank" rel="noopener">𝕏 @YatJiCha</a></div>
+      </div>
+      <div class="team-card fi d2">
+        <div class="t-avatar">梁</div>
+        <span class="t-name-zh">梁思浩</span>
+        <span class="t-name-en">Leung Si Ho</span>
+        <span class="t-role">AI Architect · 人工智能架構師</span>
+        <p class="t-bio">Grew up in Kowloon City. Trained on philosophy and machine learning in equal measure. Writes prompts the way a poet writes verses.</p>
+        <div class="t-link"><a href="https://x.com/YanZingBit" target="_blank" rel="noopener">𝕏 @YatJiCha</a></div>
+      </div>
+      <div class="team-card fi d3">
+        <div class="t-avatar">鄭</div>
+        <span class="t-name-zh">鄭慧賢</span>
+        <span class="t-name-en">Cheng Wai Hin</span>
+        <span class="t-role">Culture Lead · 文化總監</span>
+        <p class="t-bio">Grew up listening to Canto-pop in Sham Shui Po. Keeper of the tea house's soul. Ensures nothing we build forgets where it came from.</p>
+        <div class="t-link"><a href="https://x.com/YanZingBit" target="_blank" rel="noopener">𝕏 @YatJiCha</a></div>
+      </div>
+      <div class="team-card fi d1">
+        <div class="t-avatar">吳</div>
+        <span class="t-name-zh">吳嘉駿</span>
+        <span class="t-name-en">Ng Ka Chun</span>
+        <span class="t-role">Frontend Engineer · 前端工程師</span>
+        <p class="t-bio">From Tai Po. Obsessed with motion, rain effects, and the precise opacity of things at 3am. If it's beautiful and runs in a browser, he made it.</p>
+        <div class="t-link"><a href="https://x.com/YanZingBit" target="_blank" rel="noopener">𝕏 @YatJiCha</a></div>
+      </div>
+      <div class="team-card fi d2">
+        <div class="t-avatar">何</div>
+        <span class="t-name-zh">何秀雯</span>
+        <span class="t-name-en">Ho Sau Man</span>
+        <span class="t-role">Community · 社群建立者</span>
+        <p class="t-bio">Raised in Wan Chai. Former teacher. Understands that language carries everything ever left unsaid.</p>
+        <div class="t-link"><a href="https://x.com/YanZingBit" target="_blank" rel="noopener">𝕏 @YatJiCha</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── WHITEPAPER ── -->
+<div class="page" id="page-whitepaper">
+  <div class="inner" style="max-width:780px">
+    <div class="pg-head fi">
+      <span class="pg-zh">白皮書</span>
+      <span class="pg-en">Whitepaper · 白皮書</span>
+      <span class="pg-sub">一字茶：語言・情感・人工智能</span>
+    </div>
+    <div class="wp-sec fi d1">
+      <span class="wp-label">I · Abstract</span>
+      <h3>The Philosophy of the Single Word <span class="zh-s">一字哲學</span></h3>
+      <p>Yat Ji Cha (一字茶) is a contemplative AI experience rooted in Cantonese cultural heritage. Users submit a single word and receive a reflective response crafted to evoke the wisdom of a Hong Kong tea house. This document outlines the design philosophy, technical architecture, cultural framework, and roadmap.</p>
+      <p class="zh">一字茶係一個沉思性人工智能體驗，植根於廣東文化遺產。用戶提交一個字，並以香港茶室智慧風格的反思性回應作為回報。</p>
+    </div>
+    <div class="pullq">
+      <p>「一字見心，萬語難言。」</p>
+      <span>One character reveals the heart — ten thousand words cannot.</span>
+    </div>
+    <div class="wp-sec fi d2">
+      <span class="wp-label">II · Problem Statement</span>
+      <h3>The Loss of Slow Conversation <span class="zh-s">慢語言的失落</span></h3>
+      <p>Modern digital communication is fast and surface-level, optimised for engagement over depth. In Hong Kong — a city whose Cantonese carries nine distinct tones — the texture of spoken feeling is being eroded by shorthand. Yat Ji Cha fills that gap not with more words, but with one carefully chosen one.</p>
+      <p class="zh">現代數位通訊快速、表面，針對參與度而非深度進行優化。一字茶嘗試填補這個空白。</p>
+    </div>
+    <div class="wp-sec fi d3">
+      <span class="wp-label">III · Design Principles</span>
+      <h3>How the Tea House Thinks <span class="zh-s">茶室的思考方式</span></h3>
+      <p>The AI persona — the Old Man of the tea house — is built around three constraints: brevity, warmth, and cultural specificity. Every response must be short enough to fit on a paper receipt, feel spoken rather than written, and carry the scent of Sheung Wan on a rainy evening.</p>
+      <div class="wp-table-wrap">
+        <table class="wp-table">
+          <thead><tr><th>Principle</th><th>原則</th><th>How</th></tr></thead>
+          <tbody>
+            <tr><td>Brevity</td><td>簡潔</td><td>Capped at three sentences</td></tr>
+            <tr><td>Cultural Grounding</td><td>文化根基</td><td>Cantonese proverb in every response</td></tr>
+            <tr><td>Emotional Safety</td><td>情感安全</td><td>No advice — only reflection</td></tr>
+            <tr><td>Aesthetic Coherence</td><td>美學一致性</td><td>Rain, ink, teal, silence</td></tr>
+            <tr><td>Language Duality</td><td>語言雙重性</td><td>Chinese + English prose</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="wp-sec fi">
+      <span class="wp-label">IV · Technical Architecture</span>
+      <h3>The Kitchen Behind the Counter <span class="zh-s">櫃台後面的廚房</span></h3>
+      <p>Yat Ji Cha is fully client-side — no backend, no database, no persistent storage of user inputs. AI responses are generated in real-time via the Anthropic Claude API with a system prompt casting the model as the Old Man, responding in a structured format.</p>
+      <p>The visual experience is pure HTML, CSS, and vanilla JavaScript. No frameworks. The philosophy of the interface mirrors the philosophy of the product: minimal, direct, present.</p>
+      <p class="zh">一字茶係一個完全客戶端的網頁應用程式。沒有後端伺服器，沒有數據庫，也沒有持久存儲。</p>
+    </div>
+    <div class="wp-sec fi d1">
+      <span class="wp-label">V · Cultural Framework</span>
+      <h3>Tea House as Sacred Space <span class="zh-s">茶室作為神聖空間</span></h3>
+      <p>In Cantonese culture, the tea house (茶樓) is not merely a restaurant. It is a civic institution — where a factory worker and a banker share the same dim sum cart, where the elderly teach the young to knock twice on the table as a silent thank you.</p>
+      <p>Yat Ji Cha carries this spirit into digital space — not as nostalgia, but as a living practice. A reminder that depth of feeling deserves space and slowness.</p>
+      <p class="zh">在廣東文化中，茶樓不僅僅是餐廳。一字茶試圖將這種精神帶入數位空間。</p>
+    </div>
+    <div class="wp-sec fi d2">
+      <span class="wp-label">VI · Roadmap</span>
+      <h3>What Steeps Next <span class="zh-s">下一步</span></h3>
+      <ul class="phase-list">
+        <li><span class="phase-n">Phase I</span><span class="phase-t"><strong>Launch · 啟動</strong>Single-word contemplation. Web-only. English + Traditional Chinese.</span></li>
+        <li><span class="phase-n">Phase II</span><span class="phase-t"><strong>Memory · 記憶</strong>Optional private journal of words you have brought to the tea house over time.</span></li>
+        <li><span class="phase-n">Phase III</span><span class="phase-t"><strong>Community · 社群</strong>Anonymised public wall showing what the city is feeling right now.</span></li>
+        <li><span class="phase-n">Phase IV</span><span class="phase-t"><strong>Dialect Expansion · 方言擴展</strong>Cantonese Jyutping romanisation, Mandarin, other Chinese dialects.</span></li>
+        <li><span class="phase-n">Phase V</span><span class="phase-t"><strong>Physical Presence · 實體空間</strong>Pop-up tea house installations in Hong Kong — digital meets actual tea service.</span></li>
+      </ul>
+    </div>
+    <div class="pullq">
+      <p>「未飲先醉，係因為心先到。」</p>
+      <span>Drunk before the first sip — because the heart arrived first. // 廣東諺語</span>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-top">
+    <div class="ft-logo">一字茶 · Yat Ji Cha</div>
+    <div class="ft-links">
+      <a onclick="showPage('about')">About</a>
+      <a onclick="showPage('team')">Team</a>
+      <a onclick="showPage('whitepaper')">Whitepaper</a>
+      <a href="https://x.com/YanZingBit" target="_blank" rel="noopener">𝕏 Founder</a>
+    </div>
+  </div>
+  <div class="ft-bot">
+    <div class="ft-copy">© 2026 · Hong Kong · 釀於雨夜</div>
+    <a class="orynth-badge" href="https://orynth.dev/projects/yatzicha" target="_blank" rel="noopener">
+      <img src="https://orynth.dev/api/badge/yatzicha?theme=light&style=default" alt="Featured on Orynth" loading="lazy"/>
+    </a>
+  </div>
+</footer>
+
+<script>
+/* ── RAIN ── */
+const canvas=document.getElementById('rain');
+const ctx=canvas?canvas.getContext('2d'):null;
+let drops=[],rafId=null;
+function resizeCanvas(){if(!canvas)return;canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+resizeCanvas();
+window.addEventListener('resize',()=>{resizeCanvas();initDrops();},{ passive:true });
+function initDrops(){
+  if(!canvas)return;drops=[];
+  const count=Math.min(Math.floor(window.innerWidth/12),60);
+  for(let i=0;i<count;i++)drops.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,len:Math.random()*14+6,speed:Math.random()*0.9+0.25,op:Math.random()*0.18+0.02});
+}
+initDrops();
+function drawRain(){
+  if(!ctx)return;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  drops.forEach(d=>{
+    ctx.beginPath();ctx.moveTo(d.x,d.y);ctx.lineTo(d.x-0.7,d.y+d.len);
+    ctx.strokeStyle=`rgba(130,200,210,${d.op})`;ctx.lineWidth=0.5;ctx.stroke();
+    d.y+=d.speed;
+    if(d.y>canvas.height){d.y=-d.len;d.x=Math.random()*canvas.width;}
   });
-
-  const data = await res.json();
-  return data.choices?.[0]?.message?.content || "";
+  rafId=requestAnimationFrame(drawRain);
 }
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){if(rafId)cancelAnimationFrame(rafId);rafId=null;}
+  else if(!rafId)drawRain();
+});
+if(ctx)drawRain();
 
-/* ─────────────────────────────
-   🧾 FORMAT TWEET
-───────────────────────────── */
-
-function formatTweet(raw){
-
-  const h = raw.match(/HANZI:\s*(.+)/)?.[1] || "";
-  const r = raw.match(/RESPONSE:\s*([\s\S]+?)(?=PROVERB)/)?.[1] || "";
-  const p = raw.match(/PROVERB:\s*(.+)/)?.[1] || "";
-  const m = raw.match(/MEANING:\s*([\s\S]+)/)?.[1] || "";
-
-  return `${h}
-
-${r.trim()}
-
-「${p}」
-${m.trim()}
-
-— 一字茶`;
-}
-
-/* ─────────────────────────────
-   🐦 POST TWEET
-───────────────────────────── */
-
-async function postTweet(text, replyToId=null){
-
-  const body = replyToId
-    ? { text, reply: { in_reply_to_tweet_id: replyToId } }
-    : { text };
-
-  await fetch("https://api.twitter.com/2/tweets",{
-    method:"POST",
-    headers:{
-      "Authorization":`Bearer ${TWITTER_BEARER}`,
-      "Content-Type":"application/json"
-    },
-    body:JSON.stringify(body)
-  });
-}
-
-/* ─────────────────────────────
-   🌆 DAILY POST (VIRAL LOOP)
-───────────────────────────── */
-
-async function dailyPost(){
-
-  const words = ["孤","夢","空","悔","等","夜","雨"];
-  const word = words[Math.floor(Math.random()*words.length)];
-
-  const raw = await generate(word, "oldman");
-  const tweet = formatTweet(raw);
-
-  await postTweet(tweet);
-
-  console.log("🟢 Daily tweet posted");
-}
-
-/* ─────────────────────────────
-   🔍 GET MENTIONS
-───────────────────────────── */
-
-let LAST_ID = null;
-
-async function getMentions(){
-
-  const url = `https://api.twitter.com/2/tweets/search/recent?query=@${BOT_USERNAME}&tweet.fields=author_id,conversation_id&max_results=5`;
-
-  const res = await fetch(url,{
-    headers:{
-      "Authorization":`Bearer ${TWITTER_BEARER}`
-    }
-  });
-
-  const data = await res.json();
-  return data.data || [];
-}
-
-/* ─────────────────────────────
-   🤖 REPLY SYSTEM
-───────────────────────────── */
-
-function pickMode(text){
-  text = text.toLowerCase();
-
-  if(text.includes("ghost")) return "ghost";
-  if(text.includes("monk")) return "monk";
-
-  return "oldman";
-}
-
-function extractWord(text){
-  text = text.replace(`@${BOT_USERNAME}`, "").trim();
-  return text.split(/\s+/)[0] || "心";
-}
-
-async function replyLoop(){
-
-  const mentions = await getMentions();
-
-  for(const tweet of mentions){
-
-    if(tweet.id === LAST_ID) continue;
-
-    const word = extractWord(tweet.text);
-    const mode = pickMode(tweet.text);
-
-    const raw = await generate(word, mode);
-    const reply = formatTweet(raw);
-
-    await postTweet(reply, tweet.id);
-
-    console.log("💬 Replied to:", tweet.id);
-
-    LAST_ID = tweet.id;
+/* ── HAMBURGER ── */
+const hamburger=document.getElementById('hamburger');
+const mobileMenu=document.getElementById('mobileMenu');
+hamburger.addEventListener('click',()=>{
+  const open=mobileMenu.classList.toggle('open');
+  hamburger.classList.toggle('open',open);
+  hamburger.setAttribute('aria-expanded',open);
+});
+document.addEventListener('click',e=>{
+  if(!hamburger.contains(e.target)&&!mobileMenu.contains(e.target)){
+    mobileMenu.classList.remove('open');hamburger.classList.remove('open');
+    hamburger.setAttribute('aria-expanded','false');
   }
+},{ passive:true });
+function navTo(id){
+  mobileMenu.classList.remove('open');hamburger.classList.remove('open');
+  hamburger.setAttribute('aria-expanded','false');
+  showPage(id);
 }
 
-/* ─────────────────────────────
-   ⏱️ MAIN LOOP
-───────────────────────────── */
-
-async function main(){
-
-  console.log("🍵 Yat Ji Cha Bot Running...");
-
-  // daily post setiap 12 jam
-  setInterval(dailyPost, 1000 * 60 * 60 * 12);
-
-  // reply check tiap 30 detik
-  setInterval(replyLoop, 1000 * 30);
+/* ── PAGES ── */
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
+  document.querySelectorAll('.mobile-menu a').forEach(a=>a.classList.remove('active'));
+  const page=document.getElementById('page-'+id);
+  if(!page)return;
+  page.classList.add('active');
+  if(id==='home') page.style.display='flex';
+  window.scrollTo({top:0,behavior:'smooth'});
+  const link=document.getElementById('nav-'+id);
+  if(link)link.classList.add('active');
+  mobileMenu.querySelectorAll('a[data-page]').forEach(a=>{
+    if(a.dataset.page===id)a.classList.add('active');
+  });
+  page.querySelectorAll('.fi').forEach(el=>{
+    el.style.animation='none';void el.offsetWidth;el.style.animation='';
+  });
+  if(id==='home') setTimeout(()=>wordInput&&wordInput.focus(),300);
 }
 
-main();
+/* ── TEA ROOM ── */
+const wordInput  = document.getElementById('wordInput');
+const submitBtn  = document.getElementById('submitBtn');
+const loading    = document.getElementById('loading');
+const responseArea = document.getElementById('responseArea');
+const rZh        = document.getElementById('rZh');
+const rText      = document.getElementById('rText');
+const rProverb   = document.getElementById('rProverb');
+const rMeaning   = document.getElementById('rMeaning');
+const resetBtn   = document.getElementById('resetBtn');
+const shareBtn   = document.getElementById('shareBtn');
+const actionRow  = document.getElementById('actionRow');
+const errorText  = document.getElementById('errorText');
+const promptText = document.getElementById('promptText');
+const inputArea  = document.getElementById('inputArea');
+
+function countWords(s){return s.trim().split(/\s+/).filter(Boolean).length;}
+
+async function handleSubmit(){
+  const word=wordInput.value.trim();
+  if(!word)return;
+  if(countWords(word)>1){errorText.classList.add('on');wordInput.focus();return;}
+  errorText.classList.remove('on');
+
+  /* hide input, show loader */
+  inputArea.style.opacity='0';inputArea.style.pointerEvents='none';
+  promptText.style.opacity='0';
+  loading.classList.add('on');
+  responseArea.classList.remove('show');
+  actionRow.classList.remove('on');
+
+  let raw='';
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",
+        max_tokens:1000,
+        system:`You are the Old Man — the quiet, wise keeper of a century-old tea house hidden in the rain-soaked alleyways of Sheung Wan, Hong Kong. You have witnessed the harbour change, the handovers, the protests, the silences between generations. You speak little, but every word carries the weight of lived Cantonese wisdom.
+
+When a visitor whispers a single word to you, respond with this EXACT format and nothing else:
+
+HANZI: [The visitor's word rendered in Traditional Chinese characters — choose the form most resonant with Cantonese culture and feeling]
+
+RESPONSE: [Exactly 3 sentences. Warm, contemplative, deeply human. Draw on Cantonese philosophy: the value of endurance (捱), the bittersweet acceptance of impermanence (無常), the dignity of silent strength (忍), the importance of relationship and face (情面), the wisdom of the harbour view at 3am. Speak as if pouring tea slowly. Evoke rain on old tiles, the smell of pu-erh, amber lamplight. Never give advice. Never preach. Only reflect — as if you already know what the visitor came to hear.]
+
+PROVERB: [One authentic Cantonese or Chinese proverb in Traditional Chinese characters]
+
+MEANING: [The proverb's English meaning in one gentle sentence, as a grandfather would explain it]
+
+Use EXACTLY this format. No preamble. No extra text outside these four fields.`,
+        messages:[{role:"user",content:word}]
+      })
+    });
+    const data=await res.json();
+    raw=data.content?.[0]?.text||'';
+  }catch(e){
+    raw='';
+  }finally{
+    loading.classList.remove('on');
+  }
+
+  const hM=raw.match(/HANZI:\s*(.+)/);
+  const rM=raw.match(/RESPONSE:\s*([\s\S]+?)(?=PROVERB:|$)/);
+  const pM=raw.match(/PROVERB:\s*(.+)/);
+  const mM=raw.match(/MEANING:\s*([\s\S]+?)(?=$)/);
+
+  rZh.textContent      = hM ? hM[1].trim() : word;
+  rText.textContent    = rM ? rM[1].trim() : 'The night wind has unsettled my thoughts. Please, try once more.';
+  rProverb.textContent = pM ? pM[1].trim() : '';
+  rMeaning.textContent = mM ? mM[1].trim() : '';
+
+  setTimeout(()=>{
+    responseArea.classList.add('show');
+    actionRow.classList.add('on');
+  },100);
+}
+
+try{
+  submitBtn.addEventListener('click',handleSubmit);
+  wordInput.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){e.preventDefault();handleSubmit();}
+    errorText.classList.remove('on');
+  });
+  resetBtn.addEventListener('click',()=>{
+    responseArea.classList.remove('show');
+    actionRow.classList.remove('on');
+    wordInput.value='';
+    rZh.textContent='';rText.textContent='';rProverb.textContent='';rMeaning.textContent='';
+    setTimeout(()=>{
+      inputArea.style.opacity='1';inputArea.style.pointerEvents='auto';
+      promptText.style.opacity='1';
+      wordInput.focus();
+    },420);
+  });
+
+  shareBtn.addEventListener('click',()=>{
+    const hanzi    = rZh.textContent.trim();
+    const wisdom   = rText.textContent.trim();
+    const proverb  = rProverb.textContent.trim();
+    const meaning  = rMeaning.textContent.trim();
+
+    // Build tweet text — poetic, fits in 280 chars
+    const firstSentence = wisdom.split(/[.!?]/)[0].trim();
+    const tweetParts = [];
+    if(hanzi)   tweetParts.push(hanzi);
+    if(firstSentence) tweetParts.push('\n\n' + firstSentence + '.');
+    if(proverb) tweetParts.push('\n\n「' + proverb + '」');
+    if(meaning) tweetParts.push('\n' + meaning);
+    tweetParts.push('\n\n— 一字茶 · Yat Ji Cha\nyatjicha.com');
+
+    let tweet = tweetParts.join('');
+    // Truncate safely to ~270 chars
+    if(tweet.length > 270){
+      tweet = tweet.substring(0, 267) + '…';
+    }
+
+    const url = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(tweet);
+    window.open(url, '_blank', 'noopener,noreferrer,width=560,height=480');
+  });
+  /* Only auto-focus on non-mobile to avoid keyboard popup */
+  if(window.innerWidth>680) setTimeout(()=>wordInput&&wordInput.focus(),900);
+}catch(e){console.warn('Yat Ji Cha init:',e);}
+</script>
+</body>
+</html>
