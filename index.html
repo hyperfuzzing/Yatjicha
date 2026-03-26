@@ -9,22 +9,32 @@
 
 <style>
 html { scroll-behavior: smooth; }
-.fade-in { animation: fadeIn .4s ease; }
+body { background:#0b0b0b; color:#e5e5e5; }
+
+.fade-in { animation: fadeIn .6s ease; }
 @keyframes fadeIn {
-  from {opacity:0; transform:translateY(10px)}
+  from {opacity:0; transform:translateY(20px)}
   to {opacity:1; transform:translateY(0)}
 }
-.card:hover { transform:translateY(-5px); }
+
+.card:hover {
+  transform: translateY(-6px);
+  transition: .3s;
+}
+
+.soft-glow {
+  box-shadow: 0 0 40px rgba(255,255,255,0.05);
+}
 </style>
 </head>
 
-<body class="bg-gray-50 text-gray-800">
+<body>
 
 <!-- HEADER -->
-<header class="bg-white shadow sticky top-0 z-50">
+<header class="border-b border-white/10 sticky top-0 backdrop-blur z-50">
 <div class="max-w-6xl mx-auto flex justify-between p-4">
-  <h1 class="font-bold text-red-600 text-xl">🐉 yatjizha 命理館</h1>
-  <nav class="space-x-4 text-sm">
+  <h1 class="text-lg tracking-widest">yatjizha 命理館</h1>
+  <nav class="space-x-4 text-sm text-gray-400">
     <a href="#about">關於</a>
     <a href="#whitepaper">白皮書</a>
     <a href="#team">團隊</a>
@@ -33,106 +43,116 @@ html { scroll-behavior: smooth; }
 </header>
 
 <!-- HERO -->
-<section class="bg-red-600 text-white py-16 text-center">
-<h2 class="text-3xl font-bold">探索你嘅命盤</h2>
-<p class="mt-3">古老智慧 · 現代詮釋</p>
+<section class="text-center py-20">
+<h2 class="text-3xl mb-4 tracking-wide">探索你嘅命盤</h2>
+<p class="text-gray-500">一種關於能量、象徵與自我定位嘅系統</p>
 
-<!-- ORYNTH BADGE -->
-<div class="mt-6 flex justify-center">
-<a href="https://orynth.dev/projects/yatzicha" target="_blank" rel="noopener">
-<img src="https://orynth.dev/api/badge/yatzicha?theme=light&style=default" width="260">
+<div class="mt-8 flex justify-center">
+<a href="https://orynth.dev/projects/yatzicha" target="_blank">
+<img src="https://orynth.dev/api/badge/yatzicha?theme=light&style=default" width="240">
 </a>
 </div>
 </section>
 
-<!-- FINDER -->
-<section class="p-6 text-center">
-<input type="date" id="birth-date" class="border p-2 rounded">
-<button onclick="findZodiac()" class="bg-red-600 text-white px-4 py-2 rounded ml-2">
-查詢命盤
+<!-- RITUAL EXPERIENCE -->
+<section class="text-center py-20 border-t border-white/10">
+<h2 class="text-xl mb-6">開始你的命盤解讀</h2>
+
+<input type="date" id="birth-date" class="text-black p-2 rounded">
+
+<div class="mt-6">
+<button onclick="startReading()" class="px-6 py-3 border border-white/20 rounded-full hover:bg-white hover:text-black transition">
+開始解讀
 </button>
-<div id="result" class="mt-4 font-semibold"></div>
+</div>
+
+<div id="ritual" class="mt-10 opacity-0 transition duration-700 text-gray-500"></div>
+
+<div id="result-box" class="hidden mt-10 fade-in max-w-xl mx-auto">
+<h3 class="text-2xl mb-3">命盤結果</h3>
+<p id="result-text" class="text-gray-400 leading-relaxed"></p>
+</div>
 </section>
 
-<!-- ZODIAC -->
-<section class="max-w-6xl mx-auto p-6 grid md:grid-cols-2 gap-6">
+<!-- ZODIAC GRID -->
+<section class="max-w-6xl mx-auto py-16 grid md:grid-cols-2 gap-10">
 
 <div>
-<h3 class="font-bold mb-3">西方星座</h3>
-<div id="western-grid" class="grid grid-cols-4 gap-2"></div>
+<h3 class="mb-4 text-gray-400">西方星座</h3>
+<div id="western-grid" class="grid grid-cols-4 gap-3"></div>
 </div>
 
 <div>
-<h3 class="font-bold mb-3">生肖命盤</h3>
-<div id="chinese-grid" class="grid grid-cols-4 gap-2"></div>
+<h3 class="mb-4 text-gray-400">生肖系統</h3>
+<div id="chinese-grid" class="grid grid-cols-4 gap-3"></div>
 </div>
 
 </section>
 
 <!-- COMPAT -->
-<section class="text-center p-6">
-<select id="sign1"></select>
-<select id="sign2"></select>
-<button onclick="checkCompat()" class="bg-yellow-500 px-4 py-2 rounded text-white">
-配對分析
+<section class="text-center py-16 border-t border-white/10">
+<h2 class="mb-6">能量配對</h2>
+
+<select id="sign1" class="text-black p-2"></select>
+<select id="sign2" class="text-black p-2"></select>
+
+<div class="mt-4">
+<button onclick="checkCompat()" class="px-5 py-2 border border-white/20 rounded">
+分析
 </button>
-<div id="compat" class="mt-3"></div>
+</div>
+
+<div id="compat" class="mt-4 text-gray-400"></div>
 </section>
 
 <!-- ABOUT -->
-<section id="about" class="max-w-4xl mx-auto p-8 text-center">
-<h2 class="text-2xl font-bold mb-4">關於 yatjizha</h2>
-<p class="text-gray-600 leading-relaxed">
-yatjizha 並非一個普通命理網站，而係一個以策展視角構建嘅數碼空間。
-我哋相信，每一個命盤都唔只係分類，而係一種敘事，一種能量位置。
-透過簡潔介面與深層象徵，我哋重新詮釋古老系統，讓其在當代語境中重新流動。
+<section id="about" class="max-w-3xl mx-auto py-20 text-center">
+<h2 class="text-2xl mb-4">關於</h2>
+<p class="text-gray-500 leading-relaxed">
+yatjizha 並非傳統命理工具，而係一種策展式系統。
+我哋將象徵、能量與結構重新編排，
+讓個體可以在數碼空間中重新理解自己。
 </p>
 </section>
 
 <!-- WHITEPAPER -->
-<section id="whitepaper" class="bg-white py-10">
-<div class="max-w-4xl mx-auto text-center">
-<h2 class="text-2xl font-bold mb-4">白皮書</h2>
-<p class="text-gray-600 mb-4">
-本項目旨在建立一個融合東西方命理系統之數碼架構，
-透過資料、符號與互動設計，創造一種新型態嘅理解方式。
+<section id="whitepaper" class="py-20 border-t border-white/10 text-center">
+<h2 class="text-2xl mb-4">白皮書</h2>
+<p class="text-gray-500 max-w-2xl mx-auto">
+本系統融合東西方命理邏輯，
+透過資料結構與符號語言，
+建立一種可擴展嘅身份解讀模型。
 </p>
-<ul class="text-gray-500 text-sm space-y-2">
-<li>• 雙系統架構（西方 + 東方）</li>
-<li>• 用戶輸入 → 命盤映射</li>
-<li>• 未來：AI 解讀 + 個人化命理分析</li>
-</ul>
-</div>
 </section>
 
 <!-- TEAM -->
-<section id="team" class="max-w-5xl mx-auto py-10 text-center">
-<h2 class="text-2xl font-bold mb-6">團隊</h2>
+<section id="team" class="max-w-5xl mx-auto py-20 text-center">
+<h2 class="text-2xl mb-6">團隊</h2>
 
 <div class="grid md:grid-cols-3 gap-6">
 
-<div class="bg-white p-4 rounded shadow">
-<h3 class="font-bold">Yan Zing</h3>
-<p class="text-sm text-gray-500">Founder</p>
-<a href="https://x.com/YanZingBit" target="_blank" class="text-blue-500 text-sm">X Profile</a>
+<div class="card soft-glow p-5 rounded">
+<h3>Yan Zing</h3>
+<p class="text-gray-500 text-sm">Founder</p>
+<a href="https://x.com/YanZingBit" target="_blank" class="text-blue-400 text-sm">Profile</a>
 </div>
 
-<div class="bg-white p-4 rounded shadow">
-<h3 class="font-bold">Li Chen</h3>
-<p class="text-sm text-gray-500">System Architect</p>
+<div class="card soft-glow p-5 rounded">
+<h3>Li Chen</h3>
+<p class="text-gray-500 text-sm">System Architect</p>
 </div>
 
-<div class="bg-white p-4 rounded shadow">
-<h3 class="font-bold">Wong Kai</h3>
-<p class="text-sm text-gray-500">Design Curator</p>
+<div class="card soft-glow p-5 rounded">
+<h3>Wong Kai</h3>
+<p class="text-gray-500 text-sm">Design Curator</p>
 </div>
 
 </div>
 </section>
 
 <!-- MODAL -->
-<div id="modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center">
-<div class="bg-white p-6 rounded max-w-md w-full fade-in">
+<div id="modal" class="fixed inset-0 bg-black/70 hidden items-center justify-center">
+<div class="bg-[#111] p-6 rounded max-w-md w-full fade-in">
 <button onclick="closeModal()" class="float-right">✕</button>
 <div id="modal-content"></div>
 </div>
@@ -152,7 +172,7 @@ const chinese = [["鼠","🐀"],["牛","🐂"],["虎","🐅"],["兔","🐇"],
 function render(){
   western.forEach(z=>{
     let d=document.createElement("div");
-    d.className="card bg-white p-3 text-center rounded cursor-pointer";
+    d.className="card p-3 text-center border border-white/10 rounded cursor-pointer";
     d.innerHTML=`${z[1]}<br>${z[0]}`;
     d.onclick=()=>openModal(z);
     westernGrid.appendChild(d);
@@ -160,16 +180,15 @@ function render(){
 
   chinese.forEach(z=>{
     let d=document.createElement("div");
-    d.className="card bg-white p-3 text-center rounded cursor-pointer";
+    d.className="card p-3 text-center border border-white/10 rounded cursor-pointer";
     d.innerHTML=`${z[1]}<br>${z[0]}`;
     d.onclick=()=>openModal(z);
     chineseGrid.appendChild(d);
   });
 
   [...western,...chinese].forEach(z=>{
-    let o1=new Option(z[0],z[0]);
-    let o2=new Option(z[0],z[0]);
-    sign1.add(o1); sign2.add(o2);
+    sign1.add(new Option(z[0],z[0]));
+    sign2.add(new Option(z[0],z[0]));
   });
 }
 render();
@@ -177,20 +196,40 @@ render();
 // MODAL
 function openModal(z){
   modal.style.display="flex";
-  modalContent.innerHTML=`<div class="text-4xl">${z[1]}</div><h2>${z[0]}</h2>`;
+  modalContent.innerHTML=`<div class="text-4xl">${z[1]}</div><h2 class="mt-3">${z[0]}</h2>`;
 }
 function closeModal(){ modal.style.display="none"; }
 
-// FIND
-function findZodiac(){
-  let d=new Date(birth-date.value);
-  if(!d) return;
-  result.innerText="命盤已生成";
+// RITUAL
+function startReading(){
+  const ritual=document.getElementById("ritual");
+  const box=document.getElementById("result-box");
+  const text=document.getElementById("result-text");
+
+  ritual.style.opacity=1;
+  ritual.innerText="正在解析命盤...";
+
+  setTimeout(()=> ritual.innerText="能量正在重組...",1200);
+  setTimeout(()=> ritual.innerText="符號開始對齊...",2500);
+
+  setTimeout(()=>{
+    ritual.style.opacity=0;
+    box.classList.remove("hidden");
+
+    const insights=[
+      "你嘅能量偏向流動型，適合在變化中尋找定位。",
+      "你擁有雙重性格結構，理性與直覺並存。",
+      "你正處於轉換週期之中。",
+      "你嘅命盤顯示一種未完全穩定嘅能量狀態。"
+    ];
+
+    text.innerText=insights[Math.floor(Math.random()*insights.length)];
+  },4000);
 }
 
 // COMPAT
 function checkCompat(){
-  compat.innerText="配對結果：能量相容";
+  compat.innerText="兩者之間存在微妙能量共振。";
 }
 </script>
 
