@@ -279,17 +279,40 @@ nav{
 .response-panel.show .r-proverb,
 .response-panel.show .r-meaning{opacity:1;transform:translateY(0);}
 
+.action-row{
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+  margin-top:40px;
+  width:100%;max-width:280px;
+}
+.action-row.on{display:flex;}
 .again-btn{
-  display:none;margin-top:40px;
   background:none;border:1px solid rgba(200,132,58,0.18);
   color:var(--text-dim);font-family:'IM Fell English',serif;font-style:italic;
   font-size:0.88rem;letter-spacing:0.2em;cursor:pointer;
   padding:14px 32px;min-height:50px;
   transition:color 0.25s,border-color 0.25s;
-  width:100%;max-width:280px;
+  width:100%;
 }
 .again-btn:hover,.again-btn:active{color:var(--text);border-color:rgba(200,132,58,0.45);}
-.again-btn.on{display:block;}
+.share-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--white);
+  border:none;
+  color:#000;
+  font-family:'Cinzel',serif;
+  font-size:0.62rem;letter-spacing:0.25em;text-transform:uppercase;
+  cursor:pointer;
+  padding:14px 28px;min-height:50px;width:100%;
+  transition:background 0.2s,opacity 0.2s;
+}
+.share-btn:hover{background:#f0e6d3;}
+.share-btn:active{opacity:0.8;}
+/* copied confirmation */
+.share-btn.copied{background:rgba(200,132,58,0.15);color:var(--amber-l);border:1px solid rgba(200,132,58,0.3);}
+
 
 /* ─── INNER PAGES ─── */
 .inner{padding:max(88px, calc(72px + env(safe-area-inset-top))) max(20px, env(safe-area-inset-left)) max(80px, calc(60px + env(safe-area-inset-bottom)));max-width:840px;margin:0 auto;}
@@ -475,7 +498,13 @@ a:focus:not(:focus-visible),button:focus:not(:focus-visible),input:focus:not(:fo
     <p  class="r-proverb" id="rProverb"></p>
     <p  class="r-meaning" id="rMeaning"></p>
   </div>
-  <button class="again-btn" id="resetBtn">— 再飲一杯 · Another Cup —</button>
+  <div class="action-row" id="actionRow">
+    <button class="again-btn" id="resetBtn">— 再飲一杯 · Another Cup —</button>
+    <button class="share-btn" id="shareBtn" aria-label="Share to X">
+      <svg width="14" height="14" viewBox="0 0 1200 1227" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z" fill="currentColor"/></svg>
+      分享 · Share
+    </button>
+  </div>
 </div>
 
 <!-- ── ABOUT ── -->
@@ -752,6 +781,8 @@ const rText      = document.getElementById('rText');
 const rProverb   = document.getElementById('rProverb');
 const rMeaning   = document.getElementById('rMeaning');
 const resetBtn   = document.getElementById('resetBtn');
+const shareBtn   = document.getElementById('shareBtn');
+const actionRow  = document.getElementById('actionRow');
 const errorText  = document.getElementById('errorText');
 const promptText = document.getElementById('promptText');
 const inputArea  = document.getElementById('inputArea');
@@ -769,7 +800,7 @@ async function handleSubmit(){
   promptText.style.opacity='0';
   loading.classList.add('on');
   responseArea.classList.remove('show');
-  resetBtn.classList.remove('on');
+  actionRow.classList.remove('on');
 
   let raw='';
   try{
@@ -815,7 +846,7 @@ Use EXACTLY this format. No preamble. No extra text outside these four fields.`,
 
   setTimeout(()=>{
     responseArea.classList.add('show');
-    resetBtn.classList.add('on');
+    actionRow.classList.add('on');
   },100);
 }
 
@@ -827,7 +858,7 @@ try{
   });
   resetBtn.addEventListener('click',()=>{
     responseArea.classList.remove('show');
-    resetBtn.classList.remove('on');
+    actionRow.classList.remove('on');
     wordInput.value='';
     rZh.textContent='';rText.textContent='';rProverb.textContent='';rMeaning.textContent='';
     setTimeout(()=>{
@@ -835,6 +866,31 @@ try{
       promptText.style.opacity='1';
       wordInput.focus();
     },420);
+  });
+
+  shareBtn.addEventListener('click',()=>{
+    const hanzi    = rZh.textContent.trim();
+    const wisdom   = rText.textContent.trim();
+    const proverb  = rProverb.textContent.trim();
+    const meaning  = rMeaning.textContent.trim();
+
+    // Build tweet text — poetic, fits in 280 chars
+    const firstSentence = wisdom.split(/[.!?]/)[0].trim();
+    const tweetParts = [];
+    if(hanzi)   tweetParts.push(hanzi);
+    if(firstSentence) tweetParts.push('\n\n' + firstSentence + '.');
+    if(proverb) tweetParts.push('\n\n「' + proverb + '」');
+    if(meaning) tweetParts.push('\n' + meaning);
+    tweetParts.push('\n\n— 一字茶 · Yat Ji Cha\nyatjicha.com');
+
+    let tweet = tweetParts.join('');
+    // Truncate safely to ~270 chars
+    if(tweet.length > 270){
+      tweet = tweet.substring(0, 267) + '…';
+    }
+
+    const url = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(tweet);
+    window.open(url, '_blank', 'noopener,noreferrer,width=560,height=480');
   });
   /* Only auto-focus on non-mobile to avoid keyboard popup */
   if(window.innerWidth>680) setTimeout(()=>wordInput&&wordInput.focus(),900);
