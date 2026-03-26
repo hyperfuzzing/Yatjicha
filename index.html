@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>一字茶 · Yat Ji Cha</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;700;900&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;700;900&family=IM+Fell+English:ital@0;1&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --ink: #1a1410;
@@ -19,26 +19,27 @@
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  html, body {
-    height: 100%;
+  html { scroll-behavior: smooth; }
+
+  body {
     background: var(--ink);
     color: var(--paper);
     font-family: 'IM Fell English', serif;
-    overflow: hidden;
+    min-height: 100vh;
+    overflow-x: hidden;
   }
 
-  /* Rain canvas */
+  /* ── Rain canvas ── */
   canvas {
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: 0;
-    opacity: 0.55;
+    opacity: 0.45;
   }
 
-  /* Grain overlay */
-  body::before {
-    content: '';
+  /* ── Grain overlay ── */
+  .grain {
     position: fixed;
     inset: 0;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
@@ -48,71 +49,110 @@
     mix-blend-mode: overlay;
   }
 
-  /* Ambient glow center */
-  body::after {
-    content: '';
+  /* ── Nav ── */
+  nav {
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(ellipse, rgba(200,133,58,0.08) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 1;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 40px;
+    background: linear-gradient(to bottom, rgba(26,20,16,0.95) 0%, transparent 100%);
+    border-bottom: 1px solid rgba(200,133,58,0.06);
   }
 
-  /* Window frame — subtle */
-  .window-frame {
-    position: fixed;
-    inset: 0;
-    border: 1px solid rgba(200,133,58,0.08);
-    margin: 24px;
-    pointer-events: none;
-    z-index: 2;
+  .nav-logo {
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 900;
+    font-size: 1.1rem;
+    color: var(--amber);
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    filter: drop-shadow(0 0 10px rgba(200,133,58,0.3));
+    transition: filter 0.3s;
   }
-  .window-frame::before, .window-frame::after {
-    content: '';
-    position: absolute;
-    background: var(--amber);
-    opacity: 0.2;
-  }
-  .window-frame::before { top: 0; left: 50%; width: 1px; height: 100%; }
-  .window-frame::after  { left: 0; top: 50%; height: 1px; width: 100%; }
+  .nav-logo:hover { filter: drop-shadow(0 0 16px rgba(200,133,58,0.6)); }
 
-  /* Corner marks */
+  .nav-links {
+    display: flex;
+    gap: 36px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.78rem;
+    letter-spacing: 0.25em;
+    color: rgba(245,237,224,0.35);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.3s;
+    cursor: pointer;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--amber); }
+
+  /* ── Corner marks ── */
   .corner {
     position: fixed;
     width: 18px; height: 18px;
-    border-color: rgba(200,133,58,0.35);
+    border-color: rgba(200,133,58,0.2);
     border-style: solid;
     z-index: 3;
+    pointer-events: none;
   }
   .corner.tl { top: 24px; left: 24px; border-width: 1px 0 0 1px; }
   .corner.tr { top: 24px; right: 24px; border-width: 1px 1px 0 0; }
   .corner.bl { bottom: 24px; left: 24px; border-width: 0 0 1px 1px; }
   .corner.br { bottom: 24px; right: 24px; border-width: 0 1px 1px 0; }
 
-  /* Main layout */
-  .scene {
+  /* ── Side chars ── */
+  .side-chars {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 900;
+    font-size: 0.75rem;
+    letter-spacing: 0.5em;
+    writing-mode: vertical-rl;
+    color: rgba(200,133,58,0.06);
+    pointer-events: none;
+    z-index: 2;
+    line-height: 1;
+  }
+  .side-chars.left { left: 40px; }
+  .side-chars.right { right: 40px; direction: ltr; }
+
+  /* ── Pages ── */
+  .page {
+    display: none;
+    min-height: 100vh;
     position: relative;
     z-index: 10;
-    height: 100vh;
-    display: flex;
+  }
+  .page.active { display: block; }
+
+  /* ══════════════════════════════════════════
+     HOME PAGE
+  ══════════════════════════════════════════ */
+  #page-home {
+    display: none;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0;
-    padding: 60px 24px;
+    min-height: 100vh;
+    padding: 80px 24px 120px;
+  }
+  #page-home.active {
+    display: flex;
   }
 
-  /* Title block */
   .title-block {
     text-align: center;
     margin-bottom: 52px;
     animation: rise 1.8s cubic-bezier(0.16,1,0.3,1) both;
   }
-
   .title-chinese {
     font-family: 'Noto Serif TC', serif;
     font-weight: 900;
@@ -123,7 +163,6 @@
     line-height: 1;
     display: block;
   }
-
   .title-pinyin {
     font-family: 'IM Fell English', serif;
     font-style: italic;
@@ -133,7 +172,6 @@
     margin-top: 10px;
     display: block;
   }
-
   .title-divider {
     width: 60px;
     height: 1px;
@@ -141,7 +179,6 @@
     margin: 14px auto;
     opacity: 0.5;
   }
-
   .title-tagline {
     font-size: 0.7rem;
     letter-spacing: 0.45em;
@@ -149,7 +186,6 @@
     text-transform: uppercase;
   }
 
-  /* Prompt text */
   .prompt-text {
     font-family: 'Noto Serif TC', serif;
     font-weight: 300;
@@ -159,15 +195,15 @@
     text-align: center;
     margin-bottom: 20px;
     animation: rise 1.8s cubic-bezier(0.16,1,0.3,1) 0.2s both;
+    transition: opacity 0.5s;
   }
 
-  /* Input area */
   .input-area {
     width: 100%;
     max-width: 360px;
     animation: rise 1.8s cubic-bezier(0.16,1,0.3,1) 0.35s both;
+    transition: opacity 0.4s;
   }
-
   .input-wrap {
     position: relative;
     display: flex;
@@ -175,9 +211,7 @@
     border-bottom: 1px solid rgba(200,133,58,0.35);
     transition: border-color 0.4s;
   }
-  .input-wrap:focus-within {
-    border-color: var(--amber);
-  }
+  .input-wrap:focus-within { border-color: var(--amber); }
   .input-wrap:focus-within::after {
     content: '';
     position: absolute;
@@ -187,7 +221,6 @@
     filter: blur(4px);
     opacity: 0.6;
   }
-
   .word-input {
     flex: 1;
     background: transparent;
@@ -210,7 +243,6 @@
     color: rgba(245,237,224,0.18);
     letter-spacing: 0.2em;
   }
-
   .submit-btn {
     background: none;
     border: none;
@@ -222,11 +254,7 @@
     font-family: 'IM Fell English', serif;
     letter-spacing: 0.1em;
   }
-  .submit-btn:hover {
-    color: var(--amber);
-    transform: translateX(3px);
-  }
-
+  .submit-btn:hover { color: var(--amber); transform: translateX(3px); }
   .input-hint {
     text-align: center;
     font-size: 0.6rem;
@@ -235,82 +263,19 @@
     margin-top: 10px;
     text-transform: uppercase;
   }
-
-  /* Response */
-  .response-area {
-    width: 100%;
-    max-width: 400px;
-    margin-top: 48px;
-    min-height: 120px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  .error-text {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.82rem;
+    color: rgba(180,80,60,0.7);
     text-align: center;
-  }
-
-  .response-word-zh {
-    font-family: 'Noto Serif TC', serif;
-    font-weight: 900;
-    font-size: clamp(2rem, 5vw, 3rem);
-    color: var(--amber);
-    letter-spacing: 0.2em;
-    filter: drop-shadow(0 0 16px rgba(200,133,58,0.45));
-    opacity: 0;
-    transform: translateY(10px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
-    margin-bottom: 20px;
-  }
-
-  .response-text {
-    font-family: 'IM Fell English', serif;
-    font-size: clamp(0.88rem, 2vw, 1rem);
-    line-height: 1.9;
-    color: rgba(245,237,224,0.7);
-    letter-spacing: 0.04em;
-    opacity: 0;
-    transform: translateY(8px);
-    transition: opacity 0.8s ease 0.3s, transform 0.8s ease 0.3s;
-    font-style: italic;
-    max-width: 340px;
-  }
-
-  .response-proverb {
-    margin-top: 18px;
-    font-family: 'Noto Serif TC', serif;
-    font-size: 0.75rem;
-    color: rgba(200,133,58,0.45);
-    letter-spacing: 0.2em;
-    opacity: 0;
-    transition: opacity 0.8s ease 0.6s;
-    font-style: normal;
-  }
-
-  .response-area.visible .response-word-zh,
-  .response-area.visible .response-text,
-  .response-area.visible .response-proverb {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  /* Reset link */
-  .reset-btn {
+    margin-top: 12px;
     display: none;
-    margin-top: 32px;
-    background: none;
-    border: none;
-    color: rgba(245,237,224,0.2);
-    font-family: 'IM Fell English', serif;
-    font-style: italic;
-    font-size: 0.78rem;
-    letter-spacing: 0.25em;
-    cursor: pointer;
-    transition: color 0.3s;
-    text-decoration: none;
+    letter-spacing: 0.1em;
   }
-  .reset-btn:hover { color: rgba(245,237,224,0.5); }
-  .reset-btn.show { display: block; }
+  .error-text.show { display: block; }
 
-  /* Loading dots */
+  /* Loading */
   .loading {
     display: none;
     gap: 6px;
@@ -329,13 +294,87 @@
   }
   .loading span:nth-child(2) { animation-delay: 0.2s; }
   .loading span:nth-child(3) { animation-delay: 0.4s; }
-
   @keyframes pulse {
     0%, 100% { opacity: 0.2; transform: scale(0.8); }
     50% { opacity: 0.9; transform: scale(1.2); }
   }
 
-  /* Steam animation */
+  /* Response */
+  .response-area {
+    width: 100%;
+    max-width: 400px;
+    margin-top: 48px;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .response-word-zh {
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 900;
+    font-size: clamp(2rem, 5vw, 3rem);
+    color: var(--amber);
+    letter-spacing: 0.2em;
+    filter: drop-shadow(0 0 16px rgba(200,133,58,0.45));
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    margin-bottom: 20px;
+  }
+  .response-text {
+    font-family: 'IM Fell English', serif;
+    font-size: clamp(0.88rem, 2vw, 1rem);
+    line-height: 1.9;
+    color: rgba(245,237,224,0.7);
+    letter-spacing: 0.04em;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.8s ease 0.3s, transform 0.8s ease 0.3s;
+    font-style: italic;
+    max-width: 340px;
+  }
+  .response-proverb {
+    margin-top: 18px;
+    font-family: 'Noto Serif TC', serif;
+    font-size: 0.75rem;
+    color: rgba(200,133,58,0.45);
+    letter-spacing: 0.2em;
+    opacity: 0;
+    transition: opacity 0.8s ease 0.6s;
+  }
+  .response-area.visible .response-word-zh,
+  .response-area.visible .response-text,
+  .response-area.visible .response-proverb {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .reset-btn {
+    display: none;
+    margin-top: 32px;
+    background: none;
+    border: none;
+    color: rgba(245,237,224,0.2);
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.78rem;
+    letter-spacing: 0.25em;
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+  .reset-btn:hover { color: rgba(245,237,224,0.5); }
+  .reset-btn.show { display: block; }
+
+  /* Teacup & steam */
+  .teacup {
+    position: fixed;
+    bottom: 50px;
+    right: 52px;
+    z-index: 2;
+    opacity: 0.1;
+    pointer-events: none;
+  }
   .steam {
     position: fixed;
     bottom: 60px;
@@ -343,6 +382,7 @@
     opacity: 0.12;
     pointer-events: none;
     z-index: 2;
+    display: flex;
   }
   .steam-line {
     width: 2px;
@@ -356,79 +396,537 @@
   }
   .steam-line:nth-child(2) { animation-delay: 0.5s; height: 22px; }
   .steam-line:nth-child(3) { animation-delay: 1s; height: 28px; }
-
   @keyframes steamrise {
     0% { transform: scaleY(0) translateY(0); opacity: 0; }
     30% { opacity: 1; }
     100% { transform: scaleY(1) translateY(-20px); opacity: 0; }
   }
 
-  /* Teacup icon SVG */
-  .teacup {
-    position: fixed;
-    bottom: 50px;
-    right: 52px;
-    z-index: 2;
-    opacity: 0.1;
-    pointer-events: none;
+  /* ══════════════════════════════════════════
+     ABOUT PAGE
+  ══════════════════════════════════════════ */
+  #page-about {
+    padding: 130px 24px 140px;
+    max-width: 860px;
+    margin: 0 auto;
   }
 
+  .page-header {
+    text-align: center;
+    margin-bottom: 70px;
+  }
+  .page-header .zh {
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 900;
+    font-size: 3rem;
+    color: var(--amber);
+    display: block;
+    letter-spacing: 0.3em;
+    filter: drop-shadow(0 0 20px rgba(200,133,58,0.3));
+    margin-bottom: 8px;
+  }
+  .page-header .en {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.5em;
+    color: rgba(245,237,224,0.2);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 18px;
+  }
+  .page-header .hk {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 0.75rem;
+    color: rgba(200,133,58,0.4);
+    letter-spacing: 0.2em;
+    display: block;
+  }
+
+  .divider-ornament {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin: 40px 0;
+  }
+  .divider-ornament::before,
+  .divider-ornament::after {
+    content: '';
+    width: 80px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(200,133,58,0.3));
+  }
+  .divider-ornament::after {
+    background: linear-gradient(90deg, rgba(200,133,58,0.3), transparent);
+  }
+  .divider-ornament span {
+    color: rgba(200,133,58,0.4);
+    font-size: 0.7rem;
+  }
+
+  .story-section {
+    margin-bottom: 64px;
+  }
+  .story-section h3 {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.5em;
+    color: rgba(200,133,58,0.5);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .story-section p {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    line-height: 2;
+    font-size: 1rem;
+    color: rgba(245,237,224,0.65);
+    margin-bottom: 18px;
+  }
+  .story-section p.zh-text {
+    font-family: 'Noto Serif TC', serif;
+    font-style: normal;
+    font-weight: 300;
+    font-size: 0.88rem;
+    color: rgba(200,133,58,0.4);
+    letter-spacing: 0.15em;
+    line-height: 2.2;
+  }
+
+  /* Values grid */
+  .values-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 40px;
+  }
+  .value-item {
+    padding: 28px 20px;
+    border: 1px solid rgba(200,133,58,0.06);
+    text-align: center;
+    transition: border-color 0.3s, background 0.3s;
+  }
+  .value-item:hover {
+    border-color: rgba(200,133,58,0.2);
+    background: rgba(200,133,58,0.03);
+  }
+  .value-item .zh {
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 900;
+    font-size: 1.8rem;
+    color: var(--amber);
+    display: block;
+    margin-bottom: 10px;
+    opacity: 0.8;
+  }
+  .value-item .label {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.72rem;
+    color: rgba(245,237,224,0.25);
+    letter-spacing: 0.2em;
+    display: block;
+  }
+
+  /* ══════════════════════════════════════════
+     TEAM PAGE
+  ══════════════════════════════════════════ */
+  #page-team {
+    padding: 130px 24px 140px;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 2px;
+    margin-top: 60px;
+  }
+
+  .team-card {
+    border: 1px solid rgba(200,133,58,0.06);
+    padding: 36px 28px;
+    transition: border-color 0.4s, background 0.4s;
+    position: relative;
+    overflow: hidden;
+  }
+  .team-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 2px; height: 0;
+    background: var(--amber);
+    transition: height 0.4s;
+  }
+  .team-card:hover { border-color: rgba(200,133,58,0.2); background: rgba(200,133,58,0.02); }
+  .team-card:hover::before { height: 100%; }
+
+  .team-avatar {
+    width: 52px; height: 52px;
+    border: 1px solid rgba(200,133,58,0.2);
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Noto Serif TC', serif;
+    font-size: 1.4rem;
+    color: var(--amber);
+    margin-bottom: 20px;
+    background: rgba(200,133,58,0.04);
+  }
+
+  .team-name-zh {
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 900;
+    font-size: 1rem;
+    color: var(--paper);
+    letter-spacing: 0.2em;
+    margin-bottom: 4px;
+    display: block;
+  }
+  .team-name-en {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.78rem;
+    color: rgba(245,237,224,0.3);
+    letter-spacing: 0.15em;
+    display: block;
+    margin-bottom: 16px;
+  }
+  .team-role {
+    font-family: 'Cinzel', serif;
+    font-size: 0.58rem;
+    letter-spacing: 0.4em;
+    color: rgba(200,133,58,0.6);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 14px;
+  }
+  .team-bio {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.82rem;
+    line-height: 1.8;
+    color: rgba(245,237,224,0.4);
+  }
+  .team-social {
+    margin-top: 18px;
+    display: flex;
+    gap: 12px;
+  }
+  .team-social a {
+    font-family: 'IM Fell English', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: rgba(200,133,58,0.35);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.3s;
+    border-bottom: 1px solid rgba(200,133,58,0.1);
+    padding-bottom: 1px;
+  }
+  .team-social a:hover { color: var(--amber); border-color: var(--amber); }
+
+  .founder-badge {
+    position: absolute;
+    top: 20px; right: 20px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.5rem;
+    letter-spacing: 0.3em;
+    color: rgba(200,133,58,0.5);
+    text-transform: uppercase;
+    border: 1px solid rgba(200,133,58,0.2);
+    padding: 3px 8px;
+  }
+
+  /* ══════════════════════════════════════════
+     WHITEPAPER PAGE
+  ══════════════════════════════════════════ */
+  #page-whitepaper {
+    padding: 130px 24px 140px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .wp-section {
+    margin-bottom: 56px;
+  }
+  .wp-section h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 0.62rem;
+    letter-spacing: 0.55em;
+    color: rgba(200,133,58,0.5);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .wp-section h2::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(200,133,58,0.1);
+  }
+  .wp-section h3 {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--paper);
+    letter-spacing: 0.1em;
+    margin-bottom: 22px;
+    margin-top: 4px;
+  }
+  .wp-section h3 .zh-sub {
+    font-size: 0.8rem;
+    color: rgba(200,133,58,0.4);
+    margin-left: 10px;
+    letter-spacing: 0.2em;
+  }
+  .wp-section p {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.96rem;
+    line-height: 2.1;
+    color: rgba(245,237,224,0.6);
+    margin-bottom: 16px;
+  }
+  .wp-section p.zh {
+    font-family: 'Noto Serif TC', serif;
+    font-style: normal;
+    font-weight: 300;
+    font-size: 0.82rem;
+    color: rgba(200,133,58,0.35);
+    letter-spacing: 0.15em;
+    line-height: 2.3;
+  }
+
+  .wp-pullquote {
+    border-left: 2px solid rgba(200,133,58,0.25);
+    padding: 16px 24px;
+    margin: 30px 0;
+    background: rgba(200,133,58,0.03);
+  }
+  .wp-pullquote p {
+    font-family: 'Noto Serif TC', serif;
+    font-style: normal;
+    font-weight: 900;
+    font-size: 1.1rem;
+    color: rgba(200,133,58,0.7);
+    letter-spacing: 0.15em;
+    line-height: 1.8;
+    margin: 0;
+  }
+  .wp-pullquote span {
+    display: block;
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.72rem;
+    color: rgba(245,237,224,0.2);
+    letter-spacing: 0.2em;
+    margin-top: 8px;
+  }
+
+  .wp-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+  }
+  .wp-table th {
+    font-family: 'Cinzel', serif;
+    font-size: 0.55rem;
+    letter-spacing: 0.4em;
+    color: rgba(200,133,58,0.5);
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(200,133,58,0.12);
+    text-transform: uppercase;
+  }
+  .wp-table td {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.85rem;
+    color: rgba(245,237,224,0.5);
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(200,133,58,0.05);
+  }
+  .wp-table tr:hover td { color: rgba(245,237,224,0.75); background: rgba(200,133,58,0.02); }
+
+  .wp-phase-list {
+    list-style: none;
+    margin: 20px 0;
+  }
+  .wp-phase-list li {
+    display: flex;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(200,133,58,0.06);
+    align-items: flex-start;
+  }
+  .wp-phase-list li .phase-num {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    color: rgba(200,133,58,0.4);
+    letter-spacing: 0.2em;
+    min-width: 50px;
+    padding-top: 2px;
+  }
+  .wp-phase-list li .phase-text {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.88rem;
+    color: rgba(245,237,224,0.55);
+    line-height: 1.7;
+  }
+  .wp-phase-list li .phase-text strong {
+    display: block;
+    font-family: 'Noto Serif TC', serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 0.78rem;
+    color: rgba(245,237,224,0.8);
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+  }
+
+  /* ══════════════════════════════════════════
+     FOOTER
+  ══════════════════════════════════════════ */
+  footer {
+    position: relative;
+    z-index: 10;
+    padding: 30px 40px;
+    border-top: 1px solid rgba(200,133,58,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .footer-left {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 0.65rem;
+    color: rgba(200,133,58,0.25);
+    letter-spacing: 0.25em;
+  }
+  .footer-center {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.62rem;
+    color: rgba(245,237,224,0.12);
+    letter-spacing: 0.2em;
+    text-align: center;
+  }
+  .footer-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .footer-right a {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    color: rgba(245,237,224,0.15);
+    text-decoration: none;
+    transition: color 0.3s;
+    cursor: pointer;
+  }
+  .footer-right a:hover { color: rgba(200,133,58,0.5); }
+
+  .orynth-badge {
+    display: flex;
+    align-items: center;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+  }
+  .orynth-badge:hover { opacity: 1; }
+  .orynth-badge img { height: 18px; }
+
+  /* ══════════════════════════════════════════
+     SHARED ANIMATIONS
+  ══════════════════════════════════════════ */
   @keyframes rise {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* Scrolling HK characters on side */
-  .side-chars {
+  .fade-in {
+    animation: rise 1.2s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  .fade-in-delay { animation-delay: 0.15s; }
+  .fade-in-delay-2 { animation-delay: 0.3s; }
+  .fade-in-delay-3 { animation-delay: 0.45s; }
+
+  /* ══════════════════════════════════════════
+     RESPONSIVE
+  ══════════════════════════════════════════ */
+  @media (max-width: 600px) {
+    nav { padding: 16px 20px; }
+    .nav-links { gap: 20px; }
+    .values-grid { grid-template-columns: repeat(2, 1fr); }
+    .team-grid { grid-template-columns: 1fr; }
+    footer { flex-direction: column; text-align: center; }
+  }
+
+  /* ══════════════════════════════════════════
+     AMBIENT GLOW
+  ══════════════════════════════════════════ */
+  .ambient-glow {
     position: fixed;
-    top: 50%;
-    transform: translateY(-50%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(ellipse, rgba(200,133,58,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Bilingual label */
+  .bilingual {
+    display: flex;
+    gap: 12px;
+    align-items: baseline;
+    margin-bottom: 32px;
+  }
+  .bilingual .zh {
     font-family: 'Noto Serif TC', serif;
     font-weight: 900;
-    font-size: 0.75rem;
-    letter-spacing: 0.5em;
-    writing-mode: vertical-rl;
-    color: rgba(200,133,58,0.08);
-    pointer-events: none;
-    z-index: 2;
-    line-height: 1;
+    font-size: 2rem;
+    color: var(--amber);
+    letter-spacing: 0.2em;
+    filter: drop-shadow(0 0 16px rgba(200,133,58,0.3));
   }
-  .side-chars.left { left: 40px; }
-  .side-chars.right { right: 40px; direction: ltr; }
-
-  /* Error */
-  .error-text {
-    font-family: 'IM Fell English', serif;
-    font-style: italic;
-    font-size: 0.82rem;
-    color: rgba(180,80,60,0.7);
-    text-align: center;
-    margin-top: 12px;
-    display: none;
-    letter-spacing: 0.1em;
+  .bilingual .en {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.4em;
+    color: rgba(245,237,224,0.2);
+    text-transform: uppercase;
   }
-  .error-text.show { display: block; }
 </style>
 </head>
 <body>
 
 <!-- Rain -->
 <canvas id="rain"></canvas>
+<div class="grain"></div>
+<div class="ambient-glow"></div>
 
-<!-- Decorative corners & frame -->
-<div class="window-frame"></div>
+<!-- Corners -->
 <div class="corner tl"></div>
 <div class="corner tr"></div>
 <div class="corner bl"></div>
 <div class="corner br"></div>
 
-<!-- Side characters -->
+<!-- Side chars -->
 <div class="side-chars left">香港之夜・雨聲・茶香</div>
 <div class="side-chars right">一字一世界・萬語皆有情</div>
 
 <!-- Teacup & steam -->
 <div class="teacup">
-  <svg width="48" height="40" viewBox="0 0 48 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="48" height="40" viewBox="0 0 48 40" fill="none">
     <path d="M6 16 Q8 34 24 34 Q40 34 42 16 Z" stroke="#c8853a" stroke-width="1.5" fill="none"/>
     <path d="M42 20 Q50 20 50 26 Q50 32 42 30" stroke="#c8853a" stroke-width="1.5" fill="none"/>
     <line x1="4" y1="16" x2="44" y2="16" stroke="#c8853a" stroke-width="1.5"/>
@@ -441,9 +939,21 @@
   <span class="steam-line"></span>
 </div>
 
-<!-- Main scene -->
-<div class="scene">
+<!-- ── Navigation ── -->
+<nav>
+  <div class="nav-logo" onclick="showPage('home')">一字茶</div>
+  <ul class="nav-links">
+    <li><a onclick="showPage('home')" id="nav-home" class="active">Tea Room</a></li>
+    <li><a onclick="showPage('about')" id="nav-about">About</a></li>
+    <li><a onclick="showPage('team')" id="nav-team">Team</a></li>
+    <li><a onclick="showPage('whitepaper')" id="nav-whitepaper">Whitepaper</a></li>
+  </ul>
+</nav>
 
+<!-- ═══════════════════════════════════════
+     HOME PAGE
+═══════════════════════════════════════ -->
+<div class="page active" id="page-home">
   <div class="title-block">
     <span class="title-chinese">一字茶</span>
     <span class="title-pinyin">Yat Ji Cha</span>
@@ -481,8 +991,337 @@
   </div>
 
   <button class="reset-btn" id="resetBtn">— 再飲一杯 —</button>
+</div>
+
+<!-- ═══════════════════════════════════════
+     ABOUT PAGE
+═══════════════════════════════════════ -->
+<div class="page" id="page-about">
+  <div class="page-header fade-in">
+    <span class="zh">關於</span>
+    <span class="en">About Yat Ji Cha</span>
+    <span class="hk">一字・一杯・一真相</span>
+  </div>
+
+  <div class="story-section fade-in fade-in-delay">
+    <h3>· Origin · 緣起 ·</h3>
+    <p>
+      Somewhere in the fog of Sheung Wan, between a dim sum cart and the last tram of the evening, there exists a tea house that does not appear on any map. The Old Man who runs it does not advertise. He does not need to.
+    </p>
+    <p>
+      People come when they are troubled. Or restless. Or when they have a feeling they cannot name. They push open the door, sit down, and speak one word. Just one. And the Old Man listens — not to the word, but to what lives beneath it.
+    </p>
+    <p class="zh-text">
+      一字茶，不是飲品，而是對話。不是答案，而是一個空間——讓你的感受有地方落腳。
+    </p>
+  </div>
+
+  <div class="divider-ornament"><span>茶</span></div>
+
+  <div class="story-section fade-in fade-in-delay-2">
+    <h3>· What It Is · 這是什麼 ·</h3>
+    <p>
+      Yat Ji Cha is an AI-powered contemplative experience rooted in Cantonese tea culture. You arrive with a single word — a feeling, a name, a question — and receive in return a quiet reflection brewed from old Hong Kong wisdom, delivered with the warmth of a late-night tea house.
+    </p>
+    <p>
+      It is not therapy. It is not fortune-telling. It is a pause. A breath. The kind of conversation that used to happen between strangers over pu-erh at 11pm on a rainy Tuesday.
+    </p>
+    <p class="zh-text">
+      你帶一個字來，我們把它泡開，看看裡面藏著什麼。
+    </p>
+  </div>
+
+  <div class="divider-ornament"><span>心</span></div>
+
+  <div class="story-section fade-in fade-in-delay-3">
+    <h3>· Our Values · 我們的價值觀 ·</h3>
+    <div class="values-grid">
+      <div class="value-item">
+        <span class="zh">靜</span>
+        <span class="label">Stillness</span>
+      </div>
+      <div class="value-item">
+        <span class="zh">誠</span>
+        <span class="label">Honesty</span>
+      </div>
+      <div class="value-item">
+        <span class="zh">情</span>
+        <span class="label">Feeling</span>
+      </div>
+      <div class="value-item">
+        <span class="zh">根</span>
+        <span class="label">Roots</span>
+      </div>
+      <div class="value-item">
+        <span class="zh">緣</span>
+        <span class="label">Connection</span>
+      </div>
+      <div class="value-item">
+        <span class="zh">味</span>
+        <span class="label">Taste</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     TEAM PAGE
+═══════════════════════════════════════ -->
+<div class="page" id="page-team">
+  <div class="page-header fade-in">
+    <span class="zh">團隊</span>
+    <span class="en">The People Behind The Tea</span>
+    <span class="hk">釀茶之人</span>
+  </div>
+
+  <div class="team-grid">
+
+    <!-- Founder -->
+    <div class="team-card fade-in">
+      <div class="founder-badge">Founder</div>
+      <div class="team-avatar">燕</div>
+      <span class="team-name-zh">燕錦峰</span>
+      <span class="team-name-en">YanZingBit</span>
+      <span class="team-role">Founder · Brewer of Words</span>
+      <p class="team-bio">
+        Born between the harbour and the hills. Builds things that feel human. Believes the best conversations start with a single word and end with a refilled cup.
+      </p>
+      <div class="team-social">
+        <a href="https://x.com/YanZingBit" target="_blank">𝕏 Twitter</a>
+      </div>
+    </div>
+
+    <!-- HK Team Members (placeholder) -->
+    <div class="team-card fade-in fade-in-delay">
+      <div class="team-avatar">陳</div>
+      <span class="team-name-zh">陳詠琳</span>
+      <span class="team-name-en">Chan Wing Lam</span>
+      <span class="team-role">Head of Design · 視覺設計總監</span>
+      <p class="team-bio">
+        From Kennedy Town. Trained in calligraphy before pixels. Believes every font choice is a philosophical statement about the self.
+      </p>
+      <div class="team-social">
+        <a href="#" onclick="return false;">𝕏 Twitter</a>
+      </div>
+    </div>
+
+    <div class="team-card fade-in fade-in-delay-2">
+      <div class="team-avatar">梁</div>
+      <span class="team-name-zh">梁思浩</span>
+      <span class="team-name-en">Leung Si Ho</span>
+      <span class="team-role">AI Architect · 人工智能架構師</span>
+      <p class="team-bio">
+        Grew up in Kowloon City. Trained on philosophy and machine learning in equal measure. Writes prompts the way a poet writes verses — with care and revision.
+      </p>
+      <div class="team-social">
+        <a href="#" onclick="return false;">𝕏 Twitter</a>
+      </div>
+    </div>
+
+    <div class="team-card fade-in fade-in-delay-3">
+      <div class="team-avatar">鄭</div>
+      <span class="team-name-zh">鄭慧賢</span>
+      <span class="team-name-en">Cheng Wai Hin</span>
+      <span class="team-role">Culture Lead · 文化總監</span>
+      <p class="team-bio">
+        Grew up listening to Canto-pop and reading Tang poetry in Sham Shui Po. Keeper of the tea house's soul. Ensures nothing we build forgets where it came from.
+      </p>
+      <div class="team-social">
+        <a href="#" onclick="return false;">𝕏 Twitter</a>
+      </div>
+    </div>
+
+    <div class="team-card fade-in fade-in-delay">
+      <div class="team-avatar">吳</div>
+      <span class="team-name-zh">吳嘉駿</span>
+      <span class="team-name-en">Ng Ka Chun</span>
+      <span class="team-role">Frontend Engineer · 前端工程師</span>
+      <p class="team-bio">
+        From Tai Po. Obsessed with motion, rain effects, and the precise opacity of things at 3am. If it's beautiful and runs in a browser, he made it.
+      </p>
+      <div class="team-social">
+        <a href="#" onclick="return false;">𝕏 Twitter</a>
+      </div>
+    </div>
+
+    <div class="team-card fade-in fade-in-delay-2">
+      <div class="team-avatar">何</div>
+      <span class="team-name-zh">何秀雯</span>
+      <span class="team-name-en">Ho Sau Man</span>
+      <span class="team-role">Community · 社群建立者</span>
+      <p class="team-bio">
+        Raised in Wan Chai. Former secondary school teacher. Understands that language is never just language — it carries everything that was ever left unsaid.
+      </p>
+      <div class="team-social">
+        <a href="#" onclick="return false;">𝕏 Twitter</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     WHITEPAPER PAGE
+═══════════════════════════════════════ -->
+<div class="page" id="page-whitepaper">
+
+  <div class="page-header fade-in">
+    <span class="zh">白皮書</span>
+    <span class="en">Whitepaper · 白皮書</span>
+    <span class="hk">一字茶：語言・情感・人工智能</span>
+  </div>
+
+  <div class="wp-section fade-in">
+    <h2>I · Abstract</h2>
+    <h3>The Philosophy of the Single Word <span class="zh-sub">一字哲學</span></h3>
+    <p>
+      Yat Ji Cha (一字茶, "One Character Tea") is a contemplative AI experience rooted in Cantonese cultural heritage. Users submit a single word — a feeling, an emotion, a name — and receive in return a reflective response crafted to evoke the wisdom of a Hong Kong tea house. This document outlines the design philosophy, technical architecture, cultural framework, and roadmap of the project.
+    </p>
+    <p class="zh">
+      一字茶係一個沉思性人工智能體驗，植根於廣東文化遺產。用戶提交一個字——一種感受、一種情緒、一個名字——並以香港茶室智慧風格的反思性回應作為回報。
+    </p>
+  </div>
+
+  <div class="wp-pullquote">
+    <p>「一字見心，萬語難言。」</p>
+    <span>One character reveals the heart — ten thousand words cannot.</span>
+  </div>
+
+  <div class="wp-section fade-in fade-in-delay">
+    <h2>II · Problem Statement</h2>
+    <h3>The Loss of Slow Conversation <span class="zh-sub">慢語言的失落</span></h3>
+    <p>
+      Modern digital communication is fast, surface-level, and optimised for engagement over depth. Emoji replace nuance. Notifications replace contemplation. In Hong Kong specifically, a city with one of the world's richest oral traditions — Cantonese, a tonal language with nine distinct tones — the texture of spoken feeling is being eroded by shorthand.
+    </p>
+    <p>
+      There exists a gap between what people feel and what they can express. Yat Ji Cha is an attempt to fill that gap, not with more words, but with a single, carefully chosen one.
+    </p>
+    <p class="zh">
+      現代數位通訊快速、表面，並針對參與度而非深度進行優化。表情符號取代了細微差別。通知取代了沉思。一字茶嘗試填補這個空白。
+    </p>
+  </div>
+
+  <div class="wp-section fade-in fade-in-delay-2">
+    <h2>III · Design Principles</h2>
+    <h3>How the Tea House Thinks <span class="zh-sub">茶室的思考方式</span></h3>
+    <p>
+      The AI persona — the Old Man of the tea house — is designed around three constraints: brevity, warmth, and cultural specificity. Every response must be short enough to fit on a paper receipt. Every response must feel like it was spoken, not written. Every response must carry the scent of Sheung Wan on a rainy evening.
+    </p>
+    <table class="wp-table">
+      <thead>
+        <tr>
+          <th>Principle</th>
+          <th>原則</th>
+          <th>Implementation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Brevity</td>
+          <td>簡潔</td>
+          <td>Responses capped at three sentences</td>
+        </tr>
+        <tr>
+          <td>Cultural Grounding</td>
+          <td>文化根基</td>
+          <td>Cantonese proverbs in every response</td>
+        </tr>
+        <tr>
+          <td>Emotional Safety</td>
+          <td>情感安全</td>
+          <td>No advice — only reflection</td>
+        </tr>
+        <tr>
+          <td>Aesthetic Coherence</td>
+          <td>美學一致性</td>
+          <td>Rain, ink, amber, silence</td>
+        </tr>
+        <tr>
+          <td>Language Duality</td>
+          <td>語言雙重性</td>
+          <td>Chinese characters + English prose</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="wp-section fade-in fade-in-delay-3">
+    <h2>IV · Technical Architecture</h2>
+    <h3>The Kitchen Behind the Counter <span class="zh-sub">櫃台後面的廚房</span></h3>
+    <p>
+      Yat Ji Cha is a fully client-side web application. There is no backend server, no database, and no persistent storage of user inputs. The AI responses are generated in real-time via the Anthropic Claude API, using a carefully engineered system prompt that instructs the model to assume the persona of the Old Man and respond in a structured three-part format.
+    </p>
+    <p>
+      The visual experience — rain canvas, amber glows, Noto Serif typography — is constructed entirely in HTML, CSS, and vanilla JavaScript. No frameworks. No libraries. The philosophy of the interface mirrors the philosophy of the product: minimal, direct, present.
+    </p>
+    <p class="zh">
+      一字茶係一個完全客戶端的網頁應用程式。沒有後端伺服器，沒有數據庫，也沒有用戶輸入的持久存儲。
+    </p>
+  </div>
+
+  <div class="wp-section fade-in fade-in-delay">
+    <h2>V · Cultural Framework</h2>
+    <h3>Tea House as Sacred Space <span class="zh-sub">茶室作為神聖空間</span></h3>
+    <p>
+      In Cantonese culture, the tea house (茶樓) is not merely a restaurant. It is a civic institution. A space of democracy — where a factory worker and a banker share the same dim sum cart. Where the elderly teach the young how to knock on the table twice to say thank you without speaking. Where arguments are settled and alliances are made over pots of pu-erh.
+    </p>
+    <p>
+      Yat Ji Cha seeks to carry this spirit into digital space. Not as nostalgia, but as a living practice. A reminder that depth of feeling deserves space and slowness.
+    </p>
+    <p class="zh">
+      在廣東文化中，茶樓不僅僅是餐廳。它是一個公民機構。一字茶試圖將這種精神帶入數位空間。
+    </p>
+  </div>
+
+  <div class="wp-section fade-in fade-in-delay-2">
+    <h2>VI · Roadmap</h2>
+    <h3>What Steeps Next <span class="zh-sub">下一步</span></h3>
+    <ul class="wp-phase-list">
+      <li>
+        <span class="phase-num">Phase I</span>
+        <span class="phase-text"><strong>Launch · 啟動</strong>Single-word contemplation experience. Web-only. English + Traditional Chinese.</span>
+      </li>
+      <li>
+        <span class="phase-num">Phase II</span>
+        <span class="phase-text"><strong>Memory · 記憶</strong>Optional journal — a private book of words you have brought to the tea house over time.</span>
+      </li>
+      <li>
+        <span class="phase-num">Phase III</span>
+        <span class="phase-text"><strong>Community · 社群</strong>Public wall of words — anonymised, visual, allowing others to see what the city is feeling.</span>
+      </li>
+      <li>
+        <span class="phase-num">Phase IV</span>
+        <span class="phase-text"><strong>Dialect Expansion · 方言擴展</strong>Support for Cantonese romanisation (Jyutping), Mandarin, and eventually other Chinese dialects.</span>
+      </li>
+      <li>
+        <span class="phase-num">Phase V</span>
+        <span class="phase-text"><strong>Physical Presence · 實體空間</strong>Pop-up tea house installations in Hong Kong, combining the digital experience with actual tea service.</span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="wp-pullquote">
+    <p>「未飲先醉，係因為心先到。」</p>
+    <span>Drunk before the first sip — because the heart arrived first. // 廣東諺語</span>
+  </div>
 
 </div>
+
+<!-- ═══════════════════════════════════════
+     FOOTER (shared)
+═══════════════════════════════════════ -->
+<footer>
+  <div class="footer-left">一字茶 · Yat Ji Cha · © 2025</div>
+  <div class="footer-center">Hong Kong · 香港 · 釀於雨夜</div>
+  <div class="footer-right">
+    <a onclick="showPage('whitepaper')">Whitepaper</a>
+    <a onclick="showPage('about')">About</a>
+    <a href="https://x.com/YanZingBit" target="_blank">𝕏 Founder</a>
+    <a class="orynth-badge" href="https://orynth.dev/projects/yatzicha" target="_blank">
+      <img src="https://orynth.dev/api/badge/yatzicha?theme=light&style=default" alt="Featured on Orynth" />
+    </a>
+  </div>
+</footer>
 
 <script>
 // ── Rain ──────────────────────────────────────────────
@@ -522,27 +1361,54 @@ function drawRain() {
     ctx.lineWidth = 0.6;
     ctx.stroke();
     d.y += d.speed;
-    if (d.y > canvas.height) {
-      d.y = -d.len;
-      d.x = Math.random() * canvas.width;
-    }
+    if (d.y > canvas.height) { d.y = -d.len; d.x = Math.random() * canvas.width; }
   });
   requestAnimationFrame(drawRain);
 }
 drawRain();
 
-// ── Logic ──────────────────────────────────────────────
-const wordInput   = document.getElementById('wordInput');
-const submitBtn   = document.getElementById('submitBtn');
-const loading     = document.getElementById('loading');
-const responseArea= document.getElementById('responseArea');
-const responseZh  = document.getElementById('responseZh');
-const responseText= document.getElementById('responseText');
+// ── Page Navigation ──────────────────────────────────
+function showPage(id) {
+  // Hide all pages
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+
+  const page = document.getElementById('page-' + id);
+  if (page) {
+    page.classList.add('active');
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  const navLink = document.getElementById('nav-' + id);
+  if (navLink) navLink.classList.add('active');
+
+  // Restart animations
+  page.querySelectorAll('.fade-in').forEach(el => {
+    el.style.animation = 'none';
+    el.offsetHeight; // reflow
+    el.style.animation = '';
+  });
+
+  // If returning to home, ensure layout is flex-column centered
+  if (id === 'home') {
+    page.style.display = 'flex';
+    setTimeout(() => wordInput.focus(), 300);
+  }
+}
+
+// ── Tea Room Logic ────────────────────────────────────
+const wordInput    = document.getElementById('wordInput');
+const submitBtn    = document.getElementById('submitBtn');
+const loading      = document.getElementById('loading');
+const responseArea = document.getElementById('responseArea');
+const responseZh   = document.getElementById('responseZh');
+const responseText = document.getElementById('responseText');
 const responseProverb = document.getElementById('responseProverb');
-const resetBtn    = document.getElementById('resetBtn');
-const errorText   = document.getElementById('errorText');
-const promptText  = document.getElementById('promptText');
-const inputArea   = document.getElementById('inputArea');
+const resetBtn     = document.getElementById('resetBtn');
+const errorText    = document.getElementById('errorText');
+const promptText   = document.getElementById('promptText');
+const inputArea    = document.getElementById('inputArea');
 
 function countWords(str) {
   return str.trim().split(/\s+/).filter(Boolean).length;
@@ -552,7 +1418,6 @@ async function handleSubmit() {
   const word = wordInput.value.trim();
   if (!word) return;
 
-  // Validate: one word only
   if (countWords(word) > 1) {
     errorText.classList.add('show');
     wordInput.focus();
@@ -560,7 +1425,6 @@ async function handleSubmit() {
   }
   errorText.classList.remove('show');
 
-  // Hide input, show loading
   inputArea.style.opacity = '0';
   inputArea.style.pointerEvents = 'none';
   promptText.style.opacity = '0';
@@ -590,22 +1454,19 @@ Use exactly this format, nothing else outside it.`,
     const data = await response.json();
     const raw = data.content?.[0]?.text || '';
 
-    // Parse response
     const hanziMatch   = raw.match(/HANZI:\s*(.+)/);
     const responsMatch = raw.match(/RESPONSE:\s*([\s\S]+?)(?=PROVERB:|$)/);
     const proverbMatch = raw.match(/PROVERB:\s*(.+)/);
 
-    const hanzi   = hanziMatch   ? hanziMatch[1].trim()   : word;
-    const resp    = responsMatch ? responsMatch[1].trim()  : '';
-    const proverb = proverbMatch ? proverbMatch[1].trim()  : '';
+    const hanzi   = hanziMatch   ? hanziMatch[1].trim()  : word;
+    const resp    = responsMatch ? responsMatch[1].trim() : '';
+    const proverb = proverbMatch ? proverbMatch[1].trim() : '';
 
     loading.classList.remove('show');
-
     responseZh.textContent = hanzi;
     responseText.textContent = resp;
     responseProverb.textContent = proverb;
 
-    // Animate in
     setTimeout(() => {
       responseArea.classList.add('visible');
       resetBtn.classList.add('show');
