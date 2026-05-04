@@ -1,77 +1,290 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="zh-HK">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Builder Profile — Product Ready</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>yatjizha 命理館</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background: #f4f4f4;
-        color: #222;
-    }
-    header {
-        background: #111;
-        color: #fff;
-        padding: 28px;
-        text-align: center;
-    }
-    header h1 { margin: 0; font-size: 32px; }.container {
-    max-width: 900px;
-    margin: 40px auto;
-    background: #fff;
-    padding: 40px;
-    border-radius: 14px;
-    box-shadow: 0 4px 22px rgba(0,0,0,0.08);
-}
-h2 { margin-top: 0; font-size: 26px; }
-p { line-height: 1.6; font-size: 16px; }
 
-.profile-box {
-    padding: 20px;
-    background: #fafafa;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    margin-top: 20px;
+/* ===== BACKGROUND ===== */
+body {
+  margin:0;
+  color:#e5e5e5;
+  background:
+    radial-gradient(circle at 20% 20%, #ffcc66, transparent 40%),
+    radial-gradient(circle at 80% 50%, #a855f7, transparent 40%),
+    radial-gradient(circle at 50% 80%, #ff4d4d, transparent 40%),
+    #0b0b0b;
+  overflow-x:hidden;
 }
 
-footer {
-    text-align: center;
-    padding: 30px 0;
-    margin-top: 40px;
-    background: #111;
-    color: #fff;
+/* ===== PARTICLES ===== */
+.particle {
+  position: fixed;
+  width: 5px;
+  height: 5px;
+  background: rgba(255,200,100,0.8);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: floatUp 8s linear infinite;
 }
 
-a { color: #0076ff; text-decoration: none; font-weight: bold; }
+@keyframes floatUp {
+  0% { transform: translateY(100vh); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translateY(-20vh); opacity: 0; }
+}
+
+/* ===== UI ===== */
+.section{ border-top:1px solid rgba(255,255,255,0.08); }
+.fade-in{ animation:fade .8s ease; }
+@keyframes fade{ from{opacity:0} to{opacity:1} }
+
+/* ===== CARD ===== */
+canvas{
+  border-radius:20px;
+  box-shadow:0 0 40px rgba(255,200,100,0.3);
+}
 
 </style>
 </head>
+
 <body>
-<header>
-    <h1>Builder Profile</h1>
-</header><div class="container">
-    <h2>About the Builder</h2>
-    <div class="profile-box">
-        <p><strong>(English)</strong><br>
-        Creating on-chain tools, modular Web3 utilities, and execution‑first micro‑products designed for scalability and clean user experience. Focused on production‑ready architecture, rapid iteration, and composability across ecosystems.
-        </p><p><strong>(中文)</strong><br>
-    构建链上工具、模块化 Web3 实用组件与高执行力的微型产品，专注可扩展架构、快速迭代与跨生态可组合性，打造真正可投入生产环境的功能体验。
-    </p>
 
-    <p><strong>Core Focus Areas</strong><br>
-    — On‑chain automation & execution<br>
-    — Minimal and scalable product architecture<br>
-    — Web3‑native interaction flows<br>
-    — Production‑ready utility development
-    </p>
+<!-- HEADER -->
+<header class="sticky top-0 backdrop-blur border-b border-white/10">
+  <div class="max-w-6xl mx-auto flex justify-between p-4 text-sm text-gray-400">
+    <div>yatjizha 命理館</div>
+    <nav class="space-x-4">
+      <a href="#about">關於</a>
+      <a href="#how">使用方式</a>
+      <a href="#whitepaper">白皮書</a>
+      <a href="#team">團隊</a>
+    </nav>
+  </div>
+</header>
 
-    <p><strong>Builder Reference</strong><br>
-    <a href="https://x.com/shopimargaret" target="_blank">@shopimargaret</a></p>
+<!-- HERO -->
+<section class="text-center py-20">
+  <h1 class="text-2xl tracking-widest">Symbolic Identity System</h1>
+  <p class="text-gray-400 mt-2">生成你的命盤身份</p>
+</section>
+
+<!-- INPUT -->
+<section class="text-center py-10">
+
+  <input type="text" id="birth-date" placeholder="YYYY-MM-DD"
+  class="text-black px-4 py-2 rounded w-52 text-center">
+
+  <div class="mt-4 space-x-2">
+    <button onclick="generateReading()" class="px-6 py-2 bg-white text-black rounded-full">
+      Generate
+    </button>
+    <button onclick="shareTwitter()" class="px-4 py-2 border rounded-full">
+      Share X
+    </button>
+  </div>
+
+  <div id="loading" class="mt-6 text-gray-400"></div>
+
+  <div id="result-box" class="hidden mt-10 fade-in max-w-xl mx-auto">
+    <pre id="reading" class="text-left whitespace-pre-wrap"></pre>
+
+    <div class="mt-6 space-x-2">
+      <button onclick="generateCard()" class="border px-4 py-2">Generate Card</button>
+      <button onclick="downloadCard()" class="border px-4 py-2">Download</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- CANVAS -->
+<div class="flex justify-center mt-10">
+  <canvas id="cardCanvas" width="420" height="640" class="hidden"></canvas>
 </div>
 
-</div><footer>
-    <p>Builder Profile — Fully Product Ready</p>
-</footer></body>
+<!-- ABOUT -->
+<section id="about" class="section py-20 text-center max-w-3xl mx-auto">
+  <h2 class="text-2xl mb-4">關於</h2>
+  <p class="text-gray-400 leading-relaxed">
+    yatjizha 並唔只係一個命理工具，而係一種數碼身份系統。
+    我哋將時間轉化為象徵語言，讓每個人可以理解自己所處的位置。
+  </p>
+</section>
+
+<!-- HOW -->
+<section id="how" class="section py-20 text-center max-w-3xl mx-auto">
+  <h2 class="text-2xl mb-6">使用方式</h2>
+  <p class="text-gray-400">輸入出生日期 → 系統解析 → 生成身份卡 → 分享</p>
+</section>
+
+<!-- WHITEPAPER -->
+<section id="whitepaper" class="section py-20 text-center max-w-3xl mx-auto">
+  <h2 class="text-2xl mb-4">白皮書</h2>
+  <p class="text-gray-400 leading-relaxed">
+    系統基於時間結構（年、月、日）生成唯一識別，
+    並透過演算法轉換為心理與象徵層面的敘事。
+    未來將擴展為跨平台身份系統。
+  </p>
+</section>
+
+<!-- TEAM -->
+<section id="team" class="section py-20 text-center">
+  <h2 class="text-2xl mb-6">團隊</h2>
+
+  <div class="space-y-2 text-gray-400">
+
+    <p>Shopi Margaret — Builder</p>
+    <p>Yan Zing — Founder</p>
+    <p>Li Chen — System Architect</p>
+    <p>Wong Kai — Design Curator</p>
+  </div>
+
+</section>
+
+<!-- NO BADGE ANYMORE -->
+<footer class="text-center py-10 text-gray-600 text-sm">
+  © yatjizha — symbolic identity system
+</footer>
+
+<script>
+
+/* ===== PARTICLES ===== */
+window.onload = () => {
+  for(let i=0;i<30;i++){
+    const p=document.createElement("div");
+    p.className="particle";
+    p.style.left=Math.random()*100+"vw";
+    p.style.animationDelay=Math.random()*5+"s";
+    document.body.appendChild(p);
+  }
+}
+
+/* ===== ZODIAC ===== */
+function getZodiac(m,d){
+if((m==3&&d>=21)||(m==4&&d<=19)) return "白羊座";
+if((m==4&&d>=20)||(m==5&&d<=20)) return "金牛座";
+if((m==5&&d>=21)||(m==6&&d<=21)) return "雙子座";
+if((m==6&&d>=22)||(m==7&&d<=22)) return "巨蟹座";
+if((m==7&&d>=23)||(m==8&&d<=22)) return "獅子座";
+if((m==8&&d>=23)||(m==9&&d<=22)) return "處女座";
+if((m==9&&d>=23)||(m==10&&d<=23)) return "天秤座";
+if((m==10&&d>=24)||(m==11&&d<=22)) return "天蠍座";
+if((m==11&&d>=23)||(m==12&&d<=21)) return "人馬座";
+if((m==12&&d>=22)||(m==1&&d<=19)) return "山羊座";
+if((m==1&&d>=20)||(m==2&&d<=18)) return "水瓶座";
+return "雙魚座";
+}
+
+/* ===== AI ===== */
+function generateReading(){
+const val=document.getElementById("birth-date").value;
+
+if(!val || !val.includes("-")){
+  alert("Format: YYYY-MM-DD");
+  return;
+}
+
+const [y,m,day]=val.split("-").map(Number);
+
+const seed=y+m*31+day*17;
+
+const names=["Echo Pattern","Silent Axis","Fractured Flow","Hidden Core","Dual Mirror"];
+const types=["流動型","結構型","分裂型","轉換型","潛伏型"];
+const phases=["啟動期","重組期","擴張期","停滯期","轉化期"];
+
+const name=names[seed%5];
+const type=types[(seed+2)%5];
+const phase=phases[(seed+4)%5];
+const zodiac=getZodiac(m,day);
+
+const text=`識別名稱：${name}
+
+星座：${zodiac}
+能量類型：${type}
+
+當前狀態：
+${phase}`;
+
+loading.innerText="解析中...";
+
+setTimeout(()=>{
+  loading.innerText="";
+  document.getElementById("result-box").classList.remove("hidden");
+  reading.innerText=text;
+  window.identity={name,type,phase,zodiac};
+},1200);
+}
+
+/* ===== CARD ===== */
+function generateCard(){
+const c=document.getElementById("cardCanvas");
+const ctx=c.getContext("2d");
+
+c.classList.remove("hidden");
+
+const g=ctx.createLinearGradient(0,0,400,600);
+g.addColorStop(0,"#ffcc66");
+g.addColorStop(1,"#a855f7");
+
+ctx.fillStyle=g;
+ctx.fillRect(0,0,420,640);
+
+ctx.fillStyle="rgba(0,0,0,0.6)";
+ctx.fillRect(0,0,420,640);
+
+ctx.fillStyle="#fff";
+ctx.font="18px monospace";
+ctx.fillText("YATJIZHA",150,60);
+
+ctx.font="16px monospace";
+ctx.fillText(window.identity.name,100,130);
+ctx.fillText(window.identity.zodiac,150,190);
+ctx.fillText(window.identity.type,120,230);
+
+ctx.fillText("Phase:",170,320);
+ctx.fillText(window.identity.phase,140,350);
+
+ctx.strokeStyle="rgba(255,255,255,0.2)";
+ctx.strokeRect(20,20,380,600);
+
+window.cardImage = c.toDataURL();
+}
+
+/* ===== DOWNLOAD ===== */
+function downloadCard(){
+const c=document.getElementById("cardCanvas");
+const link=document.createElement("a");
+link.download="yatjizha-card.png";
+link.href=c.toDataURL();
+link.click();
+}
+
+/* ===== SHARE ON X ===== */
+function shareTwitter(){
+if(!window.identity){
+  alert("Generate first");
+  return;
+}
+
+const text = encodeURIComponent(
+`My identity on yatjizha:
+
+${window.identity.name}
+${window.identity.zodiac}
+${window.identity.type}
+Phase: ${window.identity.phase}
+
+#yatjizha`
+);
+
+window.open("https://twitter.com/intent/tweet?text="+text,"_blank");
+}
+
+</script>
+
+</body>
 </html>
